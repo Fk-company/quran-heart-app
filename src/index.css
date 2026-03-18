@@ -1,96 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 36 33% 99%;
+    --foreground: 220 26% 14%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 26% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 220 26% 14%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 162 90% 16%;
+    --primary-foreground: 36 33% 99%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 36 33% 96%;
+    --secondary-foreground: 162 90% 16%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 32 88% 37%;
+    --accent-foreground: 36 33% 99%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 162 90% 16%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
+    --sidebar-primary: 162 90% 16%;
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 162 90% 16%;
 
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Custom tokens */
+    --gold: 32 88% 37%;
+    --gold-light: 36 60% 92%;
+    --emerald-dark: 162 90% 12%;
+    --emerald-light: 162 40% 95%;
+    --parchment: 36 33% 99%;
+    --surface: 0 0% 100%;
+    --nav-height: 4rem;
+    --player-height: 3.5rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
+    --background: 220 26% 8%;
+    --foreground: 36 33% 95%;
+    --card: 220 26% 12%;
+    --card-foreground: 36 33% 95%;
+    --popover: 220 26% 12%;
+    --popover-foreground: 36 33% 95%;
+    --primary: 162 60% 40%;
+    --primary-foreground: 220 26% 8%;
+    --secondary: 220 20% 18%;
+    --secondary-foreground: 36 33% 95%;
+    --muted: 220 20% 18%;
+    --muted-foreground: 220 14% 60%;
+    --accent: 32 88% 45%;
+    --accent-foreground: 220 26% 8%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 220 20% 20%;
+    --input: 220 20% 20%;
+    --ring: 162 60% 40%;
   }
 }
 
@@ -100,6 +85,66 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+  }
+}
+
+@layer components {
+  .quran-text {
+    font-family: 'Amiri', serif;
+    @apply text-2xl leading-[2.2] text-foreground;
+    direction: rtl;
+  }
+
+  .verse-number {
+    @apply inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-semibold;
+    background: hsl(var(--emerald-light));
+    color: hsl(var(--primary));
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+  }
+
+  .card-surface {
+    @apply bg-card rounded-xl border border-border p-4;
+  }
+
+  .bottom-nav-item {
+    @apply flex flex-col items-center justify-center gap-1 text-xs font-medium transition-colors;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .bottom-nav-item.active {
+    color: hsl(var(--primary));
+  }
+
+  .skeleton-pulse {
+    @apply animate-pulse bg-muted rounded-lg;
+  }
+
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--emerald-dark)));
+  }
+
+  .gradient-gold {
+    background: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--gold)));
+  }
+
+  .page-container {
+    @apply pb-20 min-h-screen;
+  }
+
+  .section-title {
+    @apply text-lg font-bold text-foreground mb-3;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+  }
+}
+
+@layer utilities {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 }
