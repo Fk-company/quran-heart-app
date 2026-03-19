@@ -16,6 +16,7 @@ interface AudioContextType {
   pause: () => void;
   resume: () => void;
   seekTo: (time: number) => void;
+  stop: () => void;
 }
 
 const AudioCtx = createContext<AudioContextType | null>(null);
@@ -54,6 +55,8 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     audio.play();
     setCurrentTrack(track);
     setIsPlaying(true);
+    setProgress(0);
+    setDuration(0);
   };
 
   const pause = () => {
@@ -72,8 +75,20 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   };
 
+  const stop = () => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.pause();
+      audio.src = '';
+    }
+    setCurrentTrack(null);
+    setIsPlaying(false);
+    setProgress(0);
+    setDuration(0);
+  };
+
   return (
-    <AudioCtx.Provider value={{ currentTrack, isPlaying, progress, duration, play, pause, resume, seekTo }}>
+    <AudioCtx.Provider value={{ currentTrack, isPlaying, progress, duration, play, pause, resume, seekTo, stop }}>
       {children}
     </AudioCtx.Provider>
   );

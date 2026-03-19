@@ -26,6 +26,16 @@ const dailyVerses = [
   { text: 'أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ', surah: 'الرعد', ayah: 28 },
 ];
 
+const tickerItems = [
+  'سُبْحَانَ اللهِ وَبِحَمْدِهِ سُبْحَانَ اللهِ الْعَظِيمِ',
+  'لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ',
+  'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّد',
+  'أَسْتَغْفِرُ اللهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ',
+  'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ',
+  'رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ',
+  'حَسْبُنَا اللهُ وَنِعْمَ الْوَكِيلُ',
+];
+
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
@@ -40,6 +50,16 @@ const HomePage: React.FC = () => {
   const dailyVerse = useMemo(() => {
     const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
     return dailyVerses[dayOfYear % dailyVerses.length];
+  }, []);
+
+  const dailyTicker = useMemo(() => {
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    // Rotate the array based on day
+    const rotated = [...tickerItems];
+    for (let i = 0; i < dayOfYear % tickerItems.length; i++) {
+      rotated.push(rotated.shift()!);
+    }
+    return rotated;
   }, []);
 
   useEffect(() => {
@@ -64,7 +84,6 @@ const HomePage: React.FC = () => {
             async (pos) => {
               try {
                 const data = await fetchPrayerTimes(pos.coords.latitude, pos.coords.longitude);
-                // Try reverse geocode for city name
                 let locName = 'موقعك الحالي';
                 try {
                   const geoRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&localityLanguage=ar`);
@@ -98,7 +117,6 @@ const HomePage: React.FC = () => {
     load();
   }, []);
 
-  // Live countdown timer
   useEffect(() => {
     if (!prayerTimes) return;
     const interval = setInterval(() => calculateNextPrayer(prayerTimes), 30000);
@@ -164,6 +182,19 @@ const HomePage: React.FC = () => {
               <span>{locationName}</span>
             </div>
           )}
+        </div>
+
+        {/* Scrolling Ticker */}
+        <div className="mb-5 overflow-hidden rounded-xl bg-primary/5 border border-primary/10">
+          <div className="ticker-container py-2.5 px-4">
+            <div className="ticker-track">
+              {[...dailyTicker, ...dailyTicker].map((item, i) => (
+                <span key={i} className="ticker-item font-amiri text-sm text-primary whitespace-nowrap mx-8">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Hero Prayer Card */}
@@ -307,7 +338,6 @@ const HomePage: React.FC = () => {
           )}
         </div>
 
-        {/* Footer Bismillah */}
         <div className="text-center py-4">
           <p className="font-amiri text-sm text-muted-foreground">
             بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { fetchReciters, fetchSurahs, type Reciter, type Surah } from '@/lib/api';
 import { useAudioPlayer } from '@/contexts/AudioContext';
-import { Play, Pause, Search, ChevronDown, ChevronUp } from 'lucide-react';
+import { Play, Pause, Search, ChevronDown, ChevronUp, Mic, Volume2 } from 'lucide-react';
 
 const RecitersPage: React.FC = () => {
   const [reciters, setReciters] = useState<Reciter[]>([]);
@@ -52,8 +52,18 @@ const RecitersPage: React.FC = () => {
   return (
     <div className="page-container" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
-        <h1 className="text-xl font-bold text-foreground mb-4">القراء</h1>
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
+            <Mic className="w-5 h-5 text-primary-foreground" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">القراء</h1>
+            <p className="text-xs text-muted-foreground">{reciters.length > 0 ? `${reciters.length} قارئ` : 'جاري التحميل...'}</p>
+          </div>
+        </div>
 
+        {/* Search */}
         <div className="relative mb-4">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
@@ -64,6 +74,28 @@ const RecitersPage: React.FC = () => {
             className="w-full h-10 pr-10 pl-4 rounded-xl border border-border bg-card text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
           />
         </div>
+
+        {/* Currently playing banner */}
+        {currentTrack && currentTrack.id.includes('-') && (
+          <div className="card-surface mb-4 flex items-center gap-3 bg-primary/5 border-primary/20">
+            <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+              <Volume2 className="w-4 h-4 text-primary-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground truncate">{currentTrack.title}</p>
+              <p className="text-xs text-muted-foreground truncate">{currentTrack.reciter}</p>
+            </div>
+            <div className="flex gap-0.5 items-end h-5">
+              {[60, 100, 40, 80, 50].map((h, i) => (
+                <div
+                  key={i}
+                  className="w-1 bg-primary rounded-full animate-pulse"
+                  style={{ height: `${h}%`, animationDelay: `${i * 0.15}s` }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
         {loading ? (
           <div className="space-y-3">
@@ -76,20 +108,23 @@ const RecitersPage: React.FC = () => {
             {filtered.map((reciter) => {
               const isExpanded = expandedReciter === reciter.id;
               const surahNums = getReciterSurahs(reciter);
+              const isReciterPlaying = currentTrack?.reciter === reciter.name && isPlaying;
 
               return (
-                <div key={reciter.id} className="card-surface">
+                <div key={reciter.id} className={`card-surface transition-all duration-200 ${isReciterPlaying ? 'border-primary/30 bg-primary/[0.03]' : ''}`}>
                   <button
                     onClick={() => setExpandedReciter(isExpanded ? null : reciter.id)}
                     className="w-full flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <span className="text-primary font-bold text-sm">{reciter.name.charAt(0)}</span>
+                      <div className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 ${isReciterPlaying ? 'bg-primary' : 'bg-primary/10'}`}>
+                        <span className={`font-bold text-sm ${isReciterPlaying ? 'text-primary-foreground' : 'text-primary'}`}>
+                          {reciter.name.charAt(0)}
+                        </span>
                       </div>
                       <div className="text-right">
                         <div className="font-semibold text-foreground text-sm">{reciter.name}</div>
-                        <div className="text-xs text-muted-foreground">{surahNums.length} سورة</div>
+                        <div className="text-xs text-muted-foreground">{surahNums.length} سورة متاحة</div>
                       </div>
                     </div>
                     {isExpanded ? (
@@ -100,7 +135,7 @@ const RecitersPage: React.FC = () => {
                   </button>
 
                   {isExpanded && (
-                    <div className="mt-3 pt-3 border-t border-border grid grid-cols-2 gap-2 animate-fade-in max-h-60 overflow-y-auto">
+                    <div className="mt-3 pt-3 border-t border-border grid grid-cols-2 gap-2 animate-fade-in max-h-64 overflow-y-auto">
                       {surahNums.map((num) => {
                         const s = surahs.find((su) => su.number === num);
                         const trackId = `${reciter.id}-${num}`;
@@ -109,14 +144,24 @@ const RecitersPage: React.FC = () => {
                           <button
                             key={num}
                             onClick={() => handlePlay(reciter, num)}
-                            className="flex items-center gap-2 p-2 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors text-right"
+                            className={`flex items-center gap-2 p-2.5 rounded-lg transition-colors text-right ${
+                              isThisPlaying
+                                ? 'bg-primary/10 border border-primary/20'
+                                : 'bg-secondary/50 hover:bg-secondary border border-transparent'
+                            }`}
                           >
-                            {isThisPlaying ? (
-                              <Pause className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                            ) : (
-                              <Play className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                            )}
-                            <span className="text-xs text-foreground truncate">{s?.name || `سورة ${num}`}</span>
+                            <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
+                              isThisPlaying ? 'bg-primary' : 'bg-primary/10'
+                            }`}>
+                              {isThisPlaying ? (
+                                <Pause className="w-3 h-3 text-primary-foreground" />
+                              ) : (
+                                <Play className="w-3 h-3 text-primary ml-0.5" />
+                              )}
+                            </div>
+                            <span className={`text-xs truncate ${isThisPlaying ? 'text-primary font-semibold' : 'text-foreground'}`}>
+                              {s?.name || `سورة ${num}`}
+                            </span>
                           </button>
                         );
                       })}
