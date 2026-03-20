@@ -2,19 +2,41 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Book, Mic, Radio, Clock, Moon, Sun, Sunrise, Sunset,
-  CloudSun, Heart, Search, MapPin, ChevronLeft, Star, BookOpen
+  CloudSun, Heart, Search, MapPin, ChevronLeft, Star, BookOpen,
+  Users, Quote, Calendar
 } from 'lucide-react';
 import { fetchPrayerTimes, fetchSurahs, type PrayerTimes, type Surah } from '@/lib/api';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useLastRead } from '@/hooks/useLastRead';
 
 const prayerIcons: Record<string, React.ElementType> = {
   Fajr: Sunrise, Sunrise: Sun, Dhuhr: CloudSun, Asr: Sun, Maghrib: Sunset, Isha: Moon,
 };
-
 const prayerNames: Record<string, string> = {
   Fajr: 'الفجر', Sunrise: 'الشروق', Dhuhr: 'الظهر', Asr: 'العصر', Maghrib: 'المغرب', Isha: 'العشاء',
 };
-
 const prayerOrder = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'] as const;
+
+const allTickerItems = [
+  'سُبْحَانَ اللهِ وَبِحَمْدِهِ سُبْحَانَ اللهِ الْعَظِيمِ',
+  'لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ',
+  'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّد',
+  'أَسْتَغْفِرُ اللهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ',
+  'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ',
+  'رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ',
+  'حَسْبُنَا اللهُ وَنِعْمَ الْوَكِيلُ',
+  'إِنَّ مَعَ الْعُسْرِ يُسْرًا',
+  'وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ',
+  'فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ',
+  'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً',
+  'وَقُل رَّبِّ زِدْنِي عِلْمًا',
+  'أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ',
+  'وَنُنَزِّلُ مِنَ الْقُرْآنِ مَا هُوَ شِفَاءٌ وَرَحْمَةٌ لِّلْمُؤْمِنِينَ',
+  'رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا',
+  'وَإِلَـٰهُكُمْ إِلَـٰهٌ وَاحِدٌ لَّا إِلَـٰهَ إِلَّا هُوَ الرَّحْمَـٰنُ الرَّحِيمُ',
+  'سُبْحَانَ رَبِّكَ رَبِّ الْعِزَّةِ عَمَّا يَصِفُونَ',
+  'اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي',
+];
 
 const dailyVerses = [
   { text: 'إِنَّ مَعَ الْعُسْرِ يُسْرًا', surah: 'الشرح', ayah: 6 },
@@ -26,20 +48,24 @@ const dailyVerses = [
   { text: 'أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ', surah: 'الرعد', ayah: 28 },
 ];
 
-const tickerItems = [
-  'سُبْحَانَ اللهِ وَبِحَمْدِهِ سُبْحَانَ اللهِ الْعَظِيمِ',
-  'لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ',
-  'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّد',
-  'أَسْتَغْفِرُ اللهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ',
-  'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ',
-  'رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ',
-  'حَسْبُنَا اللهُ وَنِعْمَ الْوَكِيلُ',
-];
+// Seed-based shuffle: different each day, never same order
+function seededShuffle<T>(arr: T[], seed: number): T[] {
+  const result = [...arr];
+  let s = seed;
+  for (let i = result.length - 1; i > 0; i--) {
+    s = (s * 9301 + 49297) % 233280;
+    const j = Math.floor((s / 233280) * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
+  const { lastRead } = useLastRead();
   const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
-  const [nextPrayerKey, setNextPrayerKey] = useState<string>('');
+  const [nextPrayerKey, setNextPrayerKey] = useState('');
   const [nextPrayer, setNextPrayer] = useState<{ name: string; time: string; remaining: string } | null>(null);
   const [hijriDate, setHijriDate] = useState('');
   const [gregorianDate, setGregorianDate] = useState('');
@@ -47,20 +73,9 @@ const HomePage: React.FC = () => {
   const [surahs, setSurahs] = useState<Surah[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const dailyVerse = useMemo(() => {
-    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
-    return dailyVerses[dayOfYear % dailyVerses.length];
-  }, []);
-
-  const dailyTicker = useMemo(() => {
-    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
-    // Rotate the array based on day
-    const rotated = [...tickerItems];
-    for (let i = 0; i < dayOfYear % tickerItems.length; i++) {
-      rotated.push(rotated.shift()!);
-    }
-    return rotated;
-  }, []);
+  const dayOfYear = useMemo(() => Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000), []);
+  const dailyVerse = useMemo(() => dailyVerses[dayOfYear % dailyVerses.length], [dayOfYear]);
+  const tickerItems = useMemo(() => seededShuffle(allTickerItems, dayOfYear), [dayOfYear]);
 
   useEffect(() => {
     const load = async () => {
@@ -73,9 +88,7 @@ const HomePage: React.FC = () => {
             setHijriDate(`${h.day} ${h.month?.ar || ''} ${h.year}`);
           }
           const g = data.date?.gregorian;
-          if (g) {
-            setGregorianDate(`${g.weekday?.en || ''}, ${g.day} ${g.month?.en || ''} ${g.year}`);
-          }
+          if (g) setGregorianDate(`${g.weekday?.en || ''}, ${g.day} ${g.month?.en || ''} ${g.year}`);
           calculateNextPrayer(data.timings);
         };
 
@@ -105,14 +118,10 @@ const HomePage: React.FC = () => {
           const data = await fetchPrayerTimes(21.4225, 39.8262);
           handlePrayerData(data, 'مكة المكرمة');
         }
-
         const surahData = await fetchSurahs();
         setSurahs(surahData);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
+      } catch (e) { console.error(e); }
+      finally { setLoading(false); }
     };
     load();
   }, []);
@@ -131,7 +140,6 @@ const HomePage: React.FC = () => {
       const [h, m] = timeStr.split(':').map(Number);
       const prayerDate = new Date();
       prayerDate.setHours(h, m, 0, 0);
-
       if (prayerDate > now) {
         const diff = prayerDate.getTime() - now.getTime();
         const hours = Math.floor(diff / 3600000);
@@ -147,21 +155,17 @@ const HomePage: React.FC = () => {
   };
 
   const quickLinks = [
-    { label: 'المصحف', icon: Book, path: '/quran', variant: 'primary' as const },
-    { label: 'القراء', icon: Mic, path: '/reciters', variant: 'accent' as const },
-    { label: 'الراديو', icon: Radio, path: '/radio', variant: 'primary' as const },
-    { label: 'الاذكار', icon: Heart, path: '/adhkar', variant: 'accent' as const },
-    { label: 'بحث', icon: Search, path: '/search', variant: 'primary' as const },
-    { label: 'المزيد', icon: Star, path: '/more', variant: 'accent' as const },
+    { label: 'المصحف', icon: Book, path: '/quran', gradient: 'gradient-primary' },
+    { label: 'القراء', icon: Mic, path: '/reciters', gradient: 'gradient-gold' },
+    { label: 'الراديو', icon: Radio, path: '/radio', gradient: 'gradient-primary' },
+    { label: 'الاذكار', icon: Heart, path: '/adhkar', gradient: 'gradient-gold' },
+    { label: 'الأنبياء', icon: Users, path: '/prophets', gradient: 'gradient-primary' },
+    { label: 'الأحاديث', icon: Quote, path: '/hadith', gradient: 'gradient-gold' },
   ];
 
   const featuredSurahs = [
-    { num: 1, label: 'الفاتحة' },
-    { num: 36, label: 'يس' },
-    { num: 55, label: 'الرحمن' },
-    { num: 67, label: 'الملك' },
-    { num: 18, label: 'الكهف' },
-    { num: 112, label: 'الإخلاص' },
+    { num: 1, label: 'الفاتحة' }, { num: 36, label: 'يس' }, { num: 55, label: 'الرحمن' },
+    { num: 67, label: 'الملك' }, { num: 18, label: 'الكهف' }, { num: 112, label: 'الإخلاص' },
   ];
 
   return (
@@ -172,30 +176,48 @@ const HomePage: React.FC = () => {
         <div className="flex items-center justify-between mb-5">
           <div>
             <h1 className="text-xl font-bold text-foreground">القرآن الكريم</h1>
-            {hijriDate && (
-              <p className="text-xs text-muted-foreground mt-0.5">{hijriDate}</p>
+            {hijriDate && <p className="text-xs text-muted-foreground mt-0.5">{hijriDate}</p>}
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={toggleTheme} className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center transition-colors hover:bg-muted">
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-accent" /> : <Moon className="w-4 h-4 text-foreground" />}
+            </button>
+            {locationName && (
+              <div className="flex items-center gap-1 text-xs text-muted-foreground bg-secondary rounded-full px-3 py-1.5">
+                <MapPin className="w-3 h-3" />
+                <span>{locationName}</span>
+              </div>
             )}
           </div>
-          {locationName && (
-            <div className="flex items-center gap-1 text-xs text-muted-foreground bg-secondary rounded-full px-3 py-1.5">
-              <MapPin className="w-3 h-3" />
-              <span>{locationName}</span>
-            </div>
-          )}
         </div>
 
-        {/* Scrolling Ticker */}
-        <div className="mb-5 overflow-hidden rounded-xl bg-primary/5 border border-primary/10">
+        {/* Ticker */}
+        <div className="mb-5 overflow-hidden rounded-2xl bg-primary/5 border border-primary/10">
           <div className="ticker-container py-2.5 px-4">
             <div className="ticker-track">
-              {[...dailyTicker, ...dailyTicker].map((item, i) => (
-                <span key={i} className="ticker-item font-amiri text-sm text-primary whitespace-nowrap mx-8">
-                  {item}
-                </span>
+              {[...tickerItems, ...tickerItems].map((item, i) => (
+                <span key={i} className="ticker-item font-amiri text-sm text-primary whitespace-nowrap mx-8">{item}</span>
               ))}
             </div>
           </div>
         </div>
+
+        {/* Continue reading */}
+        {lastRead && (
+          <button
+            onClick={() => navigate(`/quran/${lastRead.surahNumber}`)}
+            className="w-full card-surface mb-4 flex items-center gap-3 bg-accent/5 border-accent/15"
+          >
+            <div className="w-11 h-11 rounded-xl gradient-gold flex items-center justify-center flex-shrink-0">
+              <BookOpen className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <div className="flex-1 text-right">
+              <div className="text-xs text-accent font-medium">متابعة القراءة</div>
+              <div className="text-sm font-bold text-foreground">{lastRead.surahName} - آية {lastRead.ayahNumber}</div>
+            </div>
+            <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+          </button>
+        )}
 
         {/* Hero Prayer Card */}
         <div className="gradient-hero islamic-pattern rounded-2xl p-5 mb-5 text-primary-foreground relative">
@@ -212,9 +234,7 @@ const HomePage: React.FC = () => {
                   <Clock className="w-3.5 h-3.5 opacity-80" />
                   <span className="text-xs opacity-80">الصلاة القادمة</span>
                 </div>
-                <span className="text-[10px] opacity-60 bg-primary-foreground/10 rounded-full px-2 py-0.5">
-                  {gregorianDate}
-                </span>
+                <span className="text-[10px] opacity-60 bg-primary-foreground/10 rounded-full px-2 py-0.5">{gregorianDate}</span>
               </div>
               <div className="text-3xl font-bold mb-0.5 text-shadow-sm">{nextPrayer.name}</div>
               <div className="text-xl opacity-95 font-semibold mb-1 font-amiri tracking-wide">{nextPrayer.time}</div>
@@ -232,31 +252,21 @@ const HomePage: React.FC = () => {
               return (
                 <div key={key} className={`prayer-chip ${isNext ? 'next-prayer' : ''}`}>
                   <Icon className={`w-3.5 h-3.5 mb-0.5 ${isNext ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <span className={`text-[10px] ${isNext ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
-                    {prayerNames[key]}
-                  </span>
-                  <span className={`text-xs font-semibold mt-0.5 ${isNext ? 'text-primary' : 'text-foreground'}`}>
-                    {prayerTimes[key]}
-                  </span>
+                  <span className={`text-[10px] ${isNext ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>{prayerNames[key]}</span>
+                  <span className={`text-xs font-semibold mt-0.5 ${isNext ? 'text-primary' : 'text-foreground'}`}>{prayerTimes[key]}</span>
                 </div>
               );
             })}
           </div>
         )}
 
-        {/* Quick Access Grid */}
+        {/* Quick Access */}
         <div className="mb-5">
           <h2 className="section-title">الوصول السريع</h2>
           <div className="grid grid-cols-3 gap-2.5">
             {quickLinks.map((link) => (
-              <button
-                key={link.path}
-                onClick={() => navigate(link.path)}
-                className="quick-link-btn"
-              >
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
-                  link.variant === 'primary' ? 'gradient-primary' : 'gradient-gold'
-                }`}>
+              <button key={link.path} onClick={() => navigate(link.path)} className="quick-link-btn">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${link.gradient}`}>
                   <link.icon className="w-5 h-5 text-primary-foreground" />
                 </div>
                 <span className="text-xs font-medium text-foreground">{link.label}</span>
@@ -271,12 +281,8 @@ const HomePage: React.FC = () => {
             <BookOpen className="w-4 h-4 text-accent" />
             <span className="text-xs font-semibold text-accent">آية اليوم</span>
           </div>
-          <p className="font-amiri text-xl leading-[2] text-foreground text-center mb-2">
-            {dailyVerse.text}
-          </p>
-          <p className="text-xs text-muted-foreground text-center">
-            سورة {dailyVerse.surah} - آية {dailyVerse.ayah}
-          </p>
+          <p className="font-amiri text-xl leading-[2] text-foreground text-center mb-2">{dailyVerse.text}</p>
+          <p className="text-xs text-muted-foreground text-center">سورة {dailyVerse.surah} - آية {dailyVerse.ayah}</p>
         </div>
 
         {/* Featured Surahs */}
@@ -284,11 +290,7 @@ const HomePage: React.FC = () => {
           <h2 className="section-title">سور مختارة</h2>
           <div className="grid grid-cols-3 gap-2">
             {featuredSurahs.map((s) => (
-              <button
-                key={s.num}
-                onClick={() => navigate(`/quran/${s.num}`)}
-                className="card-surface-hover flex flex-col items-center py-3 gap-1"
-              >
+              <button key={s.num} onClick={() => navigate(`/quran/${s.num}`)} className="card-surface-hover flex flex-col items-center py-3 gap-1">
                 <span className="verse-number text-sm">{s.num}</span>
                 <span className="text-xs font-semibold text-foreground mt-1">{s.label}</span>
               </button>
@@ -300,28 +302,18 @@ const HomePage: React.FC = () => {
         <div className="mb-4">
           <div className="flex items-center justify-between mb-3">
             <h2 className="section-title mb-0">سور القرآن الكريم</h2>
-            <button
-              onClick={() => navigate('/quran')}
-              className="flex items-center gap-1 text-xs text-primary font-medium"
-            >
-              عرض الكل
-              <ChevronLeft className="w-3.5 h-3.5" />
+            <button onClick={() => navigate('/quran')} className="flex items-center gap-1 text-xs text-primary font-medium">
+              عرض الكل <ChevronLeft className="w-3.5 h-3.5" />
             </button>
           </div>
           {loading ? (
             <div className="space-y-2">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="skeleton-pulse h-16 w-full" />
-              ))}
+              {Array.from({ length: 5 }).map((_, i) => <div key={i} className="skeleton-pulse h-16 w-full" />)}
             </div>
           ) : (
             <div className="space-y-2">
               {surahs.slice(0, 10).map((surah) => (
-                <button
-                  key={surah.number}
-                  onClick={() => navigate(`/quran/${surah.number}`)}
-                  className="card-surface-hover w-full flex items-center gap-3 text-right"
-                >
+                <button key={surah.number} onClick={() => navigate(`/quran/${surah.number}`)} className="card-surface-hover w-full flex items-center gap-3 text-right">
                   <div className="verse-number flex-shrink-0">{surah.number}</div>
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-foreground text-sm">{surah.name}</div>
@@ -339,9 +331,7 @@ const HomePage: React.FC = () => {
         </div>
 
         <div className="text-center py-4">
-          <p className="font-amiri text-sm text-muted-foreground">
-            بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ
-          </p>
+          <p className="font-amiri text-sm text-muted-foreground">بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</p>
         </div>
       </div>
     </div>

@@ -6,76 +6,72 @@
 
 @layer base {
   :root {
-    --background: 36 33% 99%;
+    --background: 40 25% 97%;
     --foreground: 220 26% 14%;
-
     --card: 0 0% 100%;
     --card-foreground: 220 26% 14%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 220 26% 14%;
-
-    --primary: 162 90% 16%;
-    --primary-foreground: 36 33% 99%;
-
-    --secondary: 36 33% 96%;
-    --secondary-foreground: 162 90% 16%;
-
+    --primary: 162 72% 18%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 40 20% 94%;
+    --secondary-foreground: 162 72% 18%;
     --muted: 220 14% 96%;
     --muted-foreground: 220 9% 46%;
-
     --accent: 32 88% 37%;
-    --accent-foreground: 36 33% 99%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 162 90% 16%;
-
+    --ring: 162 72% 18%;
     --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 162 90% 16%;
+    --sidebar-foreground: 240 5% 26%;
+    --sidebar-primary: 162 72% 18%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-accent: 240 5% 96%;
+    --sidebar-accent-foreground: 240 6% 10%;
     --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 162 90% 16%;
+    --sidebar-ring: 162 72% 18%;
 
-    /* Custom tokens */
     --gold: 32 88% 37%;
     --gold-light: 36 60% 92%;
-    --emerald-dark: 162 90% 12%;
+    --emerald-dark: 162 72% 12%;
     --emerald-light: 162 40% 95%;
-    --parchment: 36 33% 99%;
+    --parchment: 40 25% 97%;
     --surface: 0 0% 100%;
     --nav-height: 4rem;
     --player-height: 3.5rem;
+    --glass: 0 0% 100% / 0.7;
   }
 
   .dark {
-    --background: 220 26% 8%;
-    --foreground: 36 33% 95%;
-    --card: 220 26% 12%;
-    --card-foreground: 36 33% 95%;
-    --popover: 220 26% 12%;
-    --popover-foreground: 36 33% 95%;
-    --primary: 162 60% 40%;
-    --primary-foreground: 220 26% 8%;
-    --secondary: 220 20% 18%;
-    --secondary-foreground: 36 33% 95%;
-    --muted: 220 20% 18%;
-    --muted-foreground: 220 14% 60%;
-    --accent: 32 88% 45%;
-    --accent-foreground: 220 26% 8%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 220 20% 20%;
-    --input: 220 20% 20%;
-    --ring: 162 60% 40%;
+    --background: 222 28% 6%;
+    --foreground: 40 20% 92%;
+    --card: 222 24% 10%;
+    --card-foreground: 40 20% 92%;
+    --popover: 222 24% 10%;
+    --popover-foreground: 40 20% 92%;
+    --primary: 162 55% 42%;
+    --primary-foreground: 222 28% 6%;
+    --secondary: 222 20% 15%;
+    --secondary-foreground: 40 20% 92%;
+    --muted: 222 20% 15%;
+    --muted-foreground: 220 14% 55%;
+    --accent: 32 80% 50%;
+    --accent-foreground: 222 28% 6%;
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 222 18% 18%;
+    --input: 222 18% 18%;
+    --ring: 162 55% 42%;
+    --gold: 32 80% 50%;
+    --gold-light: 32 30% 15%;
+    --emerald-dark: 162 55% 30%;
+    --emerald-light: 162 30% 12%;
+    --glass: 222 24% 10% / 0.8;
   }
 }
 
@@ -83,18 +79,18 @@
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'IBM Plex Sans Arabic', sans-serif;
+    -webkit-tap-highlight-color: transparent;
   }
-
   h1, h2, h3, h4, h5, h6 {
     font-family: 'IBM Plex Sans Arabic', sans-serif;
   }
 }
 
 @layer components {
+  /* ====== Typography ====== */
   .quran-text {
     font-family: 'Amiri', serif;
     @apply text-2xl leading-[2.2] text-foreground;
@@ -108,45 +104,65 @@
     font-family: 'IBM Plex Sans Arabic', sans-serif;
   }
 
+  /* ====== Cards & Surfaces ====== */
   .card-surface {
-    @apply bg-card rounded-xl border border-border p-4 transition-all duration-200;
+    @apply bg-card rounded-2xl border border-border p-4 transition-all duration-300;
   }
 
   .card-surface-hover {
-    @apply card-surface;
+    @apply card-surface cursor-pointer;
   }
   .card-surface-hover:hover {
-    box-shadow: 0 4px 20px -4px hsl(var(--primary) / 0.08);
-    border-color: hsl(var(--primary) / 0.15);
+    box-shadow: 0 4px 24px -4px hsl(var(--primary) / 0.1);
+    border-color: hsl(var(--primary) / 0.2);
+    transform: translateY(-1px);
+  }
+  .card-surface-hover:active {
+    transform: translateY(0) scale(0.99);
   }
 
+  .glass-surface {
+    background: hsl(var(--glass));
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    @apply rounded-2xl border border-border/50;
+  }
+
+  /* ====== Navigation ====== */
   .bottom-nav-item {
-    @apply flex flex-col items-center justify-center gap-1 text-xs font-medium transition-colors;
+    @apply flex flex-col items-center justify-center gap-1 text-xs font-medium transition-all duration-200;
     color: hsl(var(--muted-foreground));
   }
-
   .bottom-nav-item.active {
     color: hsl(var(--primary));
   }
+  .bottom-nav-item.active::after {
+    content: '';
+    @apply w-1 h-1 rounded-full bg-primary mt-0.5;
+  }
 
+  /* ====== Skeletons ====== */
   .skeleton-pulse {
-    @apply animate-pulse bg-muted rounded-lg;
+    @apply animate-pulse bg-muted rounded-xl;
   }
 
+  /* ====== Gradients ====== */
   .gradient-primary {
-    background: linear-gradient(145deg, hsl(162 90% 18%), hsl(162 85% 12%));
+    background: linear-gradient(145deg, hsl(162 72% 22%), hsl(162 72% 14%));
   }
-
   .gradient-gold {
     background: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--gold)));
   }
-
   .gradient-hero {
-    background: linear-gradient(160deg, hsl(162 90% 20%), hsl(162 85% 10%) 60%, hsl(32 60% 20%) 100%);
+    background: linear-gradient(160deg, hsl(162 72% 24%), hsl(162 72% 12%) 60%, hsl(32 50% 18%) 100%);
+  }
+  .gradient-hero-alt {
+    background: linear-gradient(160deg, hsl(32 80% 35%), hsl(32 70% 25%) 60%, hsl(162 50% 15%) 100%);
   }
 
+  /* ====== Layout ====== */
   .page-container {
-    @apply pb-20 min-h-screen;
+    @apply pb-24 min-h-screen;
   }
 
   .section-title {
@@ -154,24 +170,28 @@
     font-family: 'IBM Plex Sans Arabic', sans-serif;
   }
 
+  /* ====== Interactive ====== */
   .quick-link-btn {
     @apply flex flex-col items-center gap-2 py-3 px-2 rounded-2xl transition-all duration-200;
   }
   .quick-link-btn:hover {
     background: hsl(var(--muted));
+    transform: translateY(-2px);
   }
   .quick-link-btn:active {
-    transform: scale(0.96);
+    transform: scale(0.95);
   }
 
   .prayer-chip {
-    @apply flex flex-col items-center py-2.5 px-1 rounded-xl border border-border bg-card transition-all duration-200;
+    @apply flex flex-col items-center py-2.5 px-1 rounded-xl border border-border bg-card transition-all duration-300;
   }
   .prayer-chip.next-prayer {
     border-color: hsl(var(--primary) / 0.3);
     background: hsl(var(--emerald-light));
+    box-shadow: 0 0 16px -4px hsl(var(--primary) / 0.2);
   }
 
+  /* ====== Islamic pattern ====== */
   .islamic-pattern {
     position: relative;
     overflow: hidden;
@@ -184,7 +204,7 @@
     width: 200px;
     height: 200px;
     border-radius: 50%;
-    background: radial-gradient(circle, hsl(0 0% 100% / 0.06) 0%, transparent 70%);
+    background: radial-gradient(circle, hsl(0 0% 100% / 0.08) 0%, transparent 70%);
     pointer-events: none;
   }
   .islamic-pattern::before {
@@ -195,10 +215,11 @@
     width: 160px;
     height: 160px;
     border-radius: 50%;
-    background: radial-gradient(circle, hsl(0 0% 100% / 0.04) 0%, transparent 70%);
+    background: radial-gradient(circle, hsl(0 0% 100% / 0.05) 0%, transparent 70%);
     pointer-events: none;
   }
 
+  /* ====== Cards ====== */
   .daily-verse-card {
     @apply rounded-2xl p-5 border;
     background: hsl(var(--gold-light));
@@ -210,34 +231,139 @@
     background: hsl(var(--emerald-light));
     color: hsl(var(--primary));
   }
+
+  /* ====== Input ====== */
+  .search-input {
+    @apply w-full h-11 pr-10 pl-4 rounded-2xl border border-border bg-card text-foreground text-sm transition-all duration-200;
+    @apply placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary;
+  }
+
+  /* ====== Grid/List toggle ====== */
+  .view-toggle-btn {
+    @apply w-9 h-9 rounded-xl flex items-center justify-center transition-colors;
+  }
+  .view-toggle-btn.active {
+    @apply bg-primary text-primary-foreground;
+  }
+  .view-toggle-btn:not(.active) {
+    @apply bg-secondary text-secondary-foreground;
+  }
+
+  /* ====== Favorite heart ====== */
+  .fav-btn {
+    @apply w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200;
+  }
+  .fav-btn:active {
+    transform: scale(0.85);
+  }
+  .fav-btn.active {
+    color: hsl(0 84% 60%);
+  }
+  .fav-btn:not(.active) {
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* ====== Chip / tag ====== */
+  .filter-chip {
+    @apply px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200;
+  }
+  .filter-chip.active {
+    @apply bg-primary text-primary-foreground shadow-sm;
+  }
+  .filter-chip:not(.active) {
+    @apply bg-secondary text-secondary-foreground;
+  }
+
+  /* ====== Bottom sheet ====== */
+  .sheet-overlay {
+    @apply fixed inset-0 z-50 bg-foreground/30;
+    backdrop-filter: blur(4px);
+    animation: fade-in 0.2s ease-out;
+  }
+  .sheet-content {
+    @apply fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-3xl border-t border-border;
+    max-height: 85vh;
+    animation: sheet-up 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .sheet-handle {
+    @apply w-10 h-1 rounded-full bg-border mx-auto mt-3 mb-2;
+  }
 }
 
 @layer utilities {
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
-
   .text-shadow-sm {
     text-shadow: 0 1px 2px hsl(0 0% 0% / 0.1);
   }
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }
 
-/* Ticker animation */
+/* ====== Ticker ====== */
 .ticker-container {
   overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
 }
-
 .ticker-track {
   display: flex;
-  animation: ticker-scroll 40s linear infinite;
+  animation: ticker-scroll 60s linear infinite;
   width: max-content;
 }
-
 .ticker-track:hover {
   animation-play-state: paused;
 }
-
 @keyframes ticker-scroll {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
+}
+
+/* ====== Sheet animation ====== */
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ====== Pulse live indicator ====== */
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+.live-pulse {
+  animation: pulse-live 1.5s ease-in-out infinite;
+}
+
+/* ====== Smooth page transitions ====== */
+.page-container {
+  animation: page-enter 0.3s ease-out;
+}
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ====== Scrollbar styling ====== */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
 }
