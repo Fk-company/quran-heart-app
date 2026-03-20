@@ -24,54 +24,45 @@ const SearchPage: React.FC = () => {
     try {
       const data = await searchQuran(query);
       setResults(data?.matches || []);
-    } catch {
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
+    } catch { setResults([]); }
+    finally { setLoading(false); }
   };
 
   return (
     <div className="page-container" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
-        <h1 className="text-xl font-bold text-foreground mb-4">البحث في القرآن</h1>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
+            <SearchIcon className="w-5 h-5 text-primary-foreground" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">البحث في القرآن</h1>
+            <p className="text-xs text-muted-foreground">ابحث عن آية أو كلمة</p>
+          </div>
+        </div>
 
         <div className="flex gap-2 mb-4">
           <div className="relative flex-1">
             <SearchIcon className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              type="text" value={query} onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              placeholder="ابحث بكلمة او آية..."
-              className="w-full h-10 pr-10 pl-4 rounded-xl border border-border bg-card text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              placeholder="ابحث بكلمة او آية..." className="search-input pr-10"
             />
           </div>
-          <button
-            onClick={handleSearch}
-            disabled={loading}
-            className="h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50"
-          >
+          <button onClick={handleSearch} disabled={loading}
+            className="h-11 px-5 rounded-2xl bg-primary text-primary-foreground text-sm font-medium disabled:opacity-50 transition-colors">
             بحث
           </button>
         </div>
 
         {loading ? (
-          <div className="space-y-3">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="skeleton-pulse h-20 w-full" />
-            ))}
-          </div>
+          <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="skeleton-pulse h-20 w-full" />)}</div>
         ) : results.length > 0 ? (
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground mb-3">{results.length} نتيجة</p>
             {results.map((result, idx) => (
-              <button
-                key={idx}
-                onClick={() => navigate(`/quran/${result.surah.number}`)}
-                className="card-surface w-full text-right"
-              >
+              <button key={idx} onClick={() => navigate(`/quran/${result.surah.number}`)} className="card-surface-hover w-full text-right">
                 <div className="flex items-center gap-2 mb-2">
                   <Book className="w-4 h-4 text-primary" />
                   <span className="text-xs font-medium text-primary">{result.surah.name} - آية {result.numberInSurah}</span>
