@@ -137,7 +137,10 @@ const HomePage: React.FC = () => {
     for (const prayer of prayerOrder) {
       const timeStr = timings[prayer];
       if (!timeStr) continue;
-      const [h, m] = timeStr.split(':').map(Number);
+      // Handle time formats like "05:30 (EET)" - strip timezone info
+      const cleanTime = timeStr.split(' ')[0];
+      const [h, m] = cleanTime.split(':').map(Number);
+      if (isNaN(h) || isNaN(m)) continue;
       const prayerDate = new Date();
       prayerDate.setHours(h, m, 0, 0);
       if (prayerDate > now) {
@@ -145,12 +148,13 @@ const HomePage: React.FC = () => {
         const hours = Math.floor(diff / 3600000);
         const mins = Math.floor((diff % 3600000) / 60000);
         const remaining = hours > 0 ? `${hours} ساعة و ${mins} دقيقة` : `${mins} دقيقة`;
-        setNextPrayer({ name: prayerNames[prayer], time: timings[prayer], remaining });
+        setNextPrayer({ name: prayerNames[prayer], time: cleanTime, remaining });
         setNextPrayerKey(prayer);
         return;
       }
     }
-    setNextPrayer({ name: prayerNames.Fajr, time: timings.Fajr, remaining: 'غداً إن شاء الله' });
+    const fajrClean = timings.Fajr?.split(' ')[0] || timings.Fajr;
+    setNextPrayer({ name: prayerNames.Fajr, time: fajrClean, remaining: 'غداً إن شاء الله' });
     setNextPrayerKey('Fajr');
   };
 
