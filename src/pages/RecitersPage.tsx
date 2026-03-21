@@ -116,8 +116,8 @@ const RecitersPage: React.FC = () => {
               const isReciterPlaying = currentTrack?.reciter === reciter.name && isPlaying;
               return (
                 <div key={reciter.id} className={`card-surface transition-all duration-200 ${isReciterPlaying ? 'border-primary/30 bg-primary/[0.03]' : ''}`}>
-                  <div className="flex items-center justify-between">
-                    <button onClick={() => setExpandedReciter(isExpanded ? null : reciter.id)} className="flex items-center gap-3 flex-1">
+                  <button onClick={() => setExpandedReciter(isExpanded ? null : reciter.id)} className="w-full flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1">
                       <div className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 ${isReciterPlaying ? 'bg-primary' : 'bg-primary/10'}`}>
                         <span className={`font-bold text-sm ${isReciterPlaying ? 'text-primary-foreground' : 'text-primary'}`}>{reciter.name.charAt(0)}</span>
                       </div>
@@ -125,14 +125,14 @@ const RecitersPage: React.FC = () => {
                         <div className="font-semibold text-foreground text-sm">{reciter.name}</div>
                         <div className="text-xs text-muted-foreground">{surahNums.length} سورة</div>
                       </div>
-                    </button>
+                    </div>
                     <div className="flex items-center gap-1">
-                      <button onClick={() => toggleReciter(reciter.id)} className={`fav-btn ${isReciterFav(reciter.id) ? 'active' : ''}`}>
+                      <button onClick={(e) => { e.stopPropagation(); toggleReciter(reciter.id); }} className={`fav-btn ${isReciterFav(reciter.id) ? 'active' : ''}`}>
                         <Heart className="w-4 h-4" fill={isReciterFav(reciter.id) ? 'currentColor' : 'none'} />
                       </button>
                       {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                     </div>
-                  </div>
+                  </button>
                   {isExpanded && (
                     <div className="mt-3 pt-3 border-t border-border grid grid-cols-2 gap-2 animate-fade-in max-h-64 overflow-y-auto">
                       {surahNums.map((num) => {

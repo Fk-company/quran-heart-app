@@ -127,6 +127,13 @@ const SurahDetailPage: React.FC = () => {
                       <BookOpen className="w-3.5 h-3.5" />
                       {showTafsir === ayah.numberInSurah ? 'اخفاء التفسير' : 'عرض التفسير'}
                     </button>
+                    <button onClick={() => {
+                      const text = `${ayah.text}\n\n${surah?.name || ''} - آية ${ayah.numberInSurah}`;
+                      if (navigator.share) navigator.share({ text });
+                      else navigator.clipboard.writeText(text);
+                    }} className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
+                      <Share2 className="w-3 h-3" /> مشاركة
+                    </button>
                     <button onClick={() => handleAyahVisible(ayah.numberInSurah)} className="flex items-center gap-1 text-xs text-accent font-medium mr-auto">
                       <Bookmark className="w-3 h-3" /> حفظ الموضع
                     </button>

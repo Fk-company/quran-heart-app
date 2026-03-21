@@ -313,7 +313,7 @@
 }
 .ticker-track {
   display: flex;
-  animation: ticker-scroll 60s linear infinite;
+  animation: ticker-scroll 120s linear infinite;
   width: max-content;
 }
 .ticker-track:hover {
@@ -321,7 +321,7 @@
 }
 @keyframes ticker-scroll {
   0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  100% { transform: translateX(-33.333%); }
 }
 
 /* ====== Sheet animation ====== */

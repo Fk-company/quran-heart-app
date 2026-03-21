@@ -253,11 +253,12 @@ const HomePage: React.FC = () => {
             {prayerOrder.map((key) => {
               const Icon = prayerIcons[key];
               const isNext = key === nextPrayerKey;
+              const displayTime = prayerTimes[key]?.split(' ')[0] || prayerTimes[key];
               return (
                 <div key={key} className={`prayer-chip ${isNext ? 'next-prayer' : ''}`}>
                   <Icon className={`w-3.5 h-3.5 mb-0.5 ${isNext ? 'text-primary' : 'text-muted-foreground'}`} />
                   <span className={`text-[10px] ${isNext ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>{prayerNames[key]}</span>
-                  <span className={`text-xs font-semibold mt-0.5 ${isNext ? 'text-primary' : 'text-foreground'}`}>{prayerTimes[key]}</span>
+                  <span className={`text-xs font-semibold mt-0.5 ${isNext ? 'text-primary' : 'text-foreground'}`}>{displayTime}</span>
                 </div>
               );
             })}
