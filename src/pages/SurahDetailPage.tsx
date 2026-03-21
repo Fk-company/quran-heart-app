@@ -4,7 +4,7 @@ import { fetchSurahAyahs, fetchTafsir, fetchSurahs, fetchReciters, type Ayah, ty
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { useLastRead } from '@/hooks/useLastRead';
 import { useFavorites } from '@/hooks/useFavorites';
-import { ArrowRight, BookOpen, Play, Pause, Mic, Heart, Bookmark } from 'lucide-react';
+import { ArrowRight, BookOpen, Play, Pause, Mic, Heart, Bookmark, Share2 } from 'lucide-react';
 
 const SurahDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
