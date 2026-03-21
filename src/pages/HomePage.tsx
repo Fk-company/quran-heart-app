@@ -195,7 +195,7 @@ const HomePage: React.FC = () => {
         <div className="mb-5 overflow-hidden rounded-2xl bg-primary/5 border border-primary/10">
           <div className="ticker-container py-2.5 px-4">
             <div className="ticker-track">
-              {[...tickerItems, ...tickerItems].map((item, i) => (
+              {[...tickerItems, ...tickerItems, ...tickerItems].map((item, i) => (
                 <span key={i} className="ticker-item font-amiri text-sm text-primary whitespace-nowrap mx-8">{item}</span>
               ))}
             </div>
