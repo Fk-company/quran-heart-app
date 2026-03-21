@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Radio, Clock, Book, Users, Quote, Calendar, Search, Settings, X } from 'lucide-react';
+import { Heart, Radio, Clock, Book, Users, Quote, Search, Star, BookOpen, BarChart3, X, Feather } from 'lucide-react';
 
 const moreItems = [
   { label: 'الاذكار والتسبيح', icon: Heart, path: '/adhkar', desc: 'اذكار الصباح والمساء والتسبيح', color: 'bg-accent/10 text-accent' },
   { label: 'الراديو', icon: Radio, path: '/radio', desc: 'بث مباشر للقرآن الكريم', color: 'bg-primary/10 text-primary' },
   { label: 'قصص الأنبياء', icon: Users, path: '/prophets', desc: 'قصص الأنبياء والمرسلين', color: 'bg-accent/10 text-accent' },
   { label: 'الأحاديث النبوية', icon: Quote, path: '/hadith', desc: 'أحاديث نبوية مختارة', color: 'bg-primary/10 text-primary' },
-  { label: 'البحث', icon: Search, path: '/search', desc: 'البحث في القرآن الكريم', color: 'bg-accent/10 text-accent' },
+  { label: 'التفسير', icon: BookOpen, path: '/tafsir', desc: 'تفاسير متعددة مع المقارنة', color: 'bg-accent/10 text-accent' },
+  { label: 'الأدعية', icon: Feather, path: '/dua', desc: 'أدعية شاملة لكل مناسبة', color: 'bg-primary/10 text-primary' },
+  { label: 'أسماء الله الحسنى', icon: Star, path: '/asma-al-husna', desc: '99 اسماً لله تعالى ومعانيها', color: 'bg-accent/10 text-accent' },
+  { label: 'آيات السكينة', icon: Heart, path: '/sakinah', desc: 'آيات للراحة والطمأنينة', color: 'bg-primary/10 text-primary' },
+  { label: 'إحصائيات القرآن', icon: BarChart3, path: '/quran-stats', desc: 'أرقام ومعلومات عن القرآن', color: 'bg-accent/10 text-accent' },
+  { label: 'البحث', icon: Search, path: '/search', desc: 'البحث في القرآن الكريم', color: 'bg-primary/10 text-primary' },
 ];
 
 interface MoreSheetProps {
@@ -32,19 +37,19 @@ export const MoreSheet: React.FC<MoreSheetProps> = ({ open, onClose }) => {
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {moreItems.map((item) => (
               <button
                 key={item.path}
                 onClick={() => { navigate(item.path); onClose(); }}
-                className="card-surface-hover w-full flex items-center gap-3"
+                className="w-full flex items-center gap-3 p-3 rounded-xl transition-colors hover:bg-muted active:scale-[0.98]"
               >
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${item.color}`}>
-                  <item.icon className="w-5 h-5" />
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${item.color}`}>
+                  <item.icon className="w-4.5 h-4.5" />
                 </div>
                 <div className="flex-1 text-right">
                   <div className="font-semibold text-foreground text-sm">{item.label}</div>
-                  <div className="text-xs text-muted-foreground">{item.desc}</div>
+                  <div className="text-[11px] text-muted-foreground">{item.desc}</div>
                 </div>
               </button>
             ))}
@@ -55,7 +60,6 @@ export const MoreSheet: React.FC<MoreSheetProps> = ({ open, onClose }) => {
   );
 };
 
-// Keep the full-page fallback for direct /more route
 const MorePage: React.FC = () => {
   const navigate = useNavigate();
 
@@ -63,15 +67,16 @@ const MorePage: React.FC = () => {
     <div className="page-container" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <h1 className="text-xl font-bold text-foreground mb-4">المزيد</h1>
-        <div className="space-y-2">
+        <div className="space-y-1.5">
           {moreItems.map((item) => (
-            <button key={item.path} onClick={() => navigate(item.path)} className="card-surface-hover w-full flex items-center gap-3">
-              <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${item.color}`}>
-                <item.icon className="w-5 h-5" />
+            <button key={item.path} onClick={() => navigate(item.path)}
+              className="w-full flex items-center gap-3 p-3 rounded-xl transition-colors hover:bg-muted active:scale-[0.98]">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${item.color}`}>
+                <item.icon className="w-4.5 h-4.5" />
               </div>
               <div className="flex-1 text-right">
                 <div className="font-semibold text-foreground text-sm">{item.label}</div>
-                <div className="text-xs text-muted-foreground">{item.desc}</div>
+                <div className="text-[11px] text-muted-foreground">{item.desc}</div>
               </div>
             </button>
           ))}

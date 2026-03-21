@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { prophets, type Prophet } from '@/data/prophets';
-import { ArrowRight, BookOpen, MapPin, Lightbulb, ChevronDown, ChevronUp, Users } from 'lucide-react';
+import { ArrowRight, BookOpen, MapPin, Lightbulb, ChevronDown, ChevronUp, Users, Grid3X3, List } from 'lucide-react';
 
 const ProphetsPage: React.FC = () => {
   const [selected, setSelected] = useState<Prophet | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
 
   if (selected) {
     return (
@@ -20,9 +21,10 @@ const ProphetsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Hero card */}
           <div className="gradient-hero islamic-pattern rounded-2xl p-5 mb-5 text-primary-foreground">
-            <div className="text-3xl mb-2">{selected.icon}</div>
+            <div className="w-12 h-12 rounded-full bg-primary-foreground/10 flex items-center justify-center mb-3">
+              <Users className="w-6 h-6" />
+            </div>
             <h2 className="text-xl font-bold mb-1">{selected.arabicName}</h2>
             <p className="text-sm opacity-80">{selected.title}</p>
             <div className="flex items-center gap-1 mt-3 text-xs opacity-70">
@@ -31,7 +33,6 @@ const ProphetsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Summary */}
           <div className="card-surface mb-3">
             <div className="flex items-center gap-2 mb-2">
               <BookOpen className="w-4 h-4 text-primary" />
@@ -40,7 +41,6 @@ const ProphetsPage: React.FC = () => {
             <p className="text-sm text-muted-foreground leading-relaxed">{selected.summary}</p>
           </div>
 
-          {/* Full story */}
           <div className="card-surface mb-3">
             <div className="flex items-center gap-2 mb-2">
               <BookOpen className="w-4 h-4 text-accent" />
@@ -49,7 +49,6 @@ const ProphetsPage: React.FC = () => {
             <p className="text-sm text-foreground leading-[1.9] font-amiri">{selected.story}</p>
           </div>
 
-          {/* Lessons */}
           <div className="card-surface mb-3">
             <div className="flex items-center gap-2 mb-3">
               <Lightbulb className="w-4 h-4 text-accent" />
@@ -67,7 +66,6 @@ const ProphetsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Quran mentions */}
           <div className="card-surface mb-4">
             <div className="flex items-center gap-2 mb-3">
               <BookOpen className="w-4 h-4 text-primary" />
@@ -91,45 +89,63 @@ const ProphetsPage: React.FC = () => {
           <div className="w-10 h-10 rounded-xl gradient-gold flex items-center justify-center">
             <Users className="w-5 h-5 text-primary-foreground" />
           </div>
-          <div>
+          <div className="flex-1">
             <h1 className="text-xl font-bold text-foreground">قصص الأنبياء</h1>
             <p className="text-xs text-muted-foreground">{prophets.length} قصة</p>
           </div>
+          <div className="flex gap-1">
+            <button onClick={() => setViewMode('list')} className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}><List className="w-4 h-4" /></button>
+            <button onClick={() => setViewMode('grid')} className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}><Grid3X3 className="w-4 h-4" /></button>
+          </div>
         </div>
 
-        <div className="space-y-2.5">
-          {prophets.map((p) => {
-            const isExpanded = expandedId === p.id;
-            return (
-              <div key={p.id} className="card-surface-hover">
-                <button
-                  onClick={() => setExpandedId(isExpanded ? null : p.id)}
-                  className="w-full flex items-center gap-3"
-                >
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 text-xl">
-                    {p.icon}
-                  </div>
-                  <div className="flex-1 text-right min-w-0">
-                    <div className="font-bold text-foreground text-sm">{p.arabicName} <span className="text-xs text-muted-foreground font-normal">عليه السلام</span></div>
-                    <div className="text-xs text-muted-foreground">{p.title}</div>
-                  </div>
-                  {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
-                </button>
-                {isExpanded && (
-                  <div className="mt-3 pt-3 border-t border-border animate-fade-in">
-                    <p className="text-sm text-muted-foreground mb-3">{p.summary}</p>
-                    <button
-                      onClick={() => setSelected(p)}
-                      className="w-full py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium"
-                    >
-                      اقرأ القصة كاملة
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+        {viewMode === 'grid' ? (
+          <div className="grid grid-cols-2 gap-2">
+            {prophets.map((p) => (
+              <button key={p.id} onClick={() => setSelected(p)} className="card-surface-hover flex flex-col items-center py-4 gap-2">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Users className="w-5 h-5 text-primary" />
+                </div>
+                <span className="font-bold text-foreground text-sm">{p.arabicName}</span>
+                <span className="text-[10px] text-muted-foreground">{p.title}</span>
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-2.5">
+            {prophets.map((p) => {
+              const isExpanded = expandedId === p.id;
+              return (
+                <div key={p.id} className="card-surface-hover">
+                  <button
+                    onClick={() => setExpandedId(isExpanded ? null : p.id)}
+                    className="w-full flex items-center gap-3"
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Users className="w-5 h-5 text-primary" />
+                    </div>
+                    <div className="flex-1 text-right min-w-0">
+                      <div className="font-bold text-foreground text-sm">{p.arabicName} <span className="text-xs text-muted-foreground font-normal">عليه السلام</span></div>
+                      <div className="text-xs text-muted-foreground">{p.title}</div>
+                    </div>
+                    {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                  </button>
+                  {isExpanded && (
+                    <div className="mt-3 pt-3 border-t border-border animate-fade-in">
+                      <p className="text-sm text-muted-foreground mb-3">{p.summary}</p>
+                      <button
+                        onClick={() => setSelected(p)}
+                        className="w-full py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium"
+                      >
+                        اقرأ القصة كاملة
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
