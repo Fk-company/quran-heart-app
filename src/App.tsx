@@ -16,6 +16,11 @@ import SearchPage from "./pages/SearchPage";
 import MorePage from "./pages/MorePage";
 import ProphetsPage from "./pages/ProphetsPage";
 import HadithPage from "./pages/HadithPage";
+import AsmaAlHusnaPage from "./pages/AsmaAlHusnaPage";
+import SakinahPage from "./pages/SakinahPage";
+import QuranStatsPage from "./pages/QuranStatsPage";
+import DuaPage from "./pages/DuaPage";
+import TafsirPage from "./pages/TafsirPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +44,11 @@ const App = () => (
                 <Route path="/more" element={<MorePage />} />
                 <Route path="/prophets" element={<ProphetsPage />} />
                 <Route path="/hadith" element={<HadithPage />} />
+                <Route path="/asma-al-husna" element={<AsmaAlHusnaPage />} />
+                <Route path="/sakinah" element={<SakinahPage />} />
+                <Route path="/quran-stats" element={<QuranStatsPage />} />
+                <Route path="/dua" element={<DuaPage />} />
+                <Route path="/tafsir" element={<TafsirPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <MiniPlayer />

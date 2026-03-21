@@ -137,7 +137,10 @@ const HomePage: React.FC = () => {
     for (const prayer of prayerOrder) {
       const timeStr = timings[prayer];
       if (!timeStr) continue;
-      const [h, m] = timeStr.split(':').map(Number);
+      // Handle time formats like "05:30 (EET)" - strip timezone info
+      const cleanTime = timeStr.split(' ')[0];
+      const [h, m] = cleanTime.split(':').map(Number);
+      if (isNaN(h) || isNaN(m)) continue;
       const prayerDate = new Date();
       prayerDate.setHours(h, m, 0, 0);
       if (prayerDate > now) {
@@ -145,12 +148,13 @@ const HomePage: React.FC = () => {
         const hours = Math.floor(diff / 3600000);
         const mins = Math.floor((diff % 3600000) / 60000);
         const remaining = hours > 0 ? `${hours} ساعة و ${mins} دقيقة` : `${mins} دقيقة`;
-        setNextPrayer({ name: prayerNames[prayer], time: timings[prayer], remaining });
+        setNextPrayer({ name: prayerNames[prayer], time: cleanTime, remaining });
         setNextPrayerKey(prayer);
         return;
       }
     }
-    setNextPrayer({ name: prayerNames.Fajr, time: timings.Fajr, remaining: 'غداً إن شاء الله' });
+    const fajrClean = timings.Fajr?.split(' ')[0] || timings.Fajr;
+    setNextPrayer({ name: prayerNames.Fajr, time: fajrClean, remaining: 'غداً إن شاء الله' });
     setNextPrayerKey('Fajr');
   };
 
@@ -195,7 +199,7 @@ const HomePage: React.FC = () => {
         <div className="mb-5 overflow-hidden rounded-2xl bg-primary/5 border border-primary/10">
           <div className="ticker-container py-2.5 px-4">
             <div className="ticker-track">
-              {[...tickerItems, ...tickerItems].map((item, i) => (
+              {[...tickerItems, ...tickerItems, ...tickerItems].map((item, i) => (
                 <span key={i} className="ticker-item font-amiri text-sm text-primary whitespace-nowrap mx-8">{item}</span>
               ))}
             </div>
@@ -249,11 +253,12 @@ const HomePage: React.FC = () => {
             {prayerOrder.map((key) => {
               const Icon = prayerIcons[key];
               const isNext = key === nextPrayerKey;
+              const displayTime = prayerTimes[key]?.split(' ')[0] || prayerTimes[key];
               return (
                 <div key={key} className={`prayer-chip ${isNext ? 'next-prayer' : ''}`}>
                   <Icon className={`w-3.5 h-3.5 mb-0.5 ${isNext ? 'text-primary' : 'text-muted-foreground'}`} />
                   <span className={`text-[10px] ${isNext ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>{prayerNames[key]}</span>
-                  <span className={`text-xs font-semibold mt-0.5 ${isNext ? 'text-primary' : 'text-foreground'}`}>{prayerTimes[key]}</span>
+                  <span className={`text-xs font-semibold mt-0.5 ${isNext ? 'text-primary' : 'text-foreground'}`}>{displayTime}</span>
                 </div>
               );
             })}

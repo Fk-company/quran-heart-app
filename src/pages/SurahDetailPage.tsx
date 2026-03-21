@@ -4,7 +4,7 @@ import { fetchSurahAyahs, fetchTafsir, fetchSurahs, fetchReciters, type Ayah, ty
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { useLastRead } from '@/hooks/useLastRead';
 import { useFavorites } from '@/hooks/useFavorites';
-import { ArrowRight, BookOpen, Play, Pause, Mic, Heart, Bookmark } from 'lucide-react';
+import { ArrowRight, BookOpen, Play, Pause, Mic, Heart, Bookmark, Share2 } from 'lucide-react';
 
 const SurahDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -126,6 +126,13 @@ const SurahDetailPage: React.FC = () => {
                     <button onClick={() => setShowTafsir(showTafsir === ayah.numberInSurah ? null : ayah.numberInSurah)} className="flex items-center gap-1 text-xs text-primary font-medium hover:underline">
                       <BookOpen className="w-3.5 h-3.5" />
                       {showTafsir === ayah.numberInSurah ? 'اخفاء التفسير' : 'عرض التفسير'}
+                    </button>
+                    <button onClick={() => {
+                      const text = `${ayah.text}\n\n${surah?.name || ''} - آية ${ayah.numberInSurah}`;
+                      if (navigator.share) navigator.share({ text });
+                      else navigator.clipboard.writeText(text);
+                    }} className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
+                      <Share2 className="w-3 h-3" /> مشاركة
                     </button>
                     <button onClick={() => handleAyahVisible(ayah.numberInSurah)} className="flex items-center gap-1 text-xs text-accent font-medium mr-auto">
                       <Bookmark className="w-3 h-3" /> حفظ الموضع
