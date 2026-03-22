@@ -1,13 +1,14 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Book, Mic, Radio, Clock, Moon, Sun, Sunrise, Sunset,
   CloudSun, Heart, Search, MapPin, ChevronLeft, Star, BookOpen,
-  Users, Quote, Calendar
+  Users, Quote, Calendar, Bell, BellOff
 } from 'lucide-react';
 import { fetchPrayerTimes, fetchSurahs, type PrayerTimes, type Surah } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLastRead } from '@/hooks/useLastRead';
+import { useNotifications } from '@/hooks/useNotifications';
 
 const prayerIcons: Record<string, React.ElementType> = {
   Fajr: Sunrise, Sunrise: Sun, Dhuhr: CloudSun, Asr: Sun, Maghrib: Sunset, Isha: Moon,
@@ -48,7 +49,6 @@ const dailyVerses = [
   { text: 'أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ', surah: 'الرعد', ayah: 28 },
 ];
 
-// Seed-based shuffle: different each day, never same order
 function seededShuffle<T>(arr: T[], seed: number): T[] {
   const result = [...arr];
   let s = seed;
@@ -64,6 +64,7 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const { lastRead } = useLastRead();
+  const { requestPermission, schedulePrayerNotification, sendAdhkarReminder, isSupported } = useNotifications();
   const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
   const [nextPrayerKey, setNextPrayerKey] = useState('');
   const [nextPrayer, setNextPrayer] = useState<{ name: string; time: string; remaining: string } | null>(null);
@@ -72,10 +73,45 @@ const HomePage: React.FC = () => {
   const [locationName, setLocationName] = useState('');
   const [surahs, setSurahs] = useState<Surah[]>([]);
   const [loading, setLoading] = useState(true);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(() => localStorage.getItem('notifications_enabled') === 'true');
 
   const dayOfYear = useMemo(() => Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000), []);
   const dailyVerse = useMemo(() => dailyVerses[dayOfYear % dailyVerses.length], [dayOfYear]);
   const tickerItems = useMemo(() => seededShuffle(allTickerItems, dayOfYear), [dayOfYear]);
+
+  const handleToggleNotifications = useCallback(async () => {
+    if (notificationsEnabled) {
+      setNotificationsEnabled(false);
+      localStorage.setItem('notifications_enabled', 'false');
+      return;
+    }
+    const granted = await requestPermission();
+    if (granted) {
+      setNotificationsEnabled(true);
+      localStorage.setItem('notifications_enabled', 'true');
+      // Schedule adhkar reminders
+      sendAdhkarReminder();
+      // Schedule prayer notifications if available
+      if (prayerTimes) {
+        prayerOrder.forEach(key => {
+          if (key === 'Sunrise') return;
+          const time = prayerTimes[key]?.split(' ')[0];
+          if (time) schedulePrayerNotification(prayerNames[key], time);
+        });
+      }
+    }
+  }, [notificationsEnabled, requestPermission, prayerTimes, schedulePrayerNotification, sendAdhkarReminder]);
+
+  // Schedule notifications when prayer times load
+  useEffect(() => {
+    if (prayerTimes && notificationsEnabled) {
+      prayerOrder.forEach(key => {
+        if (key === 'Sunrise') return;
+        const time = prayerTimes[key]?.split(' ')[0];
+        if (time) schedulePrayerNotification(prayerNames[key], time);
+      });
+    }
+  }, [prayerTimes, notificationsEnabled]);
 
   useEffect(() => {
     const load = async () => {
@@ -137,7 +173,6 @@ const HomePage: React.FC = () => {
     for (const prayer of prayerOrder) {
       const timeStr = timings[prayer];
       if (!timeStr) continue;
-      // Handle time formats like "05:30 (EET)" - strip timezone info
       const cleanTime = timeStr.split(' ')[0];
       const [h, m] = cleanTime.split(':').map(Number);
       if (isNaN(h) || isNaN(m)) continue;
@@ -183,6 +218,11 @@ const HomePage: React.FC = () => {
             {hijriDate && <p className="text-xs text-muted-foreground mt-0.5">{hijriDate}</p>}
           </div>
           <div className="flex items-center gap-2">
+            {isSupported && (
+              <button onClick={handleToggleNotifications} className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center transition-colors hover:bg-muted" title={notificationsEnabled ? 'إيقاف الإشعارات' : 'تفعيل الإشعارات'}>
+                {notificationsEnabled ? <Bell className="w-4 h-4 text-primary" /> : <BellOff className="w-4 h-4 text-muted-foreground" />}
+              </button>
+            )}
             <button onClick={toggleTheme} className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center transition-colors hover:bg-muted">
               {theme === 'dark' ? <Sun className="w-4 h-4 text-accent" /> : <Moon className="w-4 h-4 text-foreground" />}
             </button>
@@ -200,7 +240,7 @@ const HomePage: React.FC = () => {
           <div className="ticker-container py-2.5 px-4">
             <div className="ticker-track">
               {[...tickerItems, ...tickerItems, ...tickerItems].map((item, i) => (
-                <span key={i} className="ticker-item font-amiri text-sm text-primary whitespace-nowrap mx-8">{item}</span>
+                <span key={i} className="font-amiri text-sm text-primary whitespace-nowrap mx-8">{item}</span>
               ))}
             </div>
           </div>
