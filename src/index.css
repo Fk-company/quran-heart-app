@@ -90,12 +90,13 @@
 }
 
 @layer components {
-  /* ====== Typography ====== */
   .quran-text {
     font-family: 'Amiri', serif;
     @apply text-2xl leading-[2.2] text-foreground;
     direction: rtl;
   }
+
+  .font-amiri { font-family: 'Amiri', serif; }
 
   .verse-number {
     @apply inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-semibold;
@@ -104,7 +105,6 @@
     font-family: 'IBM Plex Sans Arabic', sans-serif;
   }
 
-  /* ====== Cards & Surfaces ====== */
   .card-surface {
     @apply bg-card rounded-2xl border border-border p-4 transition-all duration-300;
   }
@@ -118,7 +118,7 @@
     transform: translateY(-1px);
   }
   .card-surface-hover:active {
-    transform: translateY(0) scale(0.99);
+    transform: translateY(0) scale(0.98);
   }
 
   .glass-surface {
@@ -128,7 +128,6 @@
     @apply rounded-2xl border border-border/50;
   }
 
-  /* ====== Navigation ====== */
   .bottom-nav-item {
     @apply flex flex-col items-center justify-center gap-1 text-xs font-medium transition-all duration-200;
     color: hsl(var(--muted-foreground));
@@ -141,12 +140,10 @@
     @apply w-1 h-1 rounded-full bg-primary mt-0.5;
   }
 
-  /* ====== Skeletons ====== */
   .skeleton-pulse {
     @apply animate-pulse bg-muted rounded-xl;
   }
 
-  /* ====== Gradients ====== */
   .gradient-primary {
     background: linear-gradient(145deg, hsl(162 72% 22%), hsl(162 72% 14%));
   }
@@ -156,11 +153,7 @@
   .gradient-hero {
     background: linear-gradient(160deg, hsl(162 72% 24%), hsl(162 72% 12%) 60%, hsl(32 50% 18%) 100%);
   }
-  .gradient-hero-alt {
-    background: linear-gradient(160deg, hsl(32 80% 35%), hsl(32 70% 25%) 60%, hsl(162 50% 15%) 100%);
-  }
 
-  /* ====== Layout ====== */
   .page-container {
     @apply pb-24 min-h-screen;
   }
@@ -170,7 +163,6 @@
     font-family: 'IBM Plex Sans Arabic', sans-serif;
   }
 
-  /* ====== Interactive ====== */
   .quick-link-btn {
     @apply flex flex-col items-center gap-2 py-3 px-2 rounded-2xl transition-all duration-200;
   }
@@ -191,7 +183,6 @@
     box-shadow: 0 0 16px -4px hsl(var(--primary) / 0.2);
   }
 
-  /* ====== Islamic pattern ====== */
   .islamic-pattern {
     position: relative;
     overflow: hidden;
@@ -219,7 +210,6 @@
     pointer-events: none;
   }
 
-  /* ====== Cards ====== */
   .daily-verse-card {
     @apply rounded-2xl p-5 border;
     background: hsl(var(--gold-light));
@@ -232,13 +222,11 @@
     color: hsl(var(--primary));
   }
 
-  /* ====== Input ====== */
   .search-input {
     @apply w-full h-11 pr-10 pl-4 rounded-2xl border border-border bg-card text-foreground text-sm transition-all duration-200;
     @apply placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary;
   }
 
-  /* ====== Grid/List toggle ====== */
   .view-toggle-btn {
     @apply w-9 h-9 rounded-xl flex items-center justify-center transition-colors;
   }
@@ -249,7 +237,6 @@
     @apply bg-secondary text-secondary-foreground;
   }
 
-  /* ====== Favorite heart ====== */
   .fav-btn {
     @apply w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200;
   }
@@ -263,7 +250,6 @@
     color: hsl(var(--muted-foreground));
   }
 
-  /* ====== Chip / tag ====== */
   .filter-chip {
     @apply px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200;
   }
@@ -274,7 +260,6 @@
     @apply bg-secondary text-secondary-foreground;
   }
 
-  /* ====== Bottom sheet ====== */
   .sheet-overlay {
     @apply fixed inset-0 z-50 bg-foreground/30;
     backdrop-filter: blur(4px);
@@ -305,7 +290,7 @@
   }
 }
 
-/* ====== Ticker ====== */
+/* Ticker */
 .ticker-container {
   overflow: hidden;
   mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
@@ -324,7 +309,7 @@
   100% { transform: translateX(-33.333%); }
 }
 
-/* ====== Sheet animation ====== */
+/* Animations */
 @keyframes sheet-up {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
@@ -335,7 +320,10 @@
   to { opacity: 1; }
 }
 
-/* ====== Pulse live indicator ====== */
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
 @keyframes pulse-live {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(1.2); }
@@ -344,7 +332,6 @@
   animation: pulse-live 1.5s ease-in-out infinite;
 }
 
-/* ====== Smooth page transitions ====== */
 .page-container {
   animation: page-enter 0.3s ease-out;
 }
@@ -353,7 +340,7 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ====== Scrollbar styling ====== */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 4px;
 }

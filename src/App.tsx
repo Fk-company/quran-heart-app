@@ -21,6 +21,7 @@ import SakinahPage from "./pages/SakinahPage";
 import QuranStatsPage from "./pages/QuranStatsPage";
 import DuaPage from "./pages/DuaPage";
 import TafsirPage from "./pages/TafsirPage";
+import KidsStoriesPage from "./pages/KidsStoriesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const App = () => (
                 <Route path="/quran-stats" element={<QuranStatsPage />} />
                 <Route path="/dua" element={<DuaPage />} />
                 <Route path="/tafsir" element={<TafsirPage />} />
+                <Route path="/kids-stories" element={<KidsStoriesPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <MiniPlayer />
