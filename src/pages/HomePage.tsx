@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { fetchPrayerTimes, fetchSurahs, type PrayerTimes, type Surah } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
+import { fetchPrayerTimesByCity } from '@/lib/api';
 import { useLastRead } from '@/hooks/useLastRead';
 import { useNotifications } from '@/hooks/useNotifications';
 
