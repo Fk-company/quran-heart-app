@@ -224,9 +224,14 @@ const HomePage: React.FC = () => {
                 {notificationsEnabled ? <Bell className="w-4 h-4 text-primary" /> : <BellOff className="w-4 h-4 text-muted-foreground" />}
               </button>
             )}
-            <button onClick={toggleTheme} className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center transition-colors hover:bg-muted">
+            <button onClick={toggleTheme} className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center transition-colors hover:bg-muted" title={themeMode === 'auto' ? 'تلقائي' : theme}>
               {theme === 'dark' ? <Sun className="w-4 h-4 text-accent" /> : <Moon className="w-4 h-4 text-foreground" />}
             </button>
+            {prayerTimes && themeMode !== 'auto' && (
+              <button onClick={() => setAutoMode({ Fajr: prayerTimes.Fajr, Maghrib: prayerTimes.Maghrib })} className="text-[9px] text-primary bg-primary/10 rounded-full px-2 py-1 font-medium" title="الوضع التلقائي حسب مواقيت الصلاة">
+                تلقائي
+              </button>
+            )}
             {locationName && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground bg-secondary rounded-full px-3 py-1.5">
                 <MapPin className="w-3 h-3" />
