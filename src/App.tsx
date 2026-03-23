@@ -22,6 +22,7 @@ import QuranStatsPage from "./pages/QuranStatsPage";
 import DuaPage from "./pages/DuaPage";
 import TafsirPage from "./pages/TafsirPage";
 import KidsStoriesPage from "./pages/KidsStoriesPage";
+import FavoritesPage from "./pages/FavoritesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,7 +34,7 @@ const App = () => (
         <Sonner />
         <AudioProvider>
           <BrowserRouter>
-            <div className="min-h-screen bg-background">
+            <div className="min-h-screen bg-background islamic-bg">
               <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/quran" element={<QuranPage />} />
@@ -51,6 +52,7 @@ const App = () => (
                 <Route path="/dua" element={<DuaPage />} />
                 <Route path="/tafsir" element={<TafsirPage />} />
                 <Route path="/kids-stories" element={<KidsStoriesPage />} />
+                <Route path="/favorites" element={<FavoritesPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <MiniPlayer />

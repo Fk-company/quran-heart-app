@@ -1,8 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Radio, Users, Quote, Search, Star, BookOpen, BarChart3, X, Feather, Book } from 'lucide-react';
+import { Heart, Radio, Users, Quote, Search, Star, BookOpen, BarChart3, X, Feather, Book, Download } from 'lucide-react';
 
 const moreItems = [
+  { label: 'المفضلة', icon: Heart, path: '/favorites', desc: 'الآيات والأدعية المحفوظة', color: 'bg-destructive/10 text-destructive' },
   { label: 'الاذكار والتسبيح', icon: Heart, path: '/adhkar', desc: 'اذكار الصباح والمساء', color: 'bg-accent/10 text-accent' },
   { label: 'الراديو', icon: Radio, path: '/radio', desc: 'بث مباشر للقرآن', color: 'bg-primary/10 text-primary' },
   { label: 'قصص الأنبياء', icon: Users, path: '/prophets', desc: 'قصص الأنبياء والمرسلين', color: 'bg-accent/10 text-accent' },

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchReciters, fetchSurahs, type Reciter, type Surah } from '@/lib/api';
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { useFavorites } from '@/hooks/useFavorites';
-import { Play, Pause, Search, ChevronDown, ChevronUp, Mic, Volume2, Heart, Grid3X3, List } from 'lucide-react';
+import { Play, Pause, Search, ChevronDown, ChevronUp, Mic, Volume2, Heart, Grid3X3, List, X } from 'lucide-react';
 
 const RecitersPage: React.FC = () => {
   const [reciters, setReciters] = useState<Reciter[]>([]);
@@ -37,6 +37,53 @@ const RecitersPage: React.FC = () => {
   const getReciterSurahs = (reciter: Reciter): number[] => {
     const moshaf = reciter.moshaf?.[0];
     return moshaf ? moshaf.surah_list.split(',').map(Number).filter(Boolean) : [];
+  };
+
+  const getReciterImage = (reciter: Reciter) => {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(reciter.name)}&background=0d9488&color=fff&size=128&font-size=0.4&bold=true`;
+  };
+
+  // Surah picker dialog for grid mode
+  const SurahPicker = ({ reciter, onClose }: { reciter: Reciter; onClose: () => void }) => {
+    const surahNums = getReciterSurahs(reciter);
+    return (
+      <>
+        <div className="sheet-overlay" onClick={onClose} />
+        <div className="sheet-content" dir="rtl">
+          <div className="sheet-handle" />
+          <div className="px-5 pb-6 pt-2 max-h-[70vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <img src={getReciterImage(reciter)} alt={reciter.name} className="w-10 h-10 rounded-full" />
+                <div>
+                  <h3 className="text-base font-bold text-foreground">{reciter.name}</h3>
+                  <p className="text-xs text-muted-foreground">{surahNums.length} سورة</p>
+                </div>
+              </div>
+              <button onClick={onClose} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {surahNums.map((num) => {
+                const s = surahs.find((su) => su.number === num);
+                const trackId = `${reciter.id}-${num}`;
+                const isThisPlaying = currentTrack?.id === trackId && isPlaying;
+                return (
+                  <button key={num} onClick={() => handlePlay(reciter, num)}
+                    className={`flex items-center gap-2 p-3 rounded-xl transition-colors text-right ${isThisPlaying ? 'bg-primary/10 border border-primary/20' : 'bg-secondary/50 hover:bg-secondary border border-transparent'}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${isThisPlaying ? 'bg-primary' : 'bg-primary/10'}`}>
+                      {isThisPlaying ? <Pause className="w-3.5 h-3.5 text-primary-foreground" /> : <Play className="w-3.5 h-3.5 text-primary ml-0.5" />}
+                    </div>
+                    <span className={`text-xs truncate ${isThisPlaying ? 'text-primary font-semibold' : 'text-foreground'}`}>{s?.name || `سورة ${num}`}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </>
+    );
   };
 
   return (
@@ -83,9 +130,15 @@ const RecitersPage: React.FC = () => {
           </div>
         )}
 
+        {/* Grid Surah Picker */}
+        {viewMode === 'grid' && expandedReciter !== null && (() => {
+          const reciter = filtered.find(r => r.id === expandedReciter);
+          return reciter ? <SurahPicker reciter={reciter} onClose={() => setExpandedReciter(null)} /> : null;
+        })()}
+
         {loading ? (
           <div className={viewMode === 'grid' ? 'grid grid-cols-2 gap-2' : 'space-y-2'}>
-            {Array.from({ length: 8 }).map((_, i) => <div key={i} className={`skeleton-pulse ${viewMode === 'grid' ? 'h-24' : 'h-16'} w-full`} />)}
+            {Array.from({ length: 8 }).map((_, i) => <div key={i} className={`skeleton-pulse ${viewMode === 'grid' ? 'h-28' : 'h-16'} w-full`} />)}
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-2 gap-2">
@@ -97,10 +150,8 @@ const RecitersPage: React.FC = () => {
                   <button onClick={(e) => { e.stopPropagation(); toggleReciter(reciter.id); }} className={`fav-btn absolute top-2 left-2 w-6 h-6 ${isReciterFav(reciter.id) ? 'active' : ''}`}>
                     <Heart className="w-3 h-3" fill={isReciterFav(reciter.id) ? 'currentColor' : 'none'} />
                   </button>
-                  <button onClick={() => setExpandedReciter(expandedReciter === reciter.id ? null : reciter.id)} className="w-full flex flex-col items-center py-2 gap-1">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isReciterPlaying ? 'bg-primary' : 'bg-primary/10'}`}>
-                      <span className={`font-bold text-sm ${isReciterPlaying ? 'text-primary-foreground' : 'text-primary'}`}>{reciter.name.charAt(0)}</span>
-                    </div>
+                  <button onClick={() => setExpandedReciter(reciter.id)} className="w-full flex flex-col items-center py-3 gap-1.5">
+                    <img src={getReciterImage(reciter)} alt={reciter.name} className={`w-14 h-14 rounded-full border-2 ${isReciterPlaying ? 'border-primary' : 'border-border'}`} />
                     <span className="text-xs font-semibold text-foreground text-center line-clamp-2">{reciter.name}</span>
                     <span className="text-[10px] text-muted-foreground">{surahNums.length} سورة</span>
                   </button>
@@ -118,9 +169,7 @@ const RecitersPage: React.FC = () => {
                 <div key={reciter.id} className={`card-surface transition-all duration-200 ${isReciterPlaying ? 'border-primary/30 bg-primary/[0.03]' : ''}`}>
                   <button onClick={() => setExpandedReciter(isExpanded ? null : reciter.id)} className="w-full flex items-center justify-between">
                     <div className="flex items-center gap-3 flex-1">
-                      <div className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 ${isReciterPlaying ? 'bg-primary' : 'bg-primary/10'}`}>
-                        <span className={`font-bold text-sm ${isReciterPlaying ? 'text-primary-foreground' : 'text-primary'}`}>{reciter.name.charAt(0)}</span>
-                      </div>
+                      <img src={getReciterImage(reciter)} alt={reciter.name} className={`w-11 h-11 rounded-full border-2 ${isReciterPlaying ? 'border-primary' : 'border-border'}`} />
                       <div className="text-right">
                         <div className="font-semibold text-foreground text-sm">{reciter.name}</div>
                         <div className="text-xs text-muted-foreground">{surahNums.length} سورة</div>

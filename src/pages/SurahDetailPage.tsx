@@ -4,7 +4,7 @@ import { fetchSurahAyahs, fetchTafsir, fetchSurahs, fetchReciters, type Ayah, ty
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { useLastRead } from '@/hooks/useLastRead';
 import { useFavorites } from '@/hooks/useFavorites';
-import { ArrowRight, BookOpen, Play, Pause, Mic, Heart, Bookmark, Share2 } from 'lucide-react';
+import { ArrowRight, BookOpen, Play, Pause, Mic, Heart, Bookmark, Share2, Layers } from 'lucide-react';
 
 const SurahDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -17,9 +17,10 @@ const SurahDetailPage: React.FC = () => {
   const [reciters, setReciters] = useState<Reciter[]>([]);
   const [selectedReciter, setSelectedReciter] = useState<Reciter | null>(null);
   const [showReciterPicker, setShowReciterPicker] = useState(false);
+  const [viewMode, setViewMode] = useState<'ayah' | 'full'>('ayah');
   const { play, pause, currentTrack, isPlaying } = useAudioPlayer();
   const { savePosition } = useLastRead();
-  const { toggleSurah, isSurahFav } = useFavorites();
+  const { toggleSurah, isSurahFav, addItem, removeItem, isItemFav } = useFavorites();
 
   const surahNum = Number(id);
 
@@ -53,6 +54,12 @@ const SurahDetailPage: React.FC = () => {
     else play({ id: trackId, title: surah?.name || `سورة ${surahNum}`, reciter: selectedReciter.name, url });
   };
 
+  const toggleAyahFav = (ayah: Ayah) => {
+    const fid = `ayah-${surahNum}-${ayah.numberInSurah}`;
+    if (isItemFav(fid)) removeItem(fid);
+    else addItem({ id: fid, type: 'ayah', text: ayah.text, source: `${surah?.name || ''} - آية ${ayah.numberInSurah}` });
+  };
+
   const isCurrentlyPlaying = currentTrack?.id === `surah-${selectedReciter?.id}-${surahNum}` && isPlaying;
 
   return (
@@ -69,6 +76,9 @@ const SurahDetailPage: React.FC = () => {
               {surah ? `${surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية'} - ${surah.numberOfAyahs} آيات` : ''}
             </p>
           </div>
+          <button onClick={() => setViewMode(viewMode === 'ayah' ? 'full' : 'ayah')} className={`w-9 h-9 rounded-full flex items-center justify-center ${viewMode === 'full' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-foreground'}`} title={viewMode === 'ayah' ? 'عرض كامل' : 'عرض آية آية'}>
+            <Layers className="w-4 h-4" />
+          </button>
           <button onClick={() => surah && toggleSurah(surah.number)} className={`fav-btn ${surah && isSurahFav(surah.number) ? 'active' : ''}`}>
             <Heart className="w-5 h-5" fill={surah && isSurahFav(surah.number) ? 'currentColor' : 'none'} />
           </button>
@@ -112,10 +122,22 @@ const SurahDetailPage: React.FC = () => {
 
         {loading ? (
           <div className="space-y-4">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="skeleton-pulse h-20 w-full" />)}</div>
+        ) : viewMode === 'full' ? (
+          /* Full continuous view */
+          <div className="card-surface mb-4">
+            <p className="quran-text text-center leading-[2.8]">
+              {ayahs.map((ayah) => (
+                <span key={ayah.numberInSurah}>
+                  {ayah.text} <span className="verse-number inline-flex w-6 h-6 text-[10px] mx-1 align-middle">{ayah.numberInSurah}</span>{' '}
+                </span>
+              ))}
+            </p>
+          </div>
         ) : (
           <div className="space-y-3">
             {ayahs.map((ayah) => {
               const ayahTafsir = tafsir.find((t) => t.numberInSurah === ayah.numberInSurah);
+              const favId = `ayah-${surahNum}-${ayah.numberInSurah}`;
               return (
                 <div key={ayah.numberInSurah} className="card-surface" onClick={() => handleAyahVisible(ayah.numberInSurah)}>
                   <div className="flex items-start gap-2 mb-2">
@@ -134,8 +156,9 @@ const SurahDetailPage: React.FC = () => {
                     }} className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
                       <Share2 className="w-3 h-3" /> مشاركة
                     </button>
-                    <button onClick={() => handleAyahVisible(ayah.numberInSurah)} className="flex items-center gap-1 text-xs text-accent font-medium mr-auto">
-                      <Bookmark className="w-3 h-3" /> حفظ الموضع
+                    <button onClick={() => toggleAyahFav(ayah)} className={`flex items-center gap-1 text-xs font-medium mr-auto ${isItemFav(favId) ? 'text-destructive' : 'text-muted-foreground'}`}>
+                      <Heart className="w-3 h-3" fill={isItemFav(favId) ? 'currentColor' : 'none'} />
+                      {isItemFav(favId) ? 'محفوظة' : 'مفضلة'}
                     </button>
                   </div>
                   {showTafsir === ayah.numberInSurah && ayahTafsir && (

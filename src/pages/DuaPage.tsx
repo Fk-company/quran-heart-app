@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Search, Heart, ChevronDown, ChevronUp, BookOpen, Share2 } from 'lucide-react';
+import { useFavorites } from '@/hooks/useFavorites';
+import { Search, Heart, BookOpen, Share2 } from 'lucide-react';
 
 interface Dua {
   id: number;
@@ -47,14 +48,17 @@ const duas: Dua[] = [
 const DuaPage: React.FC = () => {
   const [selectedCat, setSelectedCat] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const [expandedId, setExpandedId] = useState<number | null>(null);
-  const [favs, setFavs] = useState<number[]>([]);
+  const { addItem, removeItem, isItemFav } = useFavorites();
 
   const filtered = selectedCat
     ? duas.filter(d => d.category === selectedCat)
     : search.trim() ? duas.filter(d => d.text.includes(search)) : duas;
 
-  const toggleFav = (id: number) => setFavs(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
+  const toggleFav = (dua: Dua) => {
+    const id = `dua-${dua.id}`;
+    if (isItemFav(id)) removeItem(id);
+    else addItem({ id, type: 'dua', text: dua.text, source: dua.reference });
+  };
 
   const shareDua = (dua: Dua) => {
     const text = `${dua.text}\n\n${dua.reference}`;
@@ -88,23 +92,26 @@ const DuaPage: React.FC = () => {
         </div>
 
         <div className="space-y-3">
-          {filtered.map(dua => (
-            <div key={dua.id} className="card-surface">
-              <p className="font-amiri text-lg leading-[2] text-foreground mb-3">{dua.text}</p>
-              {dua.occasion && <div className="stat-badge mb-2">{dua.occasion}</div>}
-              <div className="flex items-center justify-between pt-2 border-t border-border">
-                <span className="text-[11px] text-muted-foreground">{dua.reference}</span>
-                <div className="flex items-center gap-1">
-                  <button onClick={() => shareDua(dua)} className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-primary">
-                    <Share2 className="w-3.5 h-3.5" />
-                  </button>
-                  <button onClick={() => toggleFav(dua.id)} className={`fav-btn ${favs.includes(dua.id) ? 'active' : ''}`}>
-                    <Heart className="w-3.5 h-3.5" fill={favs.includes(dua.id) ? 'currentColor' : 'none'} />
-                  </button>
+          {filtered.map(dua => {
+            const fav = isItemFav(`dua-${dua.id}`);
+            return (
+              <div key={dua.id} className="card-surface">
+                <p className="font-amiri text-lg leading-[2] text-foreground mb-3">{dua.text}</p>
+                {dua.occasion && <div className="stat-badge mb-2">{dua.occasion}</div>}
+                <div className="flex items-center justify-between pt-2 border-t border-border">
+                  <span className="text-[11px] text-muted-foreground">{dua.reference}</span>
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => shareDua(dua)} className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-primary">
+                      <Share2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button onClick={() => toggleFav(dua)} className={`fav-btn ${fav ? 'active' : ''}`}>
+                      <Heart className="w-3.5 h-3.5" fill={fav ? 'currentColor' : 'none'} />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
