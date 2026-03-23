@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, Pause, X, ChevronUp, ChevronDown, SkipBack, SkipForward } from 'lucide-react';
+import { Play, Pause, X, ChevronUp, ChevronDown, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { Slider } from '@/components/ui/slider';
 
@@ -11,7 +11,7 @@ const formatTime = (seconds: number) => {
 };
 
 const MiniPlayer: React.FC = () => {
-  const { currentTrack, isPlaying, progress, duration, pause, resume, seekTo, stop } = useAudioPlayer();
+  const { currentTrack, isPlaying, progress, duration, volume, pause, resume, seekTo, setVolume, stop } = useAudioPlayer();
   const [expanded, setExpanded] = useState(false);
 
   if (!currentTrack) return null;
@@ -42,6 +42,7 @@ const MiniPlayer: React.FC = () => {
             })}
           </div>
 
+          {/* Progress */}
           <div className="mb-3">
             <Slider value={[progress]} max={duration || 100} step={1} onValueChange={([val]) => seekTo(val)} className="w-full" />
             <div className="flex justify-between mt-1.5">
@@ -50,7 +51,8 @@ const MiniPlayer: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-center gap-6">
+          {/* Controls */}
+          <div className="flex items-center justify-center gap-6 mb-3">
             <button onClick={() => seekTo(Math.max(0, progress - 10))} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
               <SkipBack className="w-4 h-4 text-foreground" />
             </button>
@@ -60,6 +62,15 @@ const MiniPlayer: React.FC = () => {
             <button onClick={() => seekTo(Math.min(duration, progress + 10))} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
               <SkipForward className="w-4 h-4 text-foreground" />
             </button>
+          </div>
+
+          {/* Volume */}
+          <div className="flex items-center gap-3 px-2">
+            <button onClick={() => setVolume(volume > 0 ? 0 : 1)} className="text-muted-foreground">
+              {volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            </button>
+            <Slider value={[volume * 100]} max={100} step={1} onValueChange={([val]) => setVolume(val / 100)} className="flex-1" />
+            <span className="text-[10px] text-muted-foreground w-8 text-center">{Math.round(volume * 100)}%</span>
           </div>
         </div>
       </div>

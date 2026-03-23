@@ -12,10 +12,12 @@ interface AudioContextType {
   isPlaying: boolean;
   progress: number;
   duration: number;
+  volume: number;
   play: (track: AudioTrack) => void;
   pause: () => void;
   resume: () => void;
   seekTo: (time: number) => void;
+  setVolume: (vol: number) => void;
   stop: () => void;
 }
 
@@ -32,10 +34,15 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [volume, setVolumeState] = useState(() => {
+    const saved = localStorage.getItem('audio-volume');
+    return saved ? parseFloat(saved) : 1;
+  });
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const audio = new Audio();
+    audio.volume = volume;
     audioRef.current = audio;
 
     audio.addEventListener('timeupdate', () => setProgress(audio.currentTime));
@@ -52,6 +59,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const audio = audioRef.current;
     if (!audio) return;
     audio.src = track.url;
+    audio.volume = volume;
     audio.play();
     setCurrentTrack(track);
     setIsPlaying(true);
@@ -59,28 +67,23 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setDuration(0);
   };
 
-  const pause = () => {
-    audioRef.current?.pause();
-    setIsPlaying(false);
-  };
-
-  const resume = () => {
-    audioRef.current?.play();
-    setIsPlaying(true);
-  };
+  const pause = () => { audioRef.current?.pause(); setIsPlaying(false); };
+  const resume = () => { audioRef.current?.play(); setIsPlaying(true); };
 
   const seekTo = (time: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-    }
+    if (audioRef.current) audioRef.current.currentTime = time;
+  };
+
+  const setVolume = (vol: number) => {
+    const v = Math.max(0, Math.min(1, vol));
+    setVolumeState(v);
+    if (audioRef.current) audioRef.current.volume = v;
+    localStorage.setItem('audio-volume', String(v));
   };
 
   const stop = () => {
     const audio = audioRef.current;
-    if (audio) {
-      audio.pause();
-      audio.src = '';
-    }
+    if (audio) { audio.pause(); audio.src = ''; }
     setCurrentTrack(null);
     setIsPlaying(false);
     setProgress(0);
@@ -88,7 +91,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   return (
-    <AudioCtx.Provider value={{ currentTrack, isPlaying, progress, duration, play, pause, resume, seekTo, stop }}>
+    <AudioCtx.Provider value={{ currentTrack, isPlaying, progress, duration, volume, play, pause, resume, seekTo, setVolume, stop }}>
       {children}
     </AudioCtx.Provider>
   );
