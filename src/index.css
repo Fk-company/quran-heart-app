@@ -48,30 +48,30 @@
   }
 
   .dark {
-    --background: 222 28% 6%;
-    --foreground: 40 20% 92%;
-    --card: 222 24% 10%;
-    --card-foreground: 40 20% 92%;
-    --popover: 222 24% 10%;
-    --popover-foreground: 40 20% 92%;
+    --background: 222 28% 7%;
+    --foreground: 40 20% 90%;
+    --card: 222 24% 11%;
+    --card-foreground: 40 20% 90%;
+    --popover: 222 24% 11%;
+    --popover-foreground: 40 20% 90%;
     --primary: 162 55% 42%;
     --primary-foreground: 222 28% 6%;
-    --secondary: 222 20% 15%;
-    --secondary-foreground: 40 20% 92%;
-    --muted: 222 20% 15%;
+    --secondary: 222 20% 16%;
+    --secondary-foreground: 40 20% 90%;
+    --muted: 222 20% 16%;
     --muted-foreground: 220 14% 55%;
     --accent: 32 80% 50%;
     --accent-foreground: 222 28% 6%;
     --destructive: 0 63% 31%;
     --destructive-foreground: 0 0% 100%;
-    --border: 222 18% 18%;
-    --input: 222 18% 18%;
+    --border: 222 18% 20%;
+    --input: 222 18% 20%;
     --ring: 162 55% 42%;
     --gold: 32 80% 50%;
     --gold-light: 32 30% 15%;
     --emerald-dark: 162 55% 30%;
-    --emerald-light: 162 30% 12%;
-    --glass: 222 24% 10% / 0.8;
+    --emerald-light: 162 30% 14%;
+    --glass: 222 24% 11% / 0.85;
   }
 }
 
@@ -90,6 +90,31 @@
 }
 
 @layer components {
+  /* Islamic background pattern */
+  .islamic-bg {
+    position: relative;
+  }
+  .islamic-bg::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      radial-gradient(circle at 15% 15%, hsl(var(--primary) / 0.04) 0%, transparent 50%),
+      radial-gradient(circle at 85% 20%, hsl(var(--accent) / 0.03) 0%, transparent 40%),
+      radial-gradient(circle at 50% 80%, hsl(var(--primary) / 0.03) 0%, transparent 50%),
+      repeating-conic-gradient(from 0deg at 50% 50%, hsl(var(--primary) / 0.008) 0deg 30deg, transparent 30deg 60deg);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 200px 200px;
+  }
+  .islamic-bg > * {
+    position: relative;
+    z-index: 1;
+  }
+
   .quran-text {
     font-family: 'Amiri', serif;
     @apply text-2xl leading-[2.2] text-foreground;
@@ -272,6 +297,13 @@
   }
   .sheet-handle {
     @apply w-10 h-1 rounded-full bg-border mx-auto mt-3 mb-2;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 }
 
