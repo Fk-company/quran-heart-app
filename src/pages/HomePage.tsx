@@ -63,7 +63,7 @@ function seededShuffle<T>(arr: T[], seed: number): T[] {
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, themeMode, toggleTheme, setAutoMode } = useTheme();
   const { lastRead } = useLastRead();
   const { requestPermission, schedulePrayerNotification, sendAdhkarReminder, isSupported } = useNotifications();
   const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
