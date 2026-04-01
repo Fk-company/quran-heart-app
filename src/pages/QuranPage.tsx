@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchSurahs, type Surah } from '@/lib/api';
-import { Search, Book, Grid3X3, List, Heart } from 'lucide-react';
+import { Search, Book, Grid3X3, List, Heart, BookOpen } from 'lucide-react';
 import { useFavorites } from '@/hooks/useFavorites';
 
 const QuranPage: React.FC = () => {
