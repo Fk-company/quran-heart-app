@@ -120,6 +120,9 @@ const SurahDetailPage: React.FC = () => {
                   <Mic className="w-3 h-3" />{selectedReciter.name}
                 </button>
               </div>
+              <button onClick={handleDownloadSurah} className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0" title="تحميل السورة">
+                <Download className="w-4 h-4 text-primary" />
+              </button>
             </div>
             {showReciterPicker && (
               <div className="mt-3 pt-3 border-t border-border max-h-40 overflow-y-auto animate-fade-in">
