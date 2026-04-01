@@ -24,6 +24,7 @@ import TafsirPage from "./pages/TafsirPage";
 import KidsStoriesPage from "./pages/KidsStoriesPage";
 import FavoritesPage from "./pages/FavoritesPage";
 import ReadingStatsPage from "./pages/ReadingStatsPage";
+import MushafPage from "./pages/MushafPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
