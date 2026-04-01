@@ -324,13 +324,13 @@ const HomePage: React.FC = () => {
         {/* Quick Access */}
         <div className="mb-5">
           <h2 className="section-title">الوصول السريع</h2>
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-5 gap-2">
             {quickLinks.map((link) => (
               <button key={link.path} onClick={() => navigate(link.path)} className="quick-link-btn">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${link.gradient}`}>
-                  <link.icon className="w-5 h-5 text-primary-foreground" />
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${link.gradient}`}>
+                  <link.icon className="w-4.5 h-4.5 text-primary-foreground" />
                 </div>
-                <span className="text-xs font-medium text-foreground">{link.label}</span>
+                <span className="text-[10px] font-medium text-foreground leading-tight text-center">{link.label}</span>
               </button>
             ))}
           </div>
