@@ -67,6 +67,24 @@ const SurahDetailPage: React.FC = () => {
 
   const isCurrentlyPlaying = currentTrack?.id === `surah-${selectedReciter?.id}-${surahNum}` && isPlaying;
 
+  const handleDownloadSurah = async () => {
+    if (!selectedReciter) return;
+    const moshaf = selectedReciter.moshaf?.[0];
+    if (!moshaf) return;
+    const url = `${moshaf.server}${String(surahNum).padStart(3, '0')}.mp3`;
+    try {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${surah?.name || 'surah'}-${selectedReciter.name}.mp3`;
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (e) {
+      window.open(url, '_blank');
+    }
+  };
+
   return (
     <div className="page-container" dir="rtl">
       <div className="px-4 pt-4 max-w-lg mx-auto">
