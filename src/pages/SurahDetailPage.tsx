@@ -38,7 +38,10 @@ const SurahDetailPage: React.FC = () => {
         setReciters(recitersData.slice(0, 30));
         if (recitersData.length > 0) setSelectedReciter(recitersData[0]);
         setLoading(false);
-        if (s) savePosition(surahNum, s.name, 1);
+        if (s) {
+          savePosition(surahNum, s.name, 1);
+          recordReading(surahNum, s.numberOfAyahs, Math.ceil(s.numberOfAyahs / 15));
+        }
       });
   }, [surahNum]);
 
