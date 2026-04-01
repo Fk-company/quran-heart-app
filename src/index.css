@@ -187,7 +187,7 @@
   }
 
   .page-container {
-    @apply pb-24 min-h-screen;
+    @apply pb-32 min-h-screen;
   }
 
   .section-title {
