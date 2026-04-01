@@ -49,6 +49,17 @@ const QuranPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Mushaf link */}
+        <button onClick={() => navigate('/mushaf')} className="w-full card-surface mb-4 flex items-center gap-3 bg-accent/5 border-accent/15">
+          <div className="w-10 h-10 rounded-xl gradient-gold flex items-center justify-center flex-shrink-0">
+            <BookOpen className="w-5 h-5 text-primary-foreground" />
+          </div>
+          <div className="flex-1 text-right">
+            <div className="text-sm font-bold text-foreground">المصحف صفحة بصفحة</div>
+            <div className="text-[11px] text-muted-foreground">اقرأ كالمصحف الورقي - 604 صفحة</div>
+          </div>
+        </button>
+
         <div className="relative mb-3">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="ابحث عن سورة..." className="search-input pr-10" />
