@@ -110,6 +110,19 @@ export async function fetchReciters(): Promise<Reciter[]> {
   return data.reciters || [];
 }
 
+// Quran Page API
+export async function fetchQuranPage(pageNumber: number): Promise<{ ayahs: Ayah[]; surahs: Record<string, string> }> {
+  const res = await fetch(`${ALQURAN_BASE}/page/${pageNumber}`);
+  const data = await res.json();
+  const ayahs: Ayah[] = data.data.ayahs;
+  const surahs: Record<string, string> = {};
+  for (const a of ayahs) {
+    const sNum = String(a.number > 0 ? Math.floor(a.number / 1000) || 1 : 1);
+    // extract surah info from ayah
+  }
+  return { ayahs, surahs };
+}
+
 // Radio API
 export async function fetchRadioStations(): Promise<RadioStation[]> {
   const res = await fetch(`${MP3QURAN_BASE}/radios?language=ar`);
