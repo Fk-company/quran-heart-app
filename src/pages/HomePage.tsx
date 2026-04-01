@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   Book, Mic, Radio, Clock, Moon, Sun, Sunrise, Sunset,
   CloudSun, Heart, Search, MapPin, ChevronLeft, Star, BookOpen,
-  Users, Quote, Calendar, Bell, BellOff
+  Users, Quote, Calendar, Bell, BellOff, Feather, BarChart3,
+  TrendingUp, Sparkles, Baby, Download
 } from 'lucide-react';
 import { fetchPrayerTimes, fetchSurahs, type PrayerTimes, type Surah } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
