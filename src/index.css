@@ -120,8 +120,10 @@
 
   .quran-text {
     font-family: 'Amiri', serif;
-    @apply text-2xl leading-[2.2] text-foreground;
+    @apply text-2xl leading-[2.4] text-foreground;
     direction: rtl;
+    letter-spacing: 0.02em;
+    word-spacing: 0.08em;
   }
 
   .font-amiri { font-family: 'Amiri', serif; }
