@@ -54,6 +54,7 @@ const App = () => (
                 <Route path="/tafsir" element={<TafsirPage />} />
                 <Route path="/kids-stories" element={<KidsStoriesPage />} />
                 <Route path="/favorites" element={<FavoritesPage />} />
+                <Route path="/reading-stats" element={<ReadingStatsPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <MiniPlayer />

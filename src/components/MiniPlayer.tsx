@@ -78,7 +78,7 @@ const MiniPlayer: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-16 left-0 right-0 z-40 glass-surface border-t border-border/50 shadow-lg">
+    <div className="fixed bottom-[4.5rem] left-0 right-0 z-40 glass-surface border-t border-border/50 shadow-lg">
       <div className="h-0.5 bg-muted">
         <div className="h-full bg-primary transition-all duration-300" style={{ width: `${progressPercent}%` }} />
       </div>
