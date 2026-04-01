@@ -22,6 +22,7 @@ const SurahDetailPage: React.FC = () => {
   const { play, pause, currentTrack, isPlaying } = useAudioPlayer();
   const { savePosition } = useLastRead();
   const { toggleSurah, isSurahFav, addItem, removeItem, isItemFav } = useFavorites();
+  const { recordReading } = useReadingTracker();
 
   const surahNum = Number(id);
 
