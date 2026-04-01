@@ -199,9 +199,18 @@ const HomePage: React.FC = () => {
     { label: 'المصحف', icon: Book, path: '/quran', gradient: 'gradient-primary' },
     { label: 'القراء', icon: Mic, path: '/reciters', gradient: 'gradient-gold' },
     { label: 'الراديو', icon: Radio, path: '/radio', gradient: 'gradient-primary' },
-    { label: 'الاذكار', icon: Heart, path: '/adhkar', gradient: 'gradient-gold' },
+    { label: 'الأذكار', icon: Heart, path: '/adhkar', gradient: 'gradient-gold' },
     { label: 'الأنبياء', icon: Users, path: '/prophets', gradient: 'gradient-primary' },
     { label: 'الأحاديث', icon: Quote, path: '/hadith', gradient: 'gradient-gold' },
+    { label: 'الأدعية', icon: Feather, path: '/dua', gradient: 'gradient-primary' },
+    { label: 'التفسير', icon: BookOpen, path: '/tafsir', gradient: 'gradient-gold' },
+    { label: 'أسماء الله', icon: Sparkles, path: '/asma-al-husna', gradient: 'gradient-primary' },
+    { label: 'السكينة', icon: Star, path: '/sakinah', gradient: 'gradient-gold' },
+    { label: 'الإحصائيات', icon: BarChart3, path: '/quran-stats', gradient: 'gradient-primary' },
+    { label: 'قصص أطفال', icon: Baby, path: '/kids-stories', gradient: 'gradient-gold' },
+    { label: 'المفضلة', icon: Heart, path: '/favorites', gradient: 'gradient-primary' },
+    { label: 'تقدم القراءة', icon: TrendingUp, path: '/reading-stats', gradient: 'gradient-gold' },
+    { label: 'البحث', icon: Search, path: '/search', gradient: 'gradient-primary' },
   ];
 
   const featuredSurahs = [
