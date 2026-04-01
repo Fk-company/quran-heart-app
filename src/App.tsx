@@ -23,6 +23,7 @@ import DuaPage from "./pages/DuaPage";
 import TafsirPage from "./pages/TafsirPage";
 import KidsStoriesPage from "./pages/KidsStoriesPage";
 import FavoritesPage from "./pages/FavoritesPage";
+import ReadingStatsPage from "./pages/ReadingStatsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -53,6 +54,7 @@ const App = () => (
                 <Route path="/tafsir" element={<TafsirPage />} />
                 <Route path="/kids-stories" element={<KidsStoriesPage />} />
                 <Route path="/favorites" element={<FavoritesPage />} />
+                <Route path="/reading-stats" element={<ReadingStatsPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <MiniPlayer />

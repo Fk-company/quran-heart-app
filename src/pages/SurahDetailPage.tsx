@@ -4,7 +4,8 @@ import { fetchSurahAyahs, fetchTafsir, fetchSurahs, fetchReciters, type Ayah, ty
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { useLastRead } from '@/hooks/useLastRead';
 import { useFavorites } from '@/hooks/useFavorites';
-import { ArrowRight, BookOpen, Play, Pause, Mic, Heart, Bookmark, Share2, Layers } from 'lucide-react';
+import { useReadingTracker } from '@/hooks/useReadingTracker';
+import { ArrowRight, BookOpen, Play, Pause, Mic, Heart, Share2, Layers, Download } from 'lucide-react';
 
 const SurahDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,6 +22,7 @@ const SurahDetailPage: React.FC = () => {
   const { play, pause, currentTrack, isPlaying } = useAudioPlayer();
   const { savePosition } = useLastRead();
   const { toggleSurah, isSurahFav, addItem, removeItem, isItemFav } = useFavorites();
+  const { recordReading } = useReadingTracker();
 
   const surahNum = Number(id);
 
@@ -36,7 +38,10 @@ const SurahDetailPage: React.FC = () => {
         setReciters(recitersData.slice(0, 30));
         if (recitersData.length > 0) setSelectedReciter(recitersData[0]);
         setLoading(false);
-        if (s) savePosition(surahNum, s.name, 1);
+        if (s) {
+          savePosition(surahNum, s.name, 1);
+          recordReading(surahNum, s.numberOfAyahs, Math.ceil(s.numberOfAyahs / 15));
+        }
       });
   }, [surahNum]);
 
@@ -61,6 +66,24 @@ const SurahDetailPage: React.FC = () => {
   };
 
   const isCurrentlyPlaying = currentTrack?.id === `surah-${selectedReciter?.id}-${surahNum}` && isPlaying;
+
+  const handleDownloadSurah = async () => {
+    if (!selectedReciter) return;
+    const moshaf = selectedReciter.moshaf?.[0];
+    if (!moshaf) return;
+    const url = `${moshaf.server}${String(surahNum).padStart(3, '0')}.mp3`;
+    try {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${surah?.name || 'surah'}-${selectedReciter.name}.mp3`;
+      a.target = '_blank';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (e) {
+      window.open(url, '_blank');
+    }
+  };
 
   return (
     <div className="page-container" dir="rtl">
@@ -97,6 +120,9 @@ const SurahDetailPage: React.FC = () => {
                   <Mic className="w-3 h-3" />{selectedReciter.name}
                 </button>
               </div>
+              <button onClick={handleDownloadSurah} className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0" title="تحميل السورة">
+                <Download className="w-4 h-4 text-primary" />
+              </button>
             </div>
             {showReciterPicker && (
               <div className="mt-3 pt-3 border-t border-border max-h-40 overflow-y-auto animate-fade-in">

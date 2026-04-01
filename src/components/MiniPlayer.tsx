@@ -19,7 +19,7 @@ const MiniPlayer: React.FC = () => {
 
   if (expanded) {
     return (
-      <div className="fixed bottom-16 left-0 right-0 z-40 bg-card border-t border-border shadow-2xl" style={{ animation: 'sheet-up 0.3s cubic-bezier(0.32,0.72,0,1)' }}>
+      <div className="fixed bottom-[4.5rem] left-0 right-0 z-40 bg-card border-t border-border shadow-2xl" style={{ animation: 'sheet-up 0.3s cubic-bezier(0.32,0.72,0,1)' }}>
         <div className="max-w-lg mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
             <button onClick={() => setExpanded(false)} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
@@ -78,7 +78,7 @@ const MiniPlayer: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-16 left-0 right-0 z-40 glass-surface border-t border-border/50 shadow-lg">
+    <div className="fixed bottom-[4.5rem] left-0 right-0 z-40 glass-surface border-t border-border/50 shadow-lg">
       <div className="h-0.5 bg-muted">
         <div className="h-full bg-primary transition-all duration-300" style={{ width: `${progressPercent}%` }} />
       </div>

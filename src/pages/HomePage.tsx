@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   Book, Mic, Radio, Clock, Moon, Sun, Sunrise, Sunset,
   CloudSun, Heart, Search, MapPin, ChevronLeft, Star, BookOpen,
-  Users, Quote, Calendar, Bell, BellOff
+  Users, Quote, Calendar, Bell, BellOff, Feather, BarChart3,
+  TrendingUp, Sparkles, Baby, Download
 } from 'lucide-react';
 import { fetchPrayerTimes, fetchSurahs, type PrayerTimes, type Surah } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -38,6 +39,14 @@ const allTickerItems = [
   'وَإِلَـٰهُكُمْ إِلَـٰهٌ وَاحِدٌ لَّا إِلَـٰهَ إِلَّا هُوَ الرَّحْمَـٰنُ الرَّحِيمُ',
   'سُبْحَانَ رَبِّكَ رَبِّ الْعِزَّةِ عَمَّا يَصِفُونَ',
   'اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ فَاعْفُ عَنِّي',
+  'يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ',
+  'اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ',
+  'رَبِّ أَوْزِعْنِي أَنْ أَشْكُرَ نِعْمَتَكَ الَّتِي أَنْعَمْتَ عَلَيَّ',
+  'وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَى',
+  'إِنَّ اللَّهَ مَعَ الصَّابِرِينَ',
+  'وَمَا تَوْفِيقِي إِلَّا بِاللَّهِ عَلَيْهِ تَوَكَّلْتُ',
+  'رَبَّنَا تَقَبَّلْ مِنَّا إِنَّكَ أَنتَ السَّمِيعُ الْعَلِيمُ',
+  'سُبْحَانَ اللَّهِ وَالْحَمْدُ لِلَّهِ وَلَا إِلَهَ إِلَّا اللَّهُ وَاللَّهُ أَكْبَرُ',
 ];
 
 const dailyVerses = [
@@ -198,9 +207,18 @@ const HomePage: React.FC = () => {
     { label: 'المصحف', icon: Book, path: '/quran', gradient: 'gradient-primary' },
     { label: 'القراء', icon: Mic, path: '/reciters', gradient: 'gradient-gold' },
     { label: 'الراديو', icon: Radio, path: '/radio', gradient: 'gradient-primary' },
-    { label: 'الاذكار', icon: Heart, path: '/adhkar', gradient: 'gradient-gold' },
+    { label: 'الأذكار', icon: Heart, path: '/adhkar', gradient: 'gradient-gold' },
     { label: 'الأنبياء', icon: Users, path: '/prophets', gradient: 'gradient-primary' },
     { label: 'الأحاديث', icon: Quote, path: '/hadith', gradient: 'gradient-gold' },
+    { label: 'الأدعية', icon: Feather, path: '/dua', gradient: 'gradient-primary' },
+    { label: 'التفسير', icon: BookOpen, path: '/tafsir', gradient: 'gradient-gold' },
+    { label: 'أسماء الله', icon: Sparkles, path: '/asma-al-husna', gradient: 'gradient-primary' },
+    { label: 'السكينة', icon: Star, path: '/sakinah', gradient: 'gradient-gold' },
+    { label: 'الإحصائيات', icon: BarChart3, path: '/quran-stats', gradient: 'gradient-primary' },
+    { label: 'قصص أطفال', icon: Baby, path: '/kids-stories', gradient: 'gradient-gold' },
+    { label: 'المفضلة', icon: Heart, path: '/favorites', gradient: 'gradient-primary' },
+    { label: 'تقدم القراءة', icon: TrendingUp, path: '/reading-stats', gradient: 'gradient-gold' },
+    { label: 'البحث', icon: Search, path: '/search', gradient: 'gradient-primary' },
   ];
 
   const featuredSurahs = [
@@ -314,13 +332,13 @@ const HomePage: React.FC = () => {
         {/* Quick Access */}
         <div className="mb-5">
           <h2 className="section-title">الوصول السريع</h2>
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-5 gap-2">
             {quickLinks.map((link) => (
               <button key={link.path} onClick={() => navigate(link.path)} className="quick-link-btn">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${link.gradient}`}>
-                  <link.icon className="w-5 h-5 text-primary-foreground" />
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${link.gradient}`}>
+                  <link.icon className="w-4.5 h-4.5 text-primary-foreground" />
                 </div>
-                <span className="text-xs font-medium text-foreground">{link.label}</span>
+                <span className="text-[10px] font-medium text-foreground leading-tight text-center">{link.label}</span>
               </button>
             ))}
           </div>
