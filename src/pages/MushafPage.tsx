@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, BookOpen, ArrowRight, Moon, Sun, Mic, Play, Pause, X } from 'lucide-react';
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { fetchReciters, type Reciter } from '@/lib/api';
+import MushafSearch from '@/components/MushafSearch';
 
 interface PageAyah {
   number: number;
