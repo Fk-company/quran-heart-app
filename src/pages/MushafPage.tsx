@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, BookOpen, ArrowRight, Moon, Sun, Mic, Play, Pause, X } from 'lucide-react';
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { fetchReciters, type Reciter } from '@/lib/api';
+import MushafSearch from '@/components/MushafSearch';
 
 interface PageAyah {
   number: number;
@@ -115,6 +116,7 @@ const MushafPage: React.FC = () => {
             <h1 className="text-lg font-bold text-foreground">المصحف الشريف</h1>
             <p className="text-xs text-muted-foreground">الجزء {juzNumber} - صفحة {currentPage}/{TOTAL_PAGES}</p>
           </div>
+          <MushafSearch onNavigateToPage={(p) => goToPage(p)} nightMode={nightMode} />
           <button onClick={() => setNightMode(!nightMode)}
             className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${nightMode ? 'bg-amber-500/20 text-amber-400' : 'bg-secondary text-foreground'}`}
             title="وضع القراءة الليلي">
