@@ -4,6 +4,7 @@ import { ChevronRight, ChevronLeft, BookOpen, ArrowRight, Moon, Sun, Mic, Play, 
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { fetchReciters, type Reciter } from '@/lib/api';
 import MushafSearch from '@/components/MushafSearch';
+import AyahTafsirModal from '@/components/AyahTafsirModal';
 
 interface PageAyah {
   number: number;
@@ -29,9 +30,9 @@ const MushafPage: React.FC = () => {
   const [reciters, setReciters] = useState<Reciter[]>([]);
   const [selectedReciter, setSelectedReciter] = useState<Reciter | null>(null);
   const [showReciterPicker, setShowReciterPicker] = useState(false);
+  const [selectedAyah, setSelectedAyah] = useState<PageAyah | null>(null);
   const { play, pause, currentTrack, isPlaying } = useAudioPlayer();
 
-  // Swipe
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -74,14 +75,13 @@ const MushafPage: React.FC = () => {
     if (p >= 1 && p <= TOTAL_PAGES) { setCurrentPage(p); setShowJumpInput(false); setPageInput(''); }
   };
 
-  // Swipe handlers (RTL: swipe left = next page in Arabic = higher number)
   const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
   const handleTouchMove = (e: React.TouchEvent) => { touchEndX.current = e.touches[0].clientX; };
   const handleTouchEnd = () => {
     const diff = touchStartX.current - touchEndX.current;
     if (Math.abs(diff) > 60) {
-      if (diff > 0) goToPage(currentPage - 1); // swipe left = previous (RTL)
-      else goToPage(currentPage + 1); // swipe right = next (RTL)
+      if (diff > 0) goToPage(currentPage - 1);
+      else goToPage(currentPage + 1);
     }
   };
 
@@ -128,7 +128,6 @@ const MushafPage: React.FC = () => {
           </button>
         </div>
 
-        {/* Jump */}
         {showJumpInput && (
           <div className="card-surface mb-4 flex items-center gap-2 animate-fade-in">
             <input type="number" value={pageInput} onChange={e => setPageInput(e.target.value)}
@@ -184,6 +183,9 @@ const MushafPage: React.FC = () => {
           ))}
         </div>
 
+        {/* Tafsir hint */}
+        <p className="text-center text-[10px] text-muted-foreground mb-2">💡 اضغط على أي آية لعرض التفسير</p>
+
         {/* Page Content */}
         {loading ? (
           <div className="mushaf-page-frame"><div className="space-y-3 p-6">
@@ -219,7 +221,10 @@ const MushafPage: React.FC = () => {
                           )}
                         </>
                       )}
-                      <span className="mushaf-ayah-text">{ayah.text}</span>{' '}
+                      <span
+                        className="mushaf-ayah-text cursor-pointer hover:underline decoration-primary/30 underline-offset-4"
+                        onClick={() => setSelectedAyah(ayah)}
+                      >{ayah.text}</span>{' '}
                       <span className={`verse-number inline-flex w-6 h-6 text-[10px] mx-0.5 align-middle ${nightMode ? 'mushaf-night-verse' : ''}`}>
                         {ayah.numberInSurah}
                       </span>{' '}
@@ -256,9 +261,11 @@ const MushafPage: React.FC = () => {
           </button>
         </div>
 
-        {/* Swipe hint */}
         <p className="text-center text-[10px] text-muted-foreground mb-4">اسحب يميناً أو يساراً للتنقل بين الصفحات</p>
       </div>
+
+      {/* Tafsir Modal */}
+      <AyahTafsirModal ayah={selectedAyah} nightMode={nightMode} onClose={() => setSelectedAyah(null)} />
     </div>
   );
 };
