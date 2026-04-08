@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useReadingTracker } from '@/hooks/useReadingTracker';
 import { useNotifications } from '@/hooks/useNotifications';
 import { Progress } from '@/components/ui/progress';
-import { BookOpen, Flame, Award, Calendar, TrendingUp, BarChart3, Target, Bell, BellOff, CheckCircle2 } from 'lucide-react';
+import { BookOpen, Flame, Award, Calendar, TrendingUp, BarChart3, Target, Bell, BellOff, CheckCircle2, Share2 } from 'lucide-react';
+import KhatmShareCard from '@/components/KhatmShareCard';
 
 const GOAL_KEY = 'quran_daily_goal';
 
