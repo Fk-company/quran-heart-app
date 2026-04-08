@@ -163,11 +163,31 @@ const ReadingStatsPage: React.FC = () => {
         <div className="card-surface mb-4 bg-primary/5 border-primary/15">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold text-foreground">تقدم الختمة</span>
-            <span className="text-xs text-primary font-bold">{khatmProgress}%</span>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setShowShareCard(!showShareCard)}
+                className="flex items-center gap-1 text-xs text-primary font-medium px-2 py-1 rounded-lg hover:bg-primary/10 transition-colors">
+                <Share2 className="w-3 h-3" />
+                مشاركة
+              </button>
+              <span className="text-xs text-primary font-bold">{khatmProgress}%</span>
+            </div>
           </div>
           <Progress value={khatmProgress} className="h-3 mb-2" />
           <p className="text-xs text-muted-foreground">{tracker.completedSurahs.length} من 114 سورة</p>
         </div>
+
+        {showShareCard && (
+          <div className="mb-4 animate-fade-in">
+            <KhatmShareCard
+              khatmProgress={khatmProgress}
+              completedSurahs={tracker.completedSurahs.length}
+              totalAyahs={tracker.totalAyahsRead}
+              totalPages={tracker.totalPagesRead}
+              khatmCount={tracker.khatmCount}
+              streak={tracker.streak}
+            />
+          </div>
+        )}
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3 mb-5">
