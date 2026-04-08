@@ -260,8 +260,35 @@
       transparent 0%, hsl(var(--gold) / 0.3) 15%,
       hsl(var(--primary) / 0.4) 50%, hsl(var(--gold) / 0.3) 85%, transparent 100%);
   }
-  .mushaf-ayah-text { transition: color 0.2s; }
+  .mushaf-ayah-text { transition: all 0.3s ease; }
   .mushaf-ayah-text:hover { color: hsl(var(--primary)); }
+
+  /* Ayah highlighting during playback */
+  .ayah-highlighted {
+    color: hsl(var(--primary)) !important;
+    background: hsl(var(--primary) / 0.08);
+    border-radius: 6px;
+    padding: 2px 4px;
+    box-shadow: 0 0 0 2px hsl(var(--primary) / 0.12);
+    animation: ayah-pulse 2s ease-in-out infinite;
+  }
+  .ayah-highlighted-night {
+    color: hsl(38 80% 75%) !important;
+    background: hsl(32 60% 30% / 0.2);
+    border-radius: 6px;
+    padding: 2px 4px;
+    box-shadow: 0 0 0 2px hsl(32 60% 40% / 0.2);
+    animation: ayah-pulse-night 2s ease-in-out infinite;
+  }
+
+  @keyframes ayah-pulse {
+    0%, 100% { box-shadow: 0 0 0 2px hsl(var(--primary) / 0.12); }
+    50% { box-shadow: 0 0 0 4px hsl(var(--primary) / 0.06); }
+  }
+  @keyframes ayah-pulse-night {
+    0%, 100% { box-shadow: 0 0 0 2px hsl(32 60% 40% / 0.2); }
+    50% { box-shadow: 0 0 0 4px hsl(32 60% 40% / 0.1); }
+  }
 
   /* Mushaf night reading mode */
   .mushaf-night { background: hsl(220 20% 6%) !important; }
