@@ -19,6 +19,7 @@ const defaultGoal: DailyGoal = { pages: 5, ayahs: 50, reminderEnabled: false, re
 const ReadingStatsPage: React.FC = () => {
   const { tracker, todayStats, khatmProgress } = useReadingTracker();
   const { requestPermission, sendNotification, isSupported } = useNotifications();
+  const [showShareCard, setShowShareCard] = useState(false);
 
   const [goal, setGoal] = useState<DailyGoal>(() => {
     try { const raw = localStorage.getItem(GOAL_KEY); return raw ? { ...defaultGoal, ...JSON.parse(raw) } : defaultGoal; }
