@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchSurahs, type Surah } from '@/lib/api';
 import { Search, Book, Grid3X3, List, Heart, BookOpen } from 'lucide-react';
 import { useFavorites } from '@/hooks/useFavorites';
+import PageHeader from '@/components/PageHeader';
 
 const QuranPage: React.FC = () => {
   const navigate = useNavigate();
