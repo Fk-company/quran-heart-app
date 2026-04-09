@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useFavorites } from '@/hooks/useFavorites';
 import { Search, Heart, BookOpen, Share2 } from 'lucide-react';
+import PageHeader from '@/components/PageHeader';
 
 interface Dua {
   id: number;
@@ -69,15 +70,12 @@ const DuaPage: React.FC = () => {
   return (
     <div className="page-container" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl gradient-gold flex items-center justify-center">
-            <BookOpen className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">الأدعية</h1>
-            <p className="text-xs text-muted-foreground">{duas.length} دعاء</p>
-          </div>
-        </div>
+        <PageHeader
+          icon={BookOpen}
+          title="الأدعية"
+          subtitle={`${duas.length} دعاء`}
+          gradient="gold"
+        />
 
         <div className="relative mb-4">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

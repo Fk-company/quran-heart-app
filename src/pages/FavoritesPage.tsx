@@ -1,6 +1,7 @@
 import React from 'react';
 import { useFavorites } from '@/hooks/useFavorites';
 import { Heart, Download, Trash2, BookOpen, Quote, Feather } from 'lucide-react';
+import PageHeader from '@/components/PageHeader';
 
 const typeIcons: Record<string, React.ElementType> = { ayah: BookOpen, hadith: Quote, dua: Feather };
 const typeLabels: Record<string, string> = { ayah: 'آية', hadith: 'حديث', dua: 'دعاء' };
@@ -12,20 +13,19 @@ const FavoritesPage: React.FC = () => {
   return (
     <div className="page-container" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center">
-            <Heart className="w-5 h-5 text-destructive" />
-          </div>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-foreground">المفضلة</h1>
-            <p className="text-xs text-muted-foreground">{items.length} عنصر محفوظ</p>
-          </div>
-          {items.length > 0 && (
-            <button onClick={exportFavorites} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-medium">
-              <Download className="w-3.5 h-3.5" /> تصدير
-            </button>
-          )}
-        </div>
+        <PageHeader
+          icon={Heart}
+          title="المفضلة"
+          subtitle={`${items.length} عنصر محفوظ`}
+          gradient="destructive"
+          actions={
+            items.length > 0 ? (
+              <button onClick={exportFavorites} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-medium">
+                <Download className="w-3.5 h-3.5" /> تصدير
+              </button>
+            ) : undefined
+          }
+        />
 
         {items.length === 0 ? (
           <div className="text-center py-16">

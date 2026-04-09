@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { searchQuran } from '@/lib/api';
 import { Search as SearchIcon, Book, Clock, X } from 'lucide-react';
+import PageHeader from '@/components/PageHeader';
 
 interface SearchResult {
   number: number;
@@ -52,15 +53,11 @@ const SearchPage: React.FC = () => {
   return (
     <div className="page-container" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
-            <SearchIcon className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">البحث في القرآن</h1>
-            <p className="text-xs text-muted-foreground">ابحث عن آية أو كلمة</p>
-          </div>
-        </div>
+        <PageHeader
+          icon={SearchIcon}
+          title="البحث في القرآن"
+          subtitle="ابحث عن آية أو كلمة"
+        />
 
         <div className="flex gap-2 mb-4">
           <div className="relative flex-1">
