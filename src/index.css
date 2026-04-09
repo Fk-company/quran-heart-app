@@ -148,13 +148,21 @@
   }
 
   .bottom-nav-item {
-    @apply flex flex-col items-center justify-center gap-1 text-xs font-medium transition-all duration-200;
+    @apply flex flex-col items-center justify-center gap-0.5 text-xs font-medium transition-all duration-300;
     color: hsl(var(--muted-foreground));
   }
-  .bottom-nav-item.active { color: hsl(var(--primary)); }
-  .bottom-nav-item.active::after {
-    content: '';
-    @apply w-1 h-1 rounded-full bg-primary mt-0.5;
+  .bottom-nav-item.active {
+    color: hsl(var(--primary));
+  }
+  .bottom-nav-item.active .nav-icon-box {
+    background: hsl(var(--primary) / 0.12);
+    border-radius: 12px;
+    padding: 6px 14px;
+  }
+  .nav-icon-box {
+    @apply flex items-center justify-center transition-all duration-300;
+    padding: 6px 14px;
+    border-radius: 12px;
   }
 
   .skeleton-pulse { @apply animate-pulse bg-muted rounded-xl; }
@@ -170,10 +178,7 @@
   }
 
   .page-container { @apply pb-32 min-h-screen; }
-  .section-title {
-    @apply text-base font-bold text-foreground mb-3;
-    font-family: 'IBM Plex Sans Arabic', sans-serif;
-  }
+  /* section-title is now defined in page-header section below */
 
   .quick-link-btn {
     @apply flex flex-col items-center gap-2 py-3 px-2 rounded-2xl transition-all duration-200;
@@ -329,18 +334,46 @@
     overflow: hidden;
   }
 
-  /* Page header consistent styling */
-  .page-header {
-    @apply flex items-center gap-3 mb-5;
+  /* Page header - premium design */
+  .page-header-wrapper {
+    @apply mb-6;
   }
-  .page-header-icon {
-    @apply w-11 h-11 rounded-xl flex items-center justify-center;
+  .page-header-icon-box {
+    @apply w-11 h-11 rounded-2xl flex items-center justify-center shadow-sm;
+    box-shadow: 0 2px 8px hsl(var(--primary) / 0.15);
   }
   .page-header-title {
-    @apply text-xl font-bold text-foreground;
+    @apply text-lg font-bold text-foreground tracking-tight;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
   }
   .page-header-subtitle {
-    @apply text-xs text-muted-foreground mt-0.5;
+    @apply text-[11px] text-muted-foreground mt-0.5 font-medium;
+  }
+  .page-header-back {
+    @apply w-9 h-9 rounded-xl bg-secondary flex items-center justify-center transition-all duration-200;
+  }
+  .page-header-back:hover {
+    @apply bg-muted;
+    transform: translateX(2px);
+  }
+  .page-header-line {
+    @apply mt-4;
+    height: 2px;
+    background: linear-gradient(90deg,
+      transparent 0%, hsl(var(--primary) / 0.25) 20%,
+      hsl(var(--accent) / 0.3) 50%,
+      hsl(var(--primary) / 0.25) 80%, transparent 100%);
+    border-radius: 2px;
+  }
+
+  /* Section title - upgraded */
+  .section-title {
+    @apply text-sm font-bold text-foreground mb-3 flex items-center gap-2;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+  }
+  .section-title::before {
+    content: '';
+    @apply w-1 h-4 rounded-full bg-primary;
   }
 
   /* Divider */

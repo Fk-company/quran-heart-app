@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { hadiths, hadithCategories } from '@/data/hadiths';
 import { useFavorites } from '@/hooks/useFavorites';
 import { Search, Heart, ChevronDown, ChevronUp, Quote, Grid3X3, List, Share2, X } from 'lucide-react';
+import PageHeader from '@/components/PageHeader';
 
 const HadithPage: React.FC = () => {
   const [selectedCat, setSelectedCat] = useState<string | null>(null);
@@ -32,19 +33,17 @@ const HadithPage: React.FC = () => {
   return (
     <div className="page-container" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
-            <Quote className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-foreground">الأحاديث النبوية</h1>
-            <p className="text-xs text-muted-foreground">{hadiths.length} حديث شريف</p>
-          </div>
-          <div className="flex gap-1">
-            <button onClick={() => setViewMode('list')} className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}><List className="w-4 h-4" /></button>
-            <button onClick={() => setViewMode('grid')} className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}><Grid3X3 className="w-4 h-4" /></button>
-          </div>
-        </div>
+        <PageHeader
+          icon={Quote}
+          title="الأحاديث النبوية"
+          subtitle={`${hadiths.length} حديث شريف`}
+          actions={
+            <div className="flex gap-1">
+              <button onClick={() => setViewMode('list')} className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}><List className="w-4 h-4" /></button>
+              <button onClick={() => setViewMode('grid')} className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}><Grid3X3 className="w-4 h-4" /></button>
+            </div>
+          }
+        />
 
         <div className="relative mb-4">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

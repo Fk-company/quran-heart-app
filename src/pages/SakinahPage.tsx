@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { Play, Pause, Heart, BookOpen } from 'lucide-react';
+import PageHeader from '@/components/PageHeader';
 
 interface SakinahVerse {
   id: number;
@@ -50,15 +51,11 @@ const SakinahPage: React.FC = () => {
   return (
     <div className="page-container" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
-            <Heart className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">آيات السكينة</h1>
-            <p className="text-xs text-muted-foreground">{sakinahVerses.length} آية للراحة والطمأنينة</p>
-          </div>
-        </div>
+        <PageHeader
+          icon={Heart}
+          title="آيات السكينة"
+          subtitle={`${sakinahVerses.length} آية للراحة والطمأنينة`}
+        />
 
         <div className="flex flex-wrap gap-2 mb-5">
           <button onClick={() => setSelectedTopic(null)} className={`filter-chip ${!selectedTopic ? 'active' : ''}`}>الكل</button>

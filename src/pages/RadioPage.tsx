@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchRadioStations, type RadioStation } from '@/lib/api';
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { Play, Pause, Radio, Signal, Search, Grid3X3, List } from 'lucide-react';
+import PageHeader from '@/components/PageHeader';
 
 const RadioPage: React.FC = () => {
   const [stations, setStations] = useState<RadioStation[]>([]);
@@ -27,19 +28,17 @@ const RadioPage: React.FC = () => {
   return (
     <div className="page-container" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
-            <Radio className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-foreground">الراديو والبث المباشر</h1>
-            <p className="text-xs text-muted-foreground">{stations.length > 0 ? `${stations.length} محطة` : 'جاري التحميل...'}</p>
-          </div>
-          <div className="flex gap-1">
-            <button onClick={() => setViewMode('list')} className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}><List className="w-4 h-4" /></button>
-            <button onClick={() => setViewMode('grid')} className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}><Grid3X3 className="w-4 h-4" /></button>
-          </div>
-        </div>
+        <PageHeader
+          icon={Radio}
+          title="الراديو والبث المباشر"
+          subtitle={stations.length > 0 ? `${stations.length} محطة` : 'جاري التحميل...'}
+          actions={
+            <div className="flex gap-1">
+              <button onClick={() => setViewMode('list')} className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}><List className="w-4 h-4" /></button>
+              <button onClick={() => setViewMode('grid')} className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}><Grid3X3 className="w-4 h-4" /></button>
+            </div>
+          }
+        />
 
         <div className="relative mb-4">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { fetchSurahs, type Surah } from '@/lib/api';
 import { BarChart3, BookOpen, Hash, FileText, Type } from 'lucide-react';
+import PageHeader from '@/components/PageHeader';
 
 const QuranStatsPage: React.FC = () => {
   const [surahs, setSurahs] = useState<Surah[]>([]);
@@ -41,15 +42,11 @@ const QuranStatsPage: React.FC = () => {
   return (
     <div className="page-container" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
-            <BarChart3 className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">إحصائيات القرآن</h1>
-            <p className="text-xs text-muted-foreground">معلومات وأرقام شاملة</p>
-          </div>
-        </div>
+        <PageHeader
+          icon={BarChart3}
+          title="إحصائيات القرآن"
+          subtitle="معلومات وأرقام شاملة"
+        />
 
         {loading ? (
           <div className="grid grid-cols-2 gap-2">

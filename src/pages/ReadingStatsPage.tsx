@@ -4,6 +4,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { Progress } from '@/components/ui/progress';
 import { BookOpen, Flame, Award, Calendar, TrendingUp, BarChart3, Target, Bell, BellOff, CheckCircle2, Share2 } from 'lucide-react';
 import KhatmShareCard from '@/components/KhatmShareCard';
+import PageHeader from '@/components/PageHeader';
 
 const GOAL_KEY = 'quran_daily_goal';
 
@@ -69,15 +70,11 @@ const ReadingStatsPage: React.FC = () => {
   return (
     <div className="page-container" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto pb-28">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
-            <TrendingUp className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">إحصائيات القراءة</h1>
-            <p className="text-xs text-muted-foreground">تتبع تقدمك في ختم القرآن</p>
-          </div>
-        </div>
+        <PageHeader
+          icon={TrendingUp}
+          title="إحصائيات القراءة"
+          subtitle="تتبع تقدمك في ختم القرآن"
+        />
 
         {/* Daily Goal Card */}
         <div className={`card-surface mb-4 border ${goalAchieved ? 'border-green-500/30 bg-green-500/5' : 'border-primary/15 bg-primary/5'}`}>

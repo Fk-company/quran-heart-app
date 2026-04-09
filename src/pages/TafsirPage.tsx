@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchSurahs, type Surah } from '@/lib/api';
 import { Search, BookOpen, ArrowRight } from 'lucide-react';
+import PageHeader from '@/components/PageHeader';
 
 const TAFSIR_EDITIONS = [
   { id: 'ar.muyassar', name: 'التفسير الميسر' },
@@ -93,15 +94,11 @@ const TafsirPage: React.FC = () => {
   return (
     <div className="page-container" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
-            <BookOpen className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">التفسير</h1>
-            <p className="text-xs text-muted-foreground">تفاسير متعددة مع إمكانية المقارنة</p>
-          </div>
-        </div>
+        <PageHeader
+          icon={BookOpen}
+          title="التفسير"
+          subtitle="تفاسير متعددة مع إمكانية المقارنة"
+        />
 
         <div className="relative mb-4">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

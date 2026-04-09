@@ -31,23 +31,34 @@ const BottomNav: React.FC = () => {
   return (
     <>
       <MoreSheet open={moreOpen} onClose={() => setMoreOpen(false)} />
-      <nav className="fixed bottom-0 left-0 right-0 z-40 glass-surface border-t border-border/50 safe-bottom">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border/30 safe-bottom"
+        style={{
+          background: 'hsl(var(--glass))',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        }}
+      >
         <div className="flex items-stretch justify-around max-w-lg mx-auto h-16">
-          {navItems.map((item) => (
-            <button
-              key={item.path}
-              onClick={() => item.isSheet ? setMoreOpen(true) : navigate(item.path)}
-              className={`bottom-nav-item flex-1 pt-2 pb-1 ${isActive(item.path) && !item.isSheet ? 'active' : ''}`}
-            >
-              <item.icon
-                className={`w-5 h-5 transition-colors ${isActive(item.path) && !item.isSheet ? 'text-primary' : 'text-muted-foreground'}`}
-                strokeWidth={isActive(item.path) && !item.isSheet ? 2.5 : 1.8}
-              />
-              <span className={`text-[10px] ${isActive(item.path) && !item.isSheet ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>
-                {item.label}
-              </span>
-            </button>
-          ))}
+          {navItems.map((item) => {
+            const active = isActive(item.path) && !item.isSheet;
+            return (
+              <button
+                key={item.path}
+                onClick={() => item.isSheet ? setMoreOpen(true) : navigate(item.path)}
+                className={`bottom-nav-item flex-1 pt-2 pb-1 ${active ? 'active' : ''}`}
+              >
+                <div className="nav-icon-box">
+                  <item.icon
+                    className={`w-5 h-5 transition-all duration-300 ${active ? 'text-primary' : 'text-muted-foreground'}`}
+                    strokeWidth={active ? 2.5 : 1.8}
+                  />
+                </div>
+                <span className={`text-[10px] transition-all duration-300 ${active ? 'text-primary font-bold' : 'text-muted-foreground font-medium'}`}>
+                  {item.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </nav>
     </>
