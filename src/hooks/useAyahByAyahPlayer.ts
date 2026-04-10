@@ -7,7 +7,6 @@ interface AyahAudio {
   surahName: string;
 }
 
-// Reciter audio CDN mappings (identifier -> base URL)
 const RECITERS: Record<string, { name: string; identifier: string }> = {
   alafasy: { name: 'مشاري العفاسي', identifier: 'ar.alafasy' },
   husary: { name: 'محمود خليل الحصري', identifier: 'ar.husary' },
@@ -27,6 +26,7 @@ export function useAyahByAyahPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const queueRef = useRef<AyahAudio[]>([]);
   const indexRef = useRef(0);
+  const onAyahEndRef = useRef<(() => boolean) | null>(null);
 
   useEffect(() => {
     const audio = new Audio();
@@ -39,6 +39,12 @@ export function useAyahByAyahPlayer() {
       setDuration(audio.duration);
     });
     audio.addEventListener('ended', () => {
+      // Check if repeat callback wants to handle this
+      if (onAyahEndRef.current) {
+        const handled = onAyahEndRef.current();
+        if (handled) return; // repeat is handling it
+      }
+      
       // Auto-advance to next ayah
       const nextIdx = indexRef.current + 1;
       if (nextIdx < queueRef.current.length) {
@@ -46,7 +52,6 @@ export function useAyahByAyahPlayer() {
         setCurrentIndex(nextIdx);
         playAyahAtIndex(nextIdx);
       } else {
-        // Finished all ayahs
         setIsAyahPlaying(false);
         setPlayingAyahNumber(null);
         setProgress(0);
@@ -59,11 +64,6 @@ export function useAyahByAyahPlayer() {
       audio.src = '';
     };
   }, []);
-
-  const getAudioUrl = useCallback((ayahNumber: number) => {
-    const reciter = RECITERS[reciterId] || RECITERS.alafasy;
-    return `https://cdn.islamic.network/quran/audio/128/${reciter.identifier}/${ayahNumber}.mp3`;
-  }, [reciterId]);
 
   const playAyahAtIndex = useCallback((idx: number) => {
     const audio = audioRef.current;
@@ -142,6 +142,18 @@ export function useAyahByAyahPlayer() {
     setReciterId(id);
   }, []);
 
+  const replayCurrentAyah = useCallback(() => {
+    const audio = audioRef.current;
+    if (audio && audio.src) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }
+  }, []);
+
+  const setOnAyahEnd = useCallback((cb: (() => boolean) | null) => {
+    onAyahEndRef.current = cb;
+  }, []);
+
   const availableReciters = Object.entries(RECITERS).map(([id, r]) => ({ id, name: r.name }));
 
   return {
@@ -161,5 +173,7 @@ export function useAyahByAyahPlayer() {
     skipNext,
     skipPrev,
     changeReciter,
+    replayCurrentAyah,
+    setOnAyahEnd,
   };
 }
