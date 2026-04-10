@@ -10,7 +10,7 @@ const ProphetsPage: React.FC = () => {
 
   if (selected) {
     return (
-      <div className="page-container" dir="rtl">
+      <div className="page-container page-with-topbar" dir="rtl">
         <div className="px-4 pt-4 max-w-lg mx-auto">
           <div className="flex items-center gap-3 mb-5">
             <button onClick={() => setSelected(null)} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
@@ -84,7 +84,7 @@ const ProphetsPage: React.FC = () => {
   }
 
   return (
-    <div className="page-container" dir="rtl">
+    <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={Users}

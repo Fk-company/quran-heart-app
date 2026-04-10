@@ -86,7 +86,7 @@ const SurahDetailPage: React.FC = () => {
   };
 
   return (
-    <div className="page-container" dir="rtl">
+    <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-4 max-w-lg mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">

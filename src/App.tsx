@@ -1,11 +1,14 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AudioProvider } from "@/contexts/AudioContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { AnimatePresence } from "framer-motion";
+import TopBar from "@/components/TopBar";
 import BottomNav from "@/components/BottomNav";
 import MiniPlayer from "@/components/MiniPlayer";
+import PageTransition from "@/components/PageTransition";
 import HomePage from "./pages/HomePage";
 import QuranPage from "./pages/QuranPage";
 import SurahDetailPage from "./pages/SurahDetailPage";
@@ -29,6 +32,36 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const AnimatedRoutes = () => {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageTransition><HomePage /></PageTransition>} />
+        <Route path="/quran" element={<PageTransition><QuranPage /></PageTransition>} />
+        <Route path="/quran/:id" element={<PageTransition><SurahDetailPage /></PageTransition>} />
+        <Route path="/mushaf" element={<PageTransition><MushafPage /></PageTransition>} />
+        <Route path="/reciters" element={<PageTransition><RecitersPage /></PageTransition>} />
+        <Route path="/adhkar" element={<PageTransition><AdhkarPage /></PageTransition>} />
+        <Route path="/radio" element={<PageTransition><RadioPage /></PageTransition>} />
+        <Route path="/search" element={<PageTransition><SearchPage /></PageTransition>} />
+        <Route path="/more" element={<PageTransition><MorePage /></PageTransition>} />
+        <Route path="/prophets" element={<PageTransition><ProphetsPage /></PageTransition>} />
+        <Route path="/hadith" element={<PageTransition><HadithPage /></PageTransition>} />
+        <Route path="/asma-al-husna" element={<PageTransition><AsmaAlHusnaPage /></PageTransition>} />
+        <Route path="/sakinah" element={<PageTransition><SakinahPage /></PageTransition>} />
+        <Route path="/quran-stats" element={<PageTransition><QuranStatsPage /></PageTransition>} />
+        <Route path="/dua" element={<PageTransition><DuaPage /></PageTransition>} />
+        <Route path="/tafsir" element={<PageTransition><TafsirPage /></PageTransition>} />
+        <Route path="/kids-stories" element={<PageTransition><KidsStoriesPage /></PageTransition>} />
+        <Route path="/favorites" element={<PageTransition><FavoritesPage /></PageTransition>} />
+        <Route path="/reading-stats" element={<PageTransition><ReadingStatsPage /></PageTransition>} />
+        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
@@ -37,28 +70,8 @@ const App = () => (
         <AudioProvider>
           <BrowserRouter>
             <div className="min-h-screen bg-background islamic-bg">
-              <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/quran" element={<QuranPage />} />
-                <Route path="/quran/:id" element={<SurahDetailPage />} />
-                <Route path="/mushaf" element={<MushafPage />} />
-                <Route path="/reciters" element={<RecitersPage />} />
-                <Route path="/adhkar" element={<AdhkarPage />} />
-                <Route path="/radio" element={<RadioPage />} />
-                <Route path="/search" element={<SearchPage />} />
-                <Route path="/more" element={<MorePage />} />
-                <Route path="/prophets" element={<ProphetsPage />} />
-                <Route path="/hadith" element={<HadithPage />} />
-                <Route path="/asma-al-husna" element={<AsmaAlHusnaPage />} />
-                <Route path="/sakinah" element={<SakinahPage />} />
-                <Route path="/quran-stats" element={<QuranStatsPage />} />
-                <Route path="/dua" element={<DuaPage />} />
-                <Route path="/tafsir" element={<TafsirPage />} />
-                <Route path="/kids-stories" element={<KidsStoriesPage />} />
-                <Route path="/favorites" element={<FavoritesPage />} />
-                <Route path="/reading-stats" element={<ReadingStatsPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <TopBar />
+              <AnimatedRoutes />
               <MiniPlayer />
               <BottomNav />
             </div>

@@ -178,6 +178,7 @@
   }
 
   .page-container { @apply pb-32 min-h-screen; }
+  .page-with-topbar { @apply pt-14; }
   /* section-title is now defined in page-header section below */
 
   .quick-link-btn {
