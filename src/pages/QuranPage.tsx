@@ -34,7 +34,7 @@ const QuranPage: React.FC = () => {
   }, [search, surahs, filter, favorites.surahs]);
 
   return (
-    <div className="page-container" dir="rtl">
+    <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={Book}
