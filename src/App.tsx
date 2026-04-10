@@ -28,6 +28,7 @@ import KidsStoriesPage from "./pages/KidsStoriesPage";
 import FavoritesPage from "./pages/FavoritesPage";
 import ReadingStatsPage from "./pages/ReadingStatsPage";
 import MushafPage from "./pages/MushafPage";
+import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +57,7 @@ const AnimatedRoutes = () => {
         <Route path="/kids-stories" element={<PageTransition><KidsStoriesPage /></PageTransition>} />
         <Route path="/favorites" element={<PageTransition><FavoritesPage /></PageTransition>} />
         <Route path="/reading-stats" element={<PageTransition><ReadingStatsPage /></PageTransition>} />
+        <Route path="/settings" element={<PageTransition><SettingsPage /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
