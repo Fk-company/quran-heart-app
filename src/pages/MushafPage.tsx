@@ -233,7 +233,7 @@ const MushafPage: React.FC = () => {
   const isAyahPlayerActive = ayahPlayer.playingAyahNumber !== null;
 
   return (
-    <div className={`page-container ${nightClass}`} dir="rtl"
+    <div className={`page-container page-with-topbar ${nightClass}`} dir="rtl"
       ref={containerRef} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
       <div className="px-4 pt-4 max-w-lg mx-auto">
         {/* Header */}
