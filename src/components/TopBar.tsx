@@ -38,6 +38,12 @@ const TopBar: React.FC = () => {
               <Moon className="w-3.5 h-3.5 text-foreground" />
             )}
           </button>
+          <button
+            onClick={() => navigate('/settings')}
+            className="w-8 h-8 rounded-xl bg-secondary/80 flex items-center justify-center transition-colors hover:bg-muted"
+          >
+            <Settings className="w-3.5 h-3.5 text-muted-foreground" />
+          </button>
         </div>
       </div>
       <div className="h-[1px] bg-border/40" />
