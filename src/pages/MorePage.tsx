@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Heart, Radio, Users, Quote, Search, Star, BookOpen, BarChart3,
-  X, Feather, Book, Grid3X3, List, ChevronLeft, TrendingUp, Baby, Sparkles, Mic
+  X, Feather, Book, Grid3X3, List, ChevronLeft, TrendingUp, Baby, Sparkles, Mic,
+  Brain, Smile, Lightbulb, Bot
 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { MoreHorizontal } from 'lucide-react';
@@ -15,6 +16,16 @@ const moreCategories = [
       { label: 'القراء', icon: Mic, path: '/reciters', desc: 'استمع لأشهر القراء', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
       { label: 'الراديو', icon: Radio, path: '/radio', desc: 'بث مباشر للقرآن', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
       { label: 'التفسير', icon: BookOpen, path: '/tafsir', desc: 'تفاسير متعددة', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
+      { label: 'المساعد القرآني', icon: Bot, path: '/ai-tafsir', desc: 'اسأل عن معنى أو تفسير', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
+    ]
+  },
+  {
+    title: 'القلب والروح',
+    items: [
+      { label: 'كيف يشعر قلبك؟', icon: Smile, path: '/emotion-quran', desc: 'آيات حسب حالتك النفسية', color: 'bg-pink-500/10 text-pink-500', gradient: 'gradient-gold' },
+      { label: 'قلب القرآن', icon: Heart, path: '/heart-quran', desc: 'سورة يس وآيات القلب', color: 'bg-red-500/10 text-red-500', gradient: 'gradient-primary' },
+      { label: 'تأملات يومية', icon: Lightbulb, path: '/daily-reflection', desc: 'آية وتدبر وعمل', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-gold' },
+      { label: 'آيات السكينة', icon: Star, path: '/sakinah', desc: 'آيات الراحة والطمأنينة', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
     ]
   },
   {
@@ -22,7 +33,6 @@ const moreCategories = [
     items: [
       { label: 'الأذكار والتسبيح', icon: Heart, path: '/adhkar', desc: 'أذكار الصباح والمساء', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
       { label: 'الأدعية', icon: Feather, path: '/dua', desc: 'أدعية لكل مناسبة', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
-      { label: 'آيات السكينة', icon: Star, path: '/sakinah', desc: 'آيات الراحة والطمأنينة', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
     ]
   },
   {
@@ -32,6 +42,7 @@ const moreCategories = [
       { label: 'قصص الأنبياء', icon: Users, path: '/prophets', desc: 'قصص الأنبياء والمرسلين', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
       { label: 'أسماء الله الحسنى', icon: Sparkles, path: '/asma-al-husna', desc: '99 اسماً لله تعالى', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
       { label: 'قصص الأطفال', icon: Baby, path: '/kids-stories', desc: 'قصص إسلامية للأطفال', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
+      { label: 'اختبار الحفظ', icon: Brain, path: '/memorization-test', desc: 'اختبر حفظك للقرآن', color: 'bg-purple-500/10 text-purple-500', gradient: 'gradient-primary' },
     ]
   },
   {
