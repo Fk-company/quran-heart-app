@@ -29,6 +29,11 @@ import FavoritesPage from "./pages/FavoritesPage";
 import ReadingStatsPage from "./pages/ReadingStatsPage";
 import MushafPage from "./pages/MushafPage";
 import SettingsPage from "./pages/SettingsPage";
+import MemorizationTestPage from "./pages/MemorizationTestPage";
+import EmotionQuranPage from "./pages/EmotionQuranPage";
+import HeartQuranPage from "./pages/HeartQuranPage";
+import DailyReflectionPage from "./pages/DailyReflectionPage";
+import AiTafsirPage from "./pages/AiTafsirPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -58,6 +63,11 @@ const AnimatedRoutes = () => {
         <Route path="/favorites" element={<PageTransition><FavoritesPage /></PageTransition>} />
         <Route path="/reading-stats" element={<PageTransition><ReadingStatsPage /></PageTransition>} />
         <Route path="/settings" element={<PageTransition><SettingsPage /></PageTransition>} />
+        <Route path="/memorization-test" element={<PageTransition><MemorizationTestPage /></PageTransition>} />
+        <Route path="/emotion-quran" element={<PageTransition><EmotionQuranPage /></PageTransition>} />
+        <Route path="/heart-quran" element={<PageTransition><HeartQuranPage /></PageTransition>} />
+        <Route path="/daily-reflection" element={<PageTransition><DailyReflectionPage /></PageTransition>} />
+        <Route path="/ai-tafsir" element={<PageTransition><AiTafsirPage /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
