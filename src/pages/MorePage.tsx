@@ -116,15 +116,34 @@ const MorePage: React.FC = () => {
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={MoreHorizontal}
-          title="المزيد"
-          subtitle="جميع الأقسام والخدمات"
+          title="جميع الأقسام"
+          subtitle={`${allItems.length} خدمة وميزة`}
           actions={
-            <div className="flex gap-1">
-              <button onClick={() => { setViewMode('list'); localStorage.setItem('view-mode-more', 'list'); }} className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}><List className="w-4 h-4" /></button>
-              <button onClick={() => { setViewMode('grid'); localStorage.setItem('view-mode-more', 'grid'); }} className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}><Grid3X3 className="w-4 h-4" /></button>
+            <div className="flex gap-1 p-1 bg-secondary rounded-2xl">
+              <button onClick={() => { setViewMode('list'); localStorage.setItem('view-mode-more', 'list'); }} className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`} aria-label="قائمة"><List className="w-4 h-4" /></button>
+              <button onClick={() => { setViewMode('grid'); localStorage.setItem('view-mode-more', 'grid'); }} className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`} aria-label="شبكة"><Grid3X3 className="w-4 h-4" /></button>
             </div>
           }
         />
+
+        {/* Stats overview */}
+        <div className="grid grid-cols-3 gap-2 mb-5">
+          <div className="stat-card text-right">
+            <div className="stat-card-icon bg-primary/10"><MoreHorizontal className="w-4 h-4 text-primary" /></div>
+            <div className="stat-card-value">{moreCategories.length}</div>
+            <div className="stat-card-label">قسم</div>
+          </div>
+          <div className="stat-card text-right">
+            <div className="stat-card-icon bg-gold-light"><Sparkles className="w-4 h-4 text-gold-deep" /></div>
+            <div className="stat-card-value">{allItems.length}</div>
+            <div className="stat-card-label">خدمة</div>
+          </div>
+          <button onClick={() => navigate('/settings')} className="stat-card text-right">
+            <div className="stat-card-icon bg-emerald-light"><Star className="w-4 h-4 text-primary" /></div>
+            <div className="stat-card-value text-base mt-1">⚙</div>
+            <div className="stat-card-label">الإعدادات</div>
+          </button>
+        </div>
 
         {moreCategories.map((category) => (
           <div key={category.title} className="mb-6">
@@ -137,10 +156,10 @@ const MorePage: React.FC = () => {
                     onClick={() => navigate(item.path)}
                     className="card-surface-hover flex flex-col items-center py-4 px-2 gap-2 text-center"
                   >
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${item.gradient}`}>
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${item.gradient} shadow-emerald`}>
                       <item.icon className="w-5 h-5 text-primary-foreground" />
                     </div>
-                    <span className="font-bold text-foreground text-xs leading-tight">{item.label}</span>
+                    <span className="font-bold text-foreground text-xs leading-tight font-kufi">{item.label}</span>
                     <span className="text-[10px] text-muted-foreground leading-tight line-clamp-2">{item.desc}</span>
                   </button>
                 ))}
@@ -153,11 +172,11 @@ const MorePage: React.FC = () => {
                     onClick={() => navigate(item.path)}
                     className="card-surface-hover w-full flex items-center gap-3"
                   >
-                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${item.color}`}>
-                      <item.icon className="w-5 h-5" />
+                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${item.gradient} shadow-emerald`}>
+                      <item.icon className="w-5 h-5 text-primary-foreground" />
                     </div>
                     <div className="flex-1 text-right min-w-0">
-                      <div className="font-semibold text-foreground text-sm">{item.label}</div>
+                      <div className="font-bold text-foreground text-sm font-kufi">{item.label}</div>
                       <div className="text-[11px] text-muted-foreground">{item.desc}</div>
                     </div>
                     <ChevronLeft className="w-4 h-4 text-muted-foreground flex-shrink-0" />

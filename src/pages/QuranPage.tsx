@@ -1,37 +1,53 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchSurahs, type Surah } from '@/lib/api';
-import { Search, Book, Grid3X3, List, Heart, BookOpen } from 'lucide-react';
+import { Book, Heart, BookOpen, SearchX, Layers } from 'lucide-react';
 import { useFavorites } from '@/hooks/useFavorites';
 import PageHeader from '@/components/PageHeader';
+import SearchFilterBar from '@/components/SearchFilterBar';
+import SkeletonGrid from '@/components/SkeletonGrid';
+import EmptyState from '@/components/EmptyState';
 
 const QuranPage: React.FC = () => {
   const navigate = useNavigate();
   const [surahs, setSurahs] = useState<Surah[]>([]);
-  const [filtered, setFiltered] = useState<Surah[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'Meccan' | 'Medinan' | 'favorites'>('all');
+  const [filter, setFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>(() => (localStorage.getItem('quran-view') as any) || 'list');
   const { toggleSurah, isSurahFav, favorites } = useFavorites();
 
   useEffect(() => { localStorage.setItem('quran-view', viewMode); }, [viewMode]);
-
   useEffect(() => {
-    fetchSurahs().then((data) => { setSurahs(data); setFiltered(data); setLoading(false); });
+    fetchSurahs().then((data) => { setSurahs(data); setLoading(false); });
   }, []);
 
-  useEffect(() => {
+  const counts = useMemo(() => ({
+    all: surahs.length,
+    Meccan: surahs.filter(s => s.revelationType === 'Meccan').length,
+    Medinan: surahs.filter(s => s.revelationType === 'Medinan').length,
+    favorites: favorites.surahs.length,
+  }), [surahs, favorites.surahs]);
+
+  const filtered = useMemo(() => {
     let result = surahs;
     if (filter === 'favorites') result = result.filter((s) => favorites.surahs.includes(s.number));
     else if (filter !== 'all') result = result.filter((s) => s.revelationType === filter);
     if (search.trim()) {
+      const q = search.toLowerCase();
       result = result.filter((s) =>
-        s.name.includes(search) || s.englishName.toLowerCase().includes(search.toLowerCase()) || String(s.number) === search
+        s.name.includes(search) || s.englishName.toLowerCase().includes(q) || String(s.number) === search
       );
     }
-    setFiltered(result);
+    return result;
   }, [search, surahs, filter, favorites.surahs]);
+
+  const filters = [
+    { key: 'all', label: 'الكل', count: counts.all },
+    { key: 'Meccan', label: 'مكية', count: counts.Meccan },
+    { key: 'Medinan', label: 'مدنية', count: counts.Medinan },
+    { key: 'favorites', label: 'المفضلة', count: counts.favorites },
+  ];
 
   return (
     <div className="page-container page-with-topbar" dir="rtl">
@@ -39,60 +55,71 @@ const QuranPage: React.FC = () => {
         <PageHeader
           icon={Book}
           title="المصحف الشريف"
-          subtitle="114 سورة"
-          actions={
-            <div className="flex gap-1">
-              <button onClick={() => setViewMode('list')} className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}><List className="w-4 h-4" /></button>
-              <button onClick={() => setViewMode('grid')} className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}><Grid3X3 className="w-4 h-4" /></button>
-            </div>
-          }
+          subtitle={`${filtered.length} من ${surahs.length} سورة`}
         />
 
-        {/* Mushaf link */}
-        <button onClick={() => navigate('/mushaf')} className="w-full card-surface mb-4 flex items-center gap-3 bg-accent/5 border-accent/15">
-          <div className="w-10 h-10 rounded-xl gradient-gold flex items-center justify-center flex-shrink-0">
+        {/* Quick stats */}
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          <div className="stat-card text-right">
+            <div className="stat-card-icon bg-primary/10"><Book className="w-4 h-4 text-primary" /></div>
+            <div className="stat-card-value">114</div>
+            <div className="stat-card-label">سورة</div>
+          </div>
+          <div className="stat-card text-right">
+            <div className="stat-card-icon bg-gold-light"><Layers className="w-4 h-4 text-gold-deep" /></div>
+            <div className="stat-card-value">30</div>
+            <div className="stat-card-label">جزء</div>
+          </div>
+          <div className="stat-card text-right">
+            <div className="stat-card-icon bg-emerald-light"><BookOpen className="w-4 h-4 text-primary" /></div>
+            <div className="stat-card-value">604</div>
+            <div className="stat-card-label">صفحة</div>
+          </div>
+        </div>
+
+        {/* Mushaf entry */}
+        <button onClick={() => navigate('/mushaf')} className="card-luxury w-full mb-4 flex items-center gap-3 text-right hover:scale-[1.01] transition-transform">
+          <div className="w-12 h-12 rounded-2xl gradient-gold flex items-center justify-center flex-shrink-0 shadow-gold">
             <BookOpen className="w-5 h-5 text-primary-foreground" />
           </div>
           <div className="flex-1 text-right">
-            <div className="text-sm font-bold text-foreground">المصحف صفحة بصفحة</div>
-            <div className="text-[11px] text-muted-foreground">اقرأ كالمصحف الورقي - 604 صفحة</div>
+            <div className="text-[11px] text-accent font-bold uppercase tracking-wider">جديد</div>
+            <div className="text-base font-bold text-foreground font-kufi">المصحف صفحة بصفحة</div>
+            <div className="text-xs text-muted-foreground mt-0.5">اقرأ كالمصحف الورقي — 604 صفحة</div>
           </div>
         </button>
 
-        <div className="relative mb-3">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="ابحث عن سورة..." className="search-input pr-10" />
-        </div>
-
-        <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
-          {([
-            { key: 'all' as const, label: 'الكل' },
-            { key: 'Meccan' as const, label: 'مكية' },
-            { key: 'Medinan' as const, label: 'مدنية' },
-            { key: 'favorites' as const, label: 'المفضلة' },
-          ] as const).map((f) => (
-            <button key={f.key} onClick={() => setFilter(f.key)} className={`filter-chip ${filter === f.key ? 'active' : ''}`}>{f.label}</button>
-          ))}
-          <span className="text-xs text-muted-foreground self-center mr-auto whitespace-nowrap">{filtered.length} سورة</span>
-        </div>
+        <SearchFilterBar
+          searchValue={search}
+          onSearchChange={setSearch}
+          searchPlaceholder="ابحث عن سورة باسمها أو رقمها..."
+          filters={filters}
+          activeFilter={filter}
+          onFilterChange={setFilter}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          showViewToggle
+        />
 
         {loading ? (
-          <div className={viewMode === 'grid' ? 'grid grid-cols-3 gap-2' : 'space-y-2'}>
-            {Array.from({ length: viewMode === 'grid' ? 9 : 10 }).map((_, i) => (
-              <div key={i} className={`skeleton-pulse ${viewMode === 'grid' ? 'h-24' : 'h-16'} w-full`} />
-            ))}
-          </div>
+          <SkeletonGrid count={8} variant={viewMode === 'grid' ? 'tile' : 'list'} />
+        ) : filtered.length === 0 ? (
+          <EmptyState
+            icon={SearchX}
+            title="لا توجد نتائج"
+            description={search ? `لم يتم العثور على سور مطابقة لـ "${search}"` : 'لا توجد سور في هذا التصنيف'}
+          />
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2.5">
             {filtered.map((surah) => (
-              <div key={surah.number} className="card-surface-hover relative flex flex-col items-center py-3 gap-1">
-                <button onClick={(e) => { e.stopPropagation(); toggleSurah(surah.number); }} className={`fav-btn absolute top-1 left-1 w-6 h-6 ${isSurahFav(surah.number) ? 'active' : ''}`}>
-                  <Heart className="w-3 h-3" fill={isSurahFav(surah.number) ? 'currentColor' : 'none'} />
+              <div key={surah.number} className="card-surface-hover relative flex flex-col items-center py-4 gap-1.5">
+                <button onClick={(e) => { e.stopPropagation(); toggleSurah(surah.number); }} className={`fav-btn absolute top-1.5 left-1.5 w-7 h-7 ${isSurahFav(surah.number) ? 'active' : ''}`}>
+                  <Heart className="w-3.5 h-3.5" fill={isSurahFav(surah.number) ? 'currentColor' : 'none'} />
                 </button>
-                <button onClick={() => navigate(`/quran/${surah.number}`)} className="flex flex-col items-center gap-1 w-full">
-                  <span className="verse-number text-sm">{surah.number}</span>
-                  <span className="text-xs font-bold text-foreground mt-1">{surah.name}</span>
-                  <span className="text-[10px] text-muted-foreground">{surah.numberOfAyahs} آيات</span>
+                <button onClick={() => navigate(`/quran/${surah.number}`)} className="flex flex-col items-center gap-1.5 w-full">
+                  <span className="verse-number">{surah.number}</span>
+                  <span className="text-xs font-bold text-foreground mt-1 font-kufi">{surah.name}</span>
+                  <span className="text-[10px] text-muted-foreground font-medium">{surah.numberOfAyahs} آيات</span>
                 </button>
               </div>
             ))}
@@ -104,9 +131,11 @@ const QuranPage: React.FC = () => {
                 <button onClick={() => navigate(`/quran/${surah.number}`)} className="flex items-center gap-3 flex-1 min-w-0">
                   <div className="verse-number flex-shrink-0">{surah.number}</div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-foreground text-sm">{surah.name}</div>
-                    <div className="text-[11px] text-muted-foreground flex items-center gap-2">
-                      <span>{surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</span>
+                    <div className="font-bold text-foreground text-sm font-kufi">{surah.name}</div>
+                    <div className="text-[11px] text-muted-foreground flex items-center gap-2 mt-0.5">
+                      <span className={surah.revelationType === 'Meccan' ? 'text-primary font-medium' : 'text-accent font-medium'}>
+                        {surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}
+                      </span>
                       <span className="w-1 h-1 rounded-full bg-border inline-block" />
                       <span>{surah.numberOfAyahs} آيات</span>
                     </div>
