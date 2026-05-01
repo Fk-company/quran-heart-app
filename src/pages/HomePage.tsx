@@ -67,7 +67,7 @@ const HomePage: React.FC = () => {
   const { theme, themeMode, toggleTheme, setAutoMode } = useTheme();
   const { lastRead } = useLastRead();
   const { requestPermission, schedulePrayerNotification, sendAdhkarReminder, isSupported } = useNotifications();
-  const { stats } = useReadingTracker();
+  const { tracker } = useReadingTracker();
   const { favorites } = useFavorites();
   const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
   const [nextPrayerKey, setNextPrayerKey] = useState('');
@@ -217,9 +217,9 @@ const HomePage: React.FC = () => {
     { num: 67, label: 'الملك' }, { num: 18, label: 'الكهف' }, { num: 112, label: 'الإخلاص' },
   ];
 
-  const totalAyahsRead = stats?.totalAyahsRead || 0;
-  const streak = stats?.streak || 0;
-  const favCount = (favorites.surahs?.length || 0) + (favorites.items?.length || 0);
+  const totalAyahsRead = tracker?.totalAyahsRead || 0;
+  const streak = tracker?.streak || 0;
+  const favCount = (favorites?.surahs?.length || 0) + (favorites?.items?.length || 0);
 
   return (
     <div className="page-container" dir="rtl">
