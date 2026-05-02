@@ -510,7 +510,7 @@ const MushafPage: React.FC = () => {
             {Array.from({ length: 8 }).map((_, i) => <div key={i} className="skeleton-pulse h-6 w-full" />)}
           </div></div>
         ) : (
-          <div className={`mushaf-page-frame ${nightMode ? 'mushaf-night-frame' : ''}`}>
+          <div className={`mushaf-page-frame ${nightMode ? 'mushaf-night-frame' : ''} animate-fade-in`} key={currentPage}>
             <div className="mushaf-ornament-top" />
             <div className="px-5 py-6 sm:px-8 sm:py-8">
               {ayahs.length > 0 && ayahs[0].numberInSurah === 1 && ayahs[0].surah.number !== 1 && ayahs[0].surah.number !== 9 && (
@@ -525,7 +525,7 @@ const MushafPage: React.FC = () => {
                 {ayahs.map((ayah, idx) => {
                   const showSurahHeader = ayah.numberInSurah === 1 && idx > 0;
                   const isHighlighted = ayahPlayer.playingAyahNumber === ayah.number;
-                  
+
                   return (
                     <React.Fragment key={ayah.number}>
                       {showSurahHeader && (
@@ -549,7 +549,7 @@ const MushafPage: React.FC = () => {
                               : 'ayah-highlighted'
                             : 'hover:underline decoration-primary/30 underline-offset-4'
                         }`}
-                        onClick={() => handleAyahClick(ayah)}
+                        onClick={(e) => { e.stopPropagation(); handleAyahClick(ayah); }}
                       >{ayah.text}</span>{' '}
                       <span className={`verse-number inline-flex w-6 h-6 text-[10px] mx-0.5 align-middle transition-all duration-300 ${
                         isHighlighted
