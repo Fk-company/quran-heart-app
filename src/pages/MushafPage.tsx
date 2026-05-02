@@ -177,7 +177,10 @@ const MushafPage: React.FC = () => {
   const { settings } = useSettings();
 
   const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
   const touchEndX = useRef(0);
+  const touchEndY = useRef(0);
+  const isSwipeCandidate = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const repeatRef = useRef({ isRepeating: false, repeatCount: 3, currentRepeat: 1 });
 
@@ -255,14 +258,29 @@ const MushafPage: React.FC = () => {
     if (p >= 1 && p <= TOTAL_PAGES) { setCurrentPage(p); setShowJumpInput(false); setPageInput(''); }
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
-  const handleTouchMove = (e: React.TouchEvent) => { touchEndX.current = e.touches[0].clientX; };
+  const handleTouchStart = (e: React.TouchEvent) => {
+    // Only consider swipes that start outside the ayah text area
+    const target = e.target as HTMLElement;
+    const isOnAyah = target.closest('.mushaf-ayah-text, .verse-number, button, a, input, [role="button"]');
+    isSwipeCandidate.current = !isOnAyah;
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    touchEndX.current = touchStartX.current;
+    touchEndY.current = touchStartY.current;
+  };
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+    touchEndY.current = e.touches[0].clientY;
+  };
   const handleTouchEnd = () => {
-    const diff = touchStartX.current - touchEndX.current;
-    if (Math.abs(diff) > 60) {
-      if (diff > 0) goToPage(currentPage - 1);
-      else goToPage(currentPage + 1);
-    }
+    if (!isSwipeCandidate.current) return;
+    const diffX = touchStartX.current - touchEndX.current;
+    const diffY = touchStartY.current - touchEndY.current;
+    // Require predominantly horizontal motion + minimum 80px to count as swipe
+    if (Math.abs(diffX) < 80) return;
+    if (Math.abs(diffY) > Math.abs(diffX) * 0.6) return; // mostly vertical = scroll
+    if (diffX > 0) goToPage(currentPage - 1);
+    else goToPage(currentPage + 1);
   };
 
   const handlePlayPage = () => {
@@ -492,7 +510,7 @@ const MushafPage: React.FC = () => {
             {Array.from({ length: 8 }).map((_, i) => <div key={i} className="skeleton-pulse h-6 w-full" />)}
           </div></div>
         ) : (
-          <div className={`mushaf-page-frame ${nightMode ? 'mushaf-night-frame' : ''}`}>
+          <div className={`mushaf-page-frame ${nightMode ? 'mushaf-night-frame' : ''} animate-fade-in`} key={currentPage}>
             <div className="mushaf-ornament-top" />
             <div className="px-5 py-6 sm:px-8 sm:py-8">
               {ayahs.length > 0 && ayahs[0].numberInSurah === 1 && ayahs[0].surah.number !== 1 && ayahs[0].surah.number !== 9 && (
@@ -507,7 +525,7 @@ const MushafPage: React.FC = () => {
                 {ayahs.map((ayah, idx) => {
                   const showSurahHeader = ayah.numberInSurah === 1 && idx > 0;
                   const isHighlighted = ayahPlayer.playingAyahNumber === ayah.number;
-                  
+
                   return (
                     <React.Fragment key={ayah.number}>
                       {showSurahHeader && (
@@ -531,7 +549,7 @@ const MushafPage: React.FC = () => {
                               : 'ayah-highlighted'
                             : 'hover:underline decoration-primary/30 underline-offset-4'
                         }`}
-                        onClick={() => handleAyahClick(ayah)}
+                        onClick={(e) => { e.stopPropagation(); handleAyahClick(ayah); }}
                       >{ayah.text}</span>{' '}
                       <span className={`verse-number inline-flex w-6 h-6 text-[10px] mx-0.5 align-middle transition-all duration-300 ${
                         isHighlighted

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useReadingTracker } from '@/hooks/useReadingTracker';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useAppStats, formatListenTime } from '@/hooks/useAppStats';
+import { useFavorites } from '@/hooks/useFavorites';
 import { Progress } from '@/components/ui/progress';
-import { BookOpen, Flame, Award, Calendar, TrendingUp, BarChart3, Target, Bell, BellOff, CheckCircle2, Share2 } from 'lucide-react';
+import { BookOpen, Flame, Award, Calendar, TrendingUp, BarChart3, Target, Bell, BellOff, CheckCircle2, Share2, Radio, Mic, Heart, Sparkles, Clock } from 'lucide-react';
 import KhatmShareCard from '@/components/KhatmShareCard';
 import PageHeader from '@/components/PageHeader';
 
@@ -19,6 +21,8 @@ const defaultGoal: DailyGoal = { pages: 5, ayahs: 50, reminderEnabled: false, re
 
 const ReadingStatsPage: React.FC = () => {
   const { tracker, todayStats, khatmProgress } = useReadingTracker();
+  const { stats: appStats } = useAppStats();
+  const { favorites } = useFavorites();
   const { requestPermission, sendNotification, isSupported } = useNotifications();
   const [showShareCard, setShowShareCard] = useState(false);
 
@@ -72,9 +76,91 @@ const ReadingStatsPage: React.FC = () => {
       <div className="px-4 pt-6 max-w-lg mx-auto pb-28">
         <PageHeader
           icon={TrendingUp}
-          title="إحصائيات القراءة"
-          subtitle="تتبع تقدمك في ختم القرآن"
+          title="لوحة الإحصائيات"
+          subtitle="تتبع رحلتك مع كتاب الله"
         />
+
+        {/* Comprehensive Dashboard */}
+        <div className="card-luxury mb-4 islamic-pattern">
+          <div className="flex items-center gap-2 mb-3 relative z-10">
+            <Sparkles className="w-4 h-4 text-accent" />
+            <span className="text-sm font-bold text-foreground font-kufi">نظرة عامة</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2.5 relative z-10">
+            <div className="rounded-2xl p-3 bg-card/60 border border-border/50">
+              <div className="flex items-center gap-2 mb-1">
+                <BookOpen className="w-3.5 h-3.5 text-primary" />
+                <span className="text-[10px] text-muted-foreground font-medium">صفحات مقروءة</span>
+              </div>
+              <div className="text-xl font-bold text-foreground tabular-nums">{tracker.totalPagesRead}</div>
+            </div>
+            <div className="rounded-2xl p-3 bg-card/60 border border-border/50">
+              <div className="flex items-center gap-2 mb-1">
+                <BarChart3 className="w-3.5 h-3.5 text-accent" />
+                <span className="text-[10px] text-muted-foreground font-medium">آيات مقروءة</span>
+              </div>
+              <div className="text-xl font-bold text-foreground tabular-nums">{tracker.totalAyahsRead}</div>
+            </div>
+            <div className="rounded-2xl p-3 bg-card/60 border border-border/50">
+              <div className="flex items-center gap-2 mb-1">
+                <Heart className="w-3.5 h-3.5 text-destructive" />
+                <span className="text-[10px] text-muted-foreground font-medium">المفضلات</span>
+              </div>
+              <div className="text-xl font-bold text-foreground tabular-nums">
+                {favorites.surahs.length + favorites.reciters.length + favorites.items.length}
+              </div>
+              <div className="text-[10px] text-muted-foreground mt-0.5">
+                {favorites.surahs.length} سور · {favorites.reciters.length} قراء
+              </div>
+            </div>
+            <div className="rounded-2xl p-3 bg-card/60 border border-border/50">
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkles className="w-3.5 h-3.5 text-accent" />
+                <span className="text-[10px] text-muted-foreground font-medium">إجمالي التسبيح</span>
+              </div>
+              <div className="text-xl font-bold text-foreground tabular-nums">{appStats.tasbeehTotal}</div>
+            </div>
+            <div className="rounded-2xl p-3 bg-card/60 border border-border/50">
+              <div className="flex items-center gap-2 mb-1">
+                <Mic className="w-3.5 h-3.5 text-primary" />
+                <span className="text-[10px] text-muted-foreground font-medium">استماع للقراء</span>
+              </div>
+              <div className="text-base font-bold text-foreground">{formatListenTime(appStats.reciterListenSeconds)}</div>
+            </div>
+            <div className="rounded-2xl p-3 bg-card/60 border border-border/50">
+              <div className="flex items-center gap-2 mb-1">
+                <Radio className="w-3.5 h-3.5 text-accent" />
+                <span className="text-[10px] text-muted-foreground font-medium">استماع للراديو</span>
+              </div>
+              <div className="text-base font-bold text-foreground">{formatListenTime(appStats.radioListenSeconds)}</div>
+            </div>
+          </div>
+          <div className="mt-3 pt-3 border-t border-border/50 flex items-center justify-around relative z-10">
+            <div className="text-center">
+              <div className="flex items-center gap-1 justify-center">
+                <Flame className="w-4 h-4 text-accent" />
+                <span className="text-lg font-bold text-foreground tabular-nums">{tracker.streak}</span>
+              </div>
+              <div className="text-[10px] text-muted-foreground">أيام متتالية</div>
+            </div>
+            <div className="w-px h-8 bg-border" />
+            <div className="text-center">
+              <div className="flex items-center gap-1 justify-center">
+                <Award className="w-4 h-4 text-primary" />
+                <span className="text-lg font-bold text-foreground tabular-nums">{tracker.khatmCount}</span>
+              </div>
+              <div className="text-[10px] text-muted-foreground">عدد الختمات</div>
+            </div>
+            <div className="w-px h-8 bg-border" />
+            <div className="text-center">
+              <div className="flex items-center gap-1 justify-center">
+                <Clock className="w-4 h-4 text-accent" />
+                <span className="text-base font-bold text-foreground">{formatListenTime(appStats.radioListenSeconds + appStats.reciterListenSeconds)}</span>
+              </div>
+              <div className="text-[10px] text-muted-foreground">إجمالي الاستماع</div>
+            </div>
+          </div>
+        </div>
 
         {/* Daily Goal Card */}
         <div className={`card-surface mb-4 border ${goalAchieved ? 'border-green-500/30 bg-green-500/5' : 'border-primary/15 bg-primary/5'}`}>
