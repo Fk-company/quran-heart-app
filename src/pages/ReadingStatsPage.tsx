@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useReadingTracker } from '@/hooks/useReadingTracker';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useAppStats, formatListenTime } from '@/hooks/useAppStats';
+import { useFavorites } from '@/hooks/useFavorites';
 import { Progress } from '@/components/ui/progress';
-import { BookOpen, Flame, Award, Calendar, TrendingUp, BarChart3, Target, Bell, BellOff, CheckCircle2, Share2 } from 'lucide-react';
+import { BookOpen, Flame, Award, Calendar, TrendingUp, BarChart3, Target, Bell, BellOff, CheckCircle2, Share2, Radio, Mic, Heart, Sparkles, Clock } from 'lucide-react';
 import KhatmShareCard from '@/components/KhatmShareCard';
 import PageHeader from '@/components/PageHeader';
 
@@ -19,6 +21,8 @@ const defaultGoal: DailyGoal = { pages: 5, ayahs: 50, reminderEnabled: false, re
 
 const ReadingStatsPage: React.FC = () => {
   const { tracker, todayStats, khatmProgress } = useReadingTracker();
+  const { stats: appStats } = useAppStats();
+  const { favorites } = useFavorites();
   const { requestPermission, sendNotification, isSupported } = useNotifications();
   const [showShareCard, setShowShareCard] = useState(false);
 
