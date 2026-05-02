@@ -1,12 +1,24 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchSurahs, type Surah } from '@/lib/api';
-import { Book, Heart, BookOpen, SearchX, Layers } from 'lucide-react';
+import { Book, Heart, BookOpen, SearchX, Layers, Filter, ChevronDown, ArrowDownAZ, Hash, Clock, Star, ArrowDown01 } from 'lucide-react';
 import { useFavorites } from '@/hooks/useFavorites';
 import PageHeader from '@/components/PageHeader';
 import SearchFilterBar from '@/components/SearchFilterBar';
 import SkeletonGrid from '@/components/SkeletonGrid';
 import EmptyState from '@/components/EmptyState';
+
+type SortKey = 'number' | 'number-desc' | 'name' | 'most-ayahs' | 'least-ayahs' | 'favorites-first';
+const SORT_KEY = 'quran-sort';
+
+const sortLabels: Record<SortKey, string> = {
+  'number': 'حسب الترتيب (1 → 114)',
+  'number-desc': 'حسب الترتيب (114 → 1)',
+  'name': 'الاسم (أ → ي)',
+  'most-ayahs': 'الأكثر آيات',
+  'least-ayahs': 'الأقل آيات',
+  'favorites-first': 'المفضلة أولاً',
+};
 
 const QuranPage: React.FC = () => {
   const navigate = useNavigate();
@@ -15,9 +27,12 @@ const QuranPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>(() => (localStorage.getItem('quran-view') as any) || 'list');
+  const [sortKey, setSortKey] = useState<SortKey>(() => (localStorage.getItem(SORT_KEY) as SortKey) || 'number');
+  const [showSort, setShowSort] = useState(false);
   const { toggleSurah, isSurahFav, favorites } = useFavorites();
 
   useEffect(() => { localStorage.setItem('quran-view', viewMode); }, [viewMode]);
+  useEffect(() => { localStorage.setItem(SORT_KEY, sortKey); }, [sortKey]);
   useEffect(() => {
     fetchSurahs().then((data) => { setSurahs(data); setLoading(false); });
   }, []);
@@ -39,8 +54,24 @@ const QuranPage: React.FC = () => {
         s.name.includes(search) || s.englishName.toLowerCase().includes(q) || String(s.number) === search
       );
     }
-    return result;
-  }, [search, surahs, filter, favorites.surahs]);
+    const sorted = [...result];
+    switch (sortKey) {
+      case 'number': sorted.sort((a, b) => a.number - b.number); break;
+      case 'number-desc': sorted.sort((a, b) => b.number - a.number); break;
+      case 'name': sorted.sort((a, b) => a.name.localeCompare(b.name, 'ar')); break;
+      case 'most-ayahs': sorted.sort((a, b) => b.numberOfAyahs - a.numberOfAyahs); break;
+      case 'least-ayahs': sorted.sort((a, b) => a.numberOfAyahs - b.numberOfAyahs); break;
+      case 'favorites-first':
+        sorted.sort((a, b) => {
+          const af = favorites.surahs.includes(a.number) ? 0 : 1;
+          const bf = favorites.surahs.includes(b.number) ? 0 : 1;
+          if (af !== bf) return af - bf;
+          return a.number - b.number;
+        });
+        break;
+    }
+    return sorted;
+  }, [search, surahs, filter, favorites.surahs, sortKey]);
 
   const filters = [
     { key: 'all', label: 'الكل', count: counts.all },
@@ -48,6 +79,15 @@ const QuranPage: React.FC = () => {
     { key: 'Medinan', label: 'مدنية', count: counts.Medinan },
     { key: 'favorites', label: 'المفضلة', count: counts.favorites },
   ];
+
+  const sortIcon: Record<SortKey, React.ReactNode> = {
+    'number': <Hash className="w-3.5 h-3.5" />,
+    'number-desc': <ArrowDown01 className="w-3.5 h-3.5" />,
+    'name': <ArrowDownAZ className="w-3.5 h-3.5" />,
+    'most-ayahs': <Layers className="w-3.5 h-3.5" />,
+    'least-ayahs': <Layers className="w-3.5 h-3.5" />,
+    'favorites-first': <Star className="w-3.5 h-3.5" />,
+  };
 
   return (
     <div className="page-container page-with-topbar" dir="rtl">
@@ -99,6 +139,27 @@ const QuranPage: React.FC = () => {
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           showViewToggle
+          rightActions={
+            <div className="relative">
+              <button onClick={() => setShowSort(!showSort)}
+                className="h-12 px-3 rounded-2xl bg-card border border-border flex items-center gap-1.5 text-xs font-semibold text-foreground hover:bg-muted transition-colors">
+                <Filter className="w-3.5 h-3.5 text-primary" />
+                <ChevronDown className={`w-3 h-3 transition-transform ${showSort ? 'rotate-180' : ''}`} />
+              </button>
+              {showSort && (
+                <div className="absolute left-0 top-full mt-2 w-56 bg-card border border-border rounded-2xl shadow-lg p-1.5 z-30 animate-fade-in">
+                  <div className="px-2 py-1 text-[10px] font-bold text-muted-foreground uppercase">الفرز</div>
+                  {(Object.keys(sortLabels) as SortKey[]).map(key => (
+                    <button key={key} onClick={() => { setSortKey(key); setShowSort(false); }}
+                      className={`w-full text-right px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors ${sortKey === key ? 'bg-primary/10 text-primary' : 'hover:bg-secondary text-foreground'}`}>
+                      {sortIcon[key]}
+                      {sortLabels[key]}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          }
         />
 
         {loading ? (
