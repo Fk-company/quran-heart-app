@@ -177,7 +177,10 @@ const MushafPage: React.FC = () => {
   const { settings } = useSettings();
 
   const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
   const touchEndX = useRef(0);
+  const touchEndY = useRef(0);
+  const isSwipeCandidate = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const repeatRef = useRef({ isRepeating: false, repeatCount: 3, currentRepeat: 1 });
 
@@ -255,14 +258,29 @@ const MushafPage: React.FC = () => {
     if (p >= 1 && p <= TOTAL_PAGES) { setCurrentPage(p); setShowJumpInput(false); setPageInput(''); }
   };
 
-  const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
-  const handleTouchMove = (e: React.TouchEvent) => { touchEndX.current = e.touches[0].clientX; };
+  const handleTouchStart = (e: React.TouchEvent) => {
+    // Only consider swipes that start outside the ayah text area
+    const target = e.target as HTMLElement;
+    const isOnAyah = target.closest('.mushaf-ayah-text, .verse-number, button, a, input, [role="button"]');
+    isSwipeCandidate.current = !isOnAyah;
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    touchEndX.current = touchStartX.current;
+    touchEndY.current = touchStartY.current;
+  };
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndX.current = e.touches[0].clientX;
+    touchEndY.current = e.touches[0].clientY;
+  };
   const handleTouchEnd = () => {
-    const diff = touchStartX.current - touchEndX.current;
-    if (Math.abs(diff) > 60) {
-      if (diff > 0) goToPage(currentPage - 1);
-      else goToPage(currentPage + 1);
-    }
+    if (!isSwipeCandidate.current) return;
+    const diffX = touchStartX.current - touchEndX.current;
+    const diffY = touchStartY.current - touchEndY.current;
+    // Require predominantly horizontal motion + minimum 80px to count as swipe
+    if (Math.abs(diffX) < 80) return;
+    if (Math.abs(diffY) > Math.abs(diffX) * 0.6) return; // mostly vertical = scroll
+    if (diffX > 0) goToPage(currentPage - 1);
+    else goToPage(currentPage + 1);
   };
 
   const handlePlayPage = () => {
