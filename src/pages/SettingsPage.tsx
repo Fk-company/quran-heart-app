@@ -224,12 +224,12 @@ const SettingsPage: React.FC = () => {
         </div>
 
         {/* Reset confirmation */}
-        {showResetConfirm && (
+        {showResetConfirm && createPortal(
           <>
-            <div className="sheet-overlay" onClick={() => setShowResetConfirm(false)} />
-            <div className="sheet-content" dir="rtl">
+            <div className="sheet-overlay" style={{ zIndex: 80 }} onClick={() => setShowResetConfirm(false)} />
+            <div className="sheet-content" style={{ zIndex: 81 }} dir="rtl">
               <div className="sheet-handle" />
-              <div className="px-5 pb-6 pt-2 text-center">
+              <div className="px-5 pb-8 pt-2 text-center">
                 <RotateCcw className="w-10 h-10 text-destructive mx-auto mb-3" />
                 <h3 className="text-lg font-bold text-foreground mb-2">إعادة الإعدادات؟</h3>
                 <p className="text-sm text-muted-foreground mb-5">سيتم إعادة جميع الإعدادات إلى القيم الافتراضية</p>
@@ -249,7 +249,8 @@ const SettingsPage: React.FC = () => {
                 </div>
               </div>
             </div>
-          </>
+          </>,
+          document.body
         )}
       </div>
     </div>
