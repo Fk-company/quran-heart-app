@@ -32,6 +32,8 @@ export function useSettings() {
 
   useEffect(() => {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    document.documentElement.setAttribute('data-color-scheme', settings.colorScheme);
+    document.documentElement.style.setProperty('--app-font-size', `${settings.fontSize}px`);
   }, [settings]);
 
   const updateSetting = useCallback(<K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {

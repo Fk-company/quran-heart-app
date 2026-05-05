@@ -35,6 +35,7 @@ import HeartQuranPage from "./pages/HeartQuranPage";
 import DailyReflectionPage from "./pages/DailyReflectionPage";
 import AiTafsirPage from "./pages/AiTafsirPage";
 import NotFound from "./pages/NotFound";
+import { useSettings } from "@/hooks/useSettings";
 
 const queryClient = new QueryClient();
 
@@ -74,6 +75,8 @@ const AnimatedRoutes = () => {
   );
 };
 
+const SettingsBootstrap = () => { useSettings(); return null; };
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
@@ -81,6 +84,7 @@ const App = () => (
         <Sonner />
         <AudioProvider>
           <BrowserRouter>
+            <SettingsBootstrap />
             <div className="min-h-screen bg-background islamic-bg">
               <TopBar />
               <AnimatedRoutes />

@@ -109,6 +109,65 @@
     --shadow-gold: 0 6px 24px -6px hsl(42 80% 45% / 0.4);
     --shadow-emerald: 0 6px 24px -6px hsl(162 60% 30% / 0.5);
   }
+
+  /* ===== Color Scheme Overrides ===== */
+  :root[data-color-scheme="warm"] {
+    --primary: 25 80% 38%;
+    --primary-glow: 30 75% 50%;
+    --accent: 45 90% 50%;
+    --accent-glow: 48 95% 62%;
+    --ring: 25 80% 38%;
+    --gold: 45 90% 50%;
+    --gold-deep: 28 85% 38%;
+    --grad-primary: linear-gradient(140deg, hsl(30 80% 42%) 0%, hsl(25 85% 30%) 60%, hsl(20 85% 22%) 100%);
+    --grad-gold: linear-gradient(135deg, hsl(48 95% 62%) 0%, hsl(42 90% 50%) 50%, hsl(32 85% 38%) 100%);
+    --grad-hero: linear-gradient(155deg, hsl(28 80% 38%) 0%, hsl(22 85% 26%) 45%, hsl(15 80% 18%) 100%);
+  }
+  :root[data-color-scheme="cool"] {
+    --primary: 210 75% 38%;
+    --primary-glow: 200 80% 50%;
+    --accent: 190 80% 42%;
+    --accent-glow: 185 85% 55%;
+    --ring: 210 75% 38%;
+    --gold: 190 80% 42%;
+    --gold-deep: 215 80% 30%;
+    --grad-primary: linear-gradient(140deg, hsl(210 78% 42%) 0%, hsl(215 82% 28%) 60%, hsl(220 85% 18%) 100%);
+    --grad-gold: linear-gradient(135deg, hsl(190 85% 55%) 0%, hsl(195 80% 42%) 50%, hsl(210 80% 32%) 100%);
+    --grad-hero: linear-gradient(155deg, hsl(210 78% 38%) 0%, hsl(215 82% 22%) 45%, hsl(190 70% 28%) 100%);
+  }
+  :root[data-color-scheme="highContrast"] {
+    --primary: 0 0% 8%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 0 0% 25%;
+    --accent: 0 0% 18%;
+    --accent-glow: 0 0% 35%;
+    --ring: 0 0% 8%;
+    --border: 0 0% 35%;
+    --muted-foreground: 0 0% 25%;
+    --gold: 45 100% 45%;
+    --gold-deep: 0 0% 8%;
+    --grad-primary: linear-gradient(140deg, hsl(0 0% 18%) 0%, hsl(0 0% 5%) 100%);
+    --grad-gold: linear-gradient(135deg, hsl(45 100% 55%) 0%, hsl(40 95% 42%) 100%);
+    --grad-hero: linear-gradient(155deg, hsl(0 0% 12%) 0%, hsl(0 0% 0%) 100%);
+  }
+
+  .dark[data-color-scheme="warm"] {
+    --primary: 30 80% 58%;
+    --accent: 45 95% 62%;
+    --ring: 30 80% 58%;
+  }
+  .dark[data-color-scheme="cool"] {
+    --primary: 200 80% 58%;
+    --accent: 190 85% 62%;
+    --ring: 200 80% 58%;
+  }
+  .dark[data-color-scheme="highContrast"] {
+    --primary: 0 0% 95%;
+    --primary-foreground: 0 0% 5%;
+    --accent: 45 100% 60%;
+    --foreground: 0 0% 100%;
+    --border: 0 0% 60%;
+  }
 }
 
 @layer base {
