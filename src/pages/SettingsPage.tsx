@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Settings, Type, Palette, Mic, RotateCcw, ChevronLeft, Repeat, Volume2, Moon, Sun, Monitor, Check } from 'lucide-react';
 import { useSettings } from '@/hooks/useSettings';
