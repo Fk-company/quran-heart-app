@@ -35,6 +35,7 @@ import HeartQuranPage from "./pages/HeartQuranPage";
 import DailyReflectionPage from "./pages/DailyReflectionPage";
 import AiTafsirPage from "./pages/AiTafsirPage";
 import NotFound from "./pages/NotFound";
+import { useSettings } from "@/hooks/useSettings";
 
 const queryClient = new QueryClient();
 
