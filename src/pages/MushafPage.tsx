@@ -249,7 +249,24 @@ const MushafPage: React.FC = () => {
 
   useEffect(() => {
     ayahPlayer.stopPlayback();
+    setSelectedAyah(null);
   }, [currentPage]);
+
+  // Auto-close tafsir modal when any audio playback starts to avoid UI overlap
+  useEffect(() => {
+    if (ayahPlayer.playingAyahNumber !== null) {
+      setSelectedAyah(null);
+      setShowReciterPicker(false);
+      setShowBookmarks(false);
+      setShowJumpInput(false);
+    }
+  }, [ayahPlayer.playingAyahNumber]);
+
+  useEffect(() => {
+    if (currentTrack?.id?.startsWith('mushaf-') && isPlaying) {
+      setSelectedAyah(null);
+    }
+  }, [currentTrack?.id, isPlaying]);
 
   const goToPage = (p: number) => { if (p >= 1 && p <= TOTAL_PAGES) setCurrentPage(p); };
 
