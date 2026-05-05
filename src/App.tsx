@@ -75,6 +75,8 @@ const AnimatedRoutes = () => {
   );
 };
 
+const SettingsBootstrap = () => { useSettings(); return null; };
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
@@ -82,6 +84,7 @@ const App = () => (
         <Sonner />
         <AudioProvider>
           <BrowserRouter>
+            <SettingsBootstrap />
             <div className="min-h-screen bg-background islamic-bg">
               <TopBar />
               <AnimatedRoutes />
