@@ -62,7 +62,25 @@ const SettingsPage: React.FC = () => {
           {savedFlash && <span className="text-primary font-medium">تم الحفظ</span>}
         </div>
 
-        <Accordion type="multiple" defaultValue={['appearance']} className="space-y-3">
+        {/* Expand / Collapse all */}
+        <div className="mb-3 flex items-center gap-2">
+          <button
+            onClick={() => setOpenSections(ALL_SECTIONS)}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-secondary/60 hover:bg-secondary text-foreground text-xs font-medium transition-colors border border-border/60"
+          >
+            <ChevronsDown className="w-3.5 h-3.5 text-primary" />
+            فتح جميع الأقسام
+          </button>
+          <button
+            onClick={() => setOpenSections([])}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-secondary/60 hover:bg-secondary text-foreground text-xs font-medium transition-colors border border-border/60"
+          >
+            <ChevronsUp className="w-3.5 h-3.5 text-accent" />
+            طي جميع الأقسام
+          </button>
+        </div>
+
+        <Accordion type="multiple" value={openSections} onValueChange={setOpenSections} className="space-y-3">
           {/* Appearance */}
           <AccordionItem value="appearance" className="card-surface !border-0 !p-0 overflow-hidden">
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
