@@ -24,6 +24,8 @@ const COLOR_SCHEMES = [
   { id: 'highContrast' as const, name: 'تباين عالي', colors: ['hsl(0,0%,10%)', 'hsl(0,0%,90%)'] },
 ];
 
+const ALL_SECTIONS = ['appearance', 'fonts', 'reciter', 'memorization', 'colors', 'about'];
+
 const Hint: React.FC<{ text: string }> = ({ text }) => (
   <span className="inline-flex items-center" title={text} aria-label={text}>
     <Info className="w-3.5 h-3.5 text-muted-foreground/70 hover:text-primary transition-colors cursor-help" />
