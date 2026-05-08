@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Settings, Type, Palette, Mic, RotateCcw, Repeat, Volume2,
-  Moon, Sun, Check, Info, Save, BookOpen, Sparkles
+  Moon, Sun, Check, Info, Save, BookOpen, Sparkles, ChevronsDown, ChevronsUp
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useSettings } from '@/hooks/useSettings';
