@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Settings, Type, Palette, Mic, RotateCcw, Repeat, Volume2,
-  Moon, Sun, Check, Info, Save, BookOpen, Sparkles
+  Moon, Sun, Check, Info, Save, BookOpen, Sparkles, ChevronsDown, ChevronsUp
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useSettings } from '@/hooks/useSettings';
@@ -24,6 +24,8 @@ const COLOR_SCHEMES = [
   { id: 'highContrast' as const, name: 'تباين عالي', colors: ['hsl(0,0%,10%)', 'hsl(0,0%,90%)'] },
 ];
 
+const ALL_SECTIONS = ['appearance', 'fonts', 'reciter', 'memorization', 'colors', 'about'];
+
 const Hint: React.FC<{ text: string }> = ({ text }) => (
   <span className="inline-flex items-center" title={text} aria-label={text}>
     <Info className="w-3.5 h-3.5 text-muted-foreground/70 hover:text-primary transition-colors cursor-help" />
@@ -35,6 +37,7 @@ const SettingsPage: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [openSections, setOpenSections] = useState<string[]>(['appearance']);
 
   // Visual confirmation that settings auto-save
   useEffect(() => {
@@ -62,7 +65,25 @@ const SettingsPage: React.FC = () => {
           {savedFlash && <span className="text-primary font-medium">تم الحفظ</span>}
         </div>
 
-        <Accordion type="multiple" defaultValue={['appearance']} className="space-y-3">
+        {/* Expand / Collapse all */}
+        <div className="mb-3 flex items-center gap-2">
+          <button
+            onClick={() => setOpenSections(ALL_SECTIONS)}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-secondary/60 hover:bg-secondary text-foreground text-xs font-medium transition-colors border border-border/60"
+          >
+            <ChevronsDown className="w-3.5 h-3.5 text-primary" />
+            فتح جميع الأقسام
+          </button>
+          <button
+            onClick={() => setOpenSections([])}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-secondary/60 hover:bg-secondary text-foreground text-xs font-medium transition-colors border border-border/60"
+          >
+            <ChevronsUp className="w-3.5 h-3.5 text-accent" />
+            طي جميع الأقسام
+          </button>
+        </div>
+
+        <Accordion type="multiple" value={openSections} onValueChange={setOpenSections} className="space-y-3">
           {/* Appearance */}
           <AccordionItem value="appearance" className="card-surface !border-0 !p-0 overflow-hidden">
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
