@@ -37,6 +37,7 @@ const SettingsPage: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [openSections, setOpenSections] = useState<string[]>(['appearance']);
 
   // Visual confirmation that settings auto-save
   useEffect(() => {
