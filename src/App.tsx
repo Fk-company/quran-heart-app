@@ -87,25 +87,29 @@ const AnimatedRoutes = () => {
 
 const SettingsBootstrap = () => { useSettings(); return null; };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <TooltipProvider>
-        <Sonner />
-        <AudioProvider>
-          <BrowserRouter>
-            <SettingsBootstrap />
-            <div className="min-h-screen bg-background islamic-bg">
-              <TopBar />
-              <AnimatedRoutes />
-              <MiniPlayer />
-              <BottomNav />
-            </div>
-          </BrowserRouter>
-        </AudioProvider>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const [showSplash, setShowSplash] = useState(true);
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <TooltipProvider>
+          <Sonner />
+          <AudioProvider>
+            <BrowserRouter>
+              <SettingsBootstrap />
+              {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
+              <div className="min-h-screen bg-background islamic-bg">
+                <TopBar />
+                <AnimatedRoutes />
+                <MiniPlayer />
+                <BottomNav />
+              </div>
+            </BrowserRouter>
+          </AudioProvider>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
