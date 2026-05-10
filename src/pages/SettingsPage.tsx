@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Settings, Type, Palette, Mic, RotateCcw, Repeat, Volume2,
-  Moon, Sun, Check, Info, Save, BookOpen, Sparkles, ChevronsDown, ChevronsUp
+  Moon, Sun, Check, Info, Save, BookOpen, Sparkles, ChevronsDown, ChevronsUp, Search, X
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useSettings } from '@/hooks/useSettings';
@@ -37,6 +37,7 @@ const SettingsPage: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [openSections, setOpenSections] = useState<string[]>(() => {
     try {
       const raw = localStorage.getItem('settings_open_sections');
