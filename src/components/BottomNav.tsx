@@ -1,32 +1,77 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Book, Mic, Home, MoreHorizontal, Heart } from 'lucide-react';
+import {
+  Book, Mic, Home, MoreHorizontal, Heart, Search, Radio, BookOpen,
+  Sparkles, Target, CalendarDays, Quote, BarChart3,
+} from 'lucide-react';
 import { MoreSheet } from '@/pages/MorePage';
 
-interface NavItem {
+export interface NavItemDef {
+  id: string;
   label: string;
   icon: React.ElementType;
   path: string;
-  isSheet?: boolean;
 }
 
-const navItems: NavItem[] = [
-  { label: 'الرئيسية', icon: Home, path: '/' },
-  { label: 'المصحف', icon: Book, path: '/quran' },
-  { label: 'القراء', icon: Mic, path: '/reciters' },
-  { label: 'المفضلة', icon: Heart, path: '/favorites' },
-  { label: 'المزيد', icon: MoreHorizontal, path: '/more', isSheet: true },
+// All available items the user can pick for the bottom bar
+export const NAV_CATALOG: NavItemDef[] = [
+  { id: 'home', label: 'الرئيسية', icon: Home, path: '/' },
+  { id: 'quran', label: 'المصحف', icon: Book, path: '/quran' },
+  { id: 'reciters', label: 'القراء', icon: Mic, path: '/reciters' },
+  { id: 'favorites', label: 'المفضلة', icon: Heart, path: '/favorites' },
+  { id: 'search', label: 'البحث', icon: Search, path: '/search' },
+  { id: 'radio', label: 'الراديو', icon: Radio, path: '/radio' },
+  { id: 'tafsir', label: 'التفسير', icon: BookOpen, path: '/tafsir' },
+  { id: 'wird', label: 'وردي', icon: Sparkles, path: '/daily-wird' },
+  { id: 'khatm', label: 'الختمة', icon: Target, path: '/khatm-plan' },
+  { id: 'hijri', label: 'التقويم', icon: CalendarDays, path: '/hijri-calendar' },
+  { id: 'hadith', label: 'الأحاديث', icon: Quote, path: '/hadith' },
+  { id: 'stats', label: 'إحصائياتي', icon: BarChart3, path: '/reading-stats' },
 ];
+
+export const DEFAULT_NAV_IDS = ['home', 'quran', 'reciters', 'favorites'];
+const STORAGE_KEY = 'bottom_nav_ids_v1';
+
+export const getNavIds = (): string[] => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length === 4) return parsed;
+    }
+  } catch {}
+  return DEFAULT_NAV_IDS;
+};
+
+export const setNavIds = (ids: string[]) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(ids.slice(0, 4)));
+    window.dispatchEvent(new Event('bottom-nav-changed'));
+  } catch {}
+};
 
 const BottomNav: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [navIds, setIds] = useState<string[]>(getNavIds);
 
-  const isActive = (path: string) => {
-    if (path === '/') return location.pathname === '/';
-    return location.pathname.startsWith(path);
-  };
+  useEffect(() => {
+    const update = () => setIds(getNavIds());
+    window.addEventListener('bottom-nav-changed', update);
+    window.addEventListener('storage', update);
+    return () => {
+      window.removeEventListener('bottom-nav-changed', update);
+      window.removeEventListener('storage', update);
+    };
+  }, []);
+
+  const items = navIds
+    .map((id) => NAV_CATALOG.find((i) => i.id === id))
+    .filter((x): x is NavItemDef => Boolean(x));
+
+  const isActive = (path: string) =>
+    path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
   return (
     <>
@@ -46,17 +91,18 @@ const BottomNav: React.FC = () => {
           style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--accent) / 0.4) 50%, transparent)' }}
         />
         <div className="flex items-stretch justify-around max-w-lg mx-auto h-[68px]">
-          {navItems.map((item) => {
-            const active = isActive(item.path) && !item.isSheet;
+          {items.map((item) => {
+            const active = isActive(item.path);
+            const Icon = item.icon;
             return (
               <button
-                key={item.path}
-                onClick={() => (item.isSheet ? setMoreOpen(true) : navigate(item.path))}
+                key={item.id}
+                onClick={() => navigate(item.path)}
                 className={`bottom-nav-item flex-1 pt-2 pb-1 ${active ? 'active' : ''}`}
                 aria-label={item.label}
               >
                 <div className="nav-icon-box">
-                  <item.icon
+                  <Icon
                     className={`w-5 h-5 transition-all duration-300 ${active ? 'text-primary' : 'text-muted-foreground'}`}
                     strokeWidth={active ? 2.5 : 1.8}
                   />
@@ -69,6 +115,16 @@ const BottomNav: React.FC = () => {
               </button>
             );
           })}
+          <button
+            onClick={() => setMoreOpen(true)}
+            className="bottom-nav-item flex-1 pt-2 pb-1"
+            aria-label="المزيد"
+          >
+            <div className="nav-icon-box">
+              <MoreHorizontal className="w-5 h-5 text-muted-foreground transition-all duration-300" strokeWidth={1.8} />
+            </div>
+            <span className="text-muted-foreground font-medium transition-all duration-300">المزيد</span>
+          </button>
         </div>
       </nav>
     </>
