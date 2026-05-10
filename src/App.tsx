@@ -37,6 +37,7 @@ import AiTafsirPage from "./pages/AiTafsirPage";
 import HijriCalendarPage from "./pages/HijriCalendarPage";
 import KhatmPlanPage from "./pages/KhatmPlanPage";
 import DailyWirdPage from "./pages/DailyWirdPage";
+import TasbihStatsPage from "./pages/TasbihStatsPage";
 import NotFound from "./pages/NotFound";
 import { useSettings } from "@/hooks/useSettings";
 
