@@ -34,6 +34,8 @@ import EmotionQuranPage from "./pages/EmotionQuranPage";
 import HeartQuranPage from "./pages/HeartQuranPage";
 import DailyReflectionPage from "./pages/DailyReflectionPage";
 import AiTafsirPage from "./pages/AiTafsirPage";
+import HijriCalendarPage from "./pages/HijriCalendarPage";
+import KhatmPlanPage from "./pages/KhatmPlanPage";
 import NotFound from "./pages/NotFound";
 import { useSettings } from "@/hooks/useSettings";
 
@@ -69,6 +71,8 @@ const AnimatedRoutes = () => {
         <Route path="/heart-quran" element={<PageTransition><HeartQuranPage /></PageTransition>} />
         <Route path="/daily-reflection" element={<PageTransition><DailyReflectionPage /></PageTransition>} />
         <Route path="/ai-tafsir" element={<PageTransition><AiTafsirPage /></PageTransition>} />
+        <Route path="/hijri-calendar" element={<PageTransition><HijriCalendarPage /></PageTransition>} />
+        <Route path="/khatm-plan" element={<PageTransition><KhatmPlanPage /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
