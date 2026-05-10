@@ -182,25 +182,48 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     if (!prayerTimes) return;
-    const interval = setInterval(() => calculateNextPrayer(prayerTimes), 30000);
+    calculateNextPrayer(prayerTimes, timezone);
+    const interval = setInterval(() => calculateNextPrayer(prayerTimes, timezone), 15000);
     return () => clearInterval(interval);
-  }, [prayerTimes]);
+  }, [prayerTimes, timezone]);
 
-  const calculateNextPrayer = (timings: PrayerTimes) => {
-    const now = new Date();
+  const getNowInTz = (tz: string) => {
+    try {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz, hour12: false,
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+      }).formatToParts(new Date());
+      const obj: Record<string, string> = {};
+      for (const p of parts) obj[p.type] = p.value;
+      return {
+        h: (parseInt(obj.hour, 10) || 0) % 24,
+        m: parseInt(obj.minute, 10) || 0,
+        s: parseInt(obj.second, 10) || 0,
+      };
+    } catch {
+      const d = new Date();
+      return { h: d.getHours(), m: d.getMinutes(), s: d.getSeconds() };
+    }
+  };
+
+  const calculateNextPrayer = (timings: PrayerTimes, tz?: string) => {
+    const { h: nowH, m: nowM, s: nowS } = tz ? getNowInTz(tz) : (() => { const d = new Date(); return { h: d.getHours(), m: d.getMinutes(), s: d.getSeconds() }; })();
+    const nowSec = nowH * 3600 + nowM * 60 + nowS;
     for (const prayer of prayerOrder) {
       const timeStr = timings[prayer];
       if (!timeStr) continue;
       const cleanTime = timeStr.split(' ')[0];
       const [h, m] = cleanTime.split(':').map(Number);
       if (isNaN(h) || isNaN(m)) continue;
-      const prayerDate = new Date();
-      prayerDate.setHours(h, m, 0, 0);
-      if (prayerDate > now) {
-        const diff = prayerDate.getTime() - now.getTime();
-        const hours = Math.floor(diff / 3600000);
-        const mins = Math.floor((diff % 3600000) / 60000);
-        const remaining = hours > 0 ? `${hours} ساعة و ${mins} دقيقة` : `${mins} دقيقة`;
+      const prayerSec = h * 3600 + m * 60;
+      if (prayerSec > nowSec) {
+        const diff = prayerSec - nowSec;
+        const hours = Math.floor(diff / 3600);
+        const mins = Math.floor((diff % 3600) / 60);
+        const secs = diff % 60;
+        const remaining = hours > 0
+          ? `${hours} ساعة و ${mins} دقيقة`
+          : mins > 0 ? `${mins} دقيقة و ${secs} ثانية` : `${secs} ثانية`;
         setNextPrayer({ name: prayerNames[prayer], time: cleanTime, remaining });
         setNextPrayerKey(prayer);
         return;
