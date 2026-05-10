@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -9,6 +10,7 @@ import TopBar from "@/components/TopBar";
 import BottomNav from "@/components/BottomNav";
 import MiniPlayer from "@/components/MiniPlayer";
 import PageTransition from "@/components/PageTransition";
+import SplashScreen from "@/components/SplashScreen";
 import HomePage from "./pages/HomePage";
 import QuranPage from "./pages/QuranPage";
 import SurahDetailPage from "./pages/SurahDetailPage";
@@ -85,25 +87,29 @@ const AnimatedRoutes = () => {
 
 const SettingsBootstrap = () => { useSettings(); return null; };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <TooltipProvider>
-        <Sonner />
-        <AudioProvider>
-          <BrowserRouter>
-            <SettingsBootstrap />
-            <div className="min-h-screen bg-background islamic-bg">
-              <TopBar />
-              <AnimatedRoutes />
-              <MiniPlayer />
-              <BottomNav />
-            </div>
-          </BrowserRouter>
-        </AudioProvider>
-      </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const [showSplash, setShowSplash] = useState(true);
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <TooltipProvider>
+          <Sonner />
+          <AudioProvider>
+            <BrowserRouter>
+              <SettingsBootstrap />
+              {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
+              <div className="min-h-screen bg-background islamic-bg">
+                <TopBar />
+                <AnimatedRoutes />
+                <MiniPlayer />
+                <BottomNav />
+              </div>
+            </BrowserRouter>
+          </AudioProvider>
+        </TooltipProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

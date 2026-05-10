@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Moon, Sun, Settings, Search } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
+import appLogo from '@/assets/app-logo.png';
 
 const TopBar: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
@@ -21,9 +22,8 @@ const TopBar: React.FC = () => {
     >
       <div className="flex items-center justify-between h-14 px-4 max-w-lg mx-auto" dir="rtl">
         <button onClick={() => navigate('/')} className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-xl gradient-primary flex items-center justify-center shadow-emerald relative overflow-hidden">
-            <span className="font-amiri text-primary-foreground text-base font-bold leading-none">ﷺ</span>
-            <span className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden bg-card border border-border/40">
+            <img src={appLogo} alt="قلب القرآن" width={36} height={36} loading="lazy" className="w-full h-full object-contain" />
           </div>
           <div className="text-right leading-tight">
             <div className="text-sm font-bold text-foreground tracking-tight font-kufi">قلب القرآن</div>
