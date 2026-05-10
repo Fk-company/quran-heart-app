@@ -37,7 +37,20 @@ const SettingsPage: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
-  const [openSections, setOpenSections] = useState<string[]>(['appearance']);
+  const [openSections, setOpenSections] = useState<string[]>(() => {
+    try {
+      const raw = localStorage.getItem('settings_open_sections');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed.filter((v) => ALL_SECTIONS.includes(v));
+      }
+    } catch {}
+    return ['appearance'];
+  });
+
+  useEffect(() => {
+    try { localStorage.setItem('settings_open_sections', JSON.stringify(openSections)); } catch {}
+  }, [openSections]);
 
   // Visual confirmation that settings auto-save
   useEffect(() => {

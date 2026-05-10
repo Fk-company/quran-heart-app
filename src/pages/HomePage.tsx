@@ -7,7 +7,7 @@ import {
   TrendingUp, Sparkles, Baby, Brain, Smile, Lightbulb, Bot, Settings,
   Flame, Trophy
 } from 'lucide-react';
-import { fetchPrayerTimes, fetchSurahs, type PrayerTimes, type Surah } from '@/lib/api';
+import { fetchPrayerTimes, fetchPrayerTimesByCity, fetchSurahs, type PrayerTimes, type Surah } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLastRead } from '@/hooks/useLastRead';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -78,6 +78,13 @@ const HomePage: React.FC = () => {
   const [surahs, setSurahs] = useState<Surah[]>([]);
   const [loading, setLoading] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(() => localStorage.getItem('notifications_enabled') === 'true');
+  const [manualLocation, setManualLocation] = useState<{ city: string; country: string } | null>(() => {
+    try { const raw = localStorage.getItem('manual_location'); return raw ? JSON.parse(raw) : null; } catch { return null; }
+  });
+  const [timezone, setTimezone] = useState<string>('');
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [pickerCountry, setPickerCountry] = useState('');
+  const [pickerCity, setPickerCity] = useState('');
 
   const dayOfYear = useMemo(() => Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000), []);
   const dailyVerse = useMemo(() => dailyVerses[dayOfYear % dailyVerses.length], [dayOfYear]);
@@ -116,10 +123,12 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     const load = async () => {
+      setLoading(true);
       try {
         const handlePrayerData = (data: any, locName: string) => {
           setPrayerTimes(data.timings);
           setLocationName(locName);
+          if (data.meta?.timezone) setTimezone(data.meta.timezone);
           if (data.date?.hijri) {
             const h = data.date.hijri;
             setHijriDate(`${h.day} ${h.month?.ar || ''} ${h.year}`);
@@ -129,7 +138,15 @@ const HomePage: React.FC = () => {
           calculateNextPrayer(data.timings);
         };
 
-        if (navigator.geolocation) {
+        if (manualLocation) {
+          try {
+            const data = await fetchPrayerTimesByCity(manualLocation.city, manualLocation.country);
+            handlePrayerData(data, `${manualLocation.city}، ${manualLocation.country}`);
+          } catch {
+            const data = await fetchPrayerTimes(21.4225, 39.8262);
+            handlePrayerData(data, 'مكة المكرمة');
+          }
+        } else if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             async (pos) => {
               try {
@@ -161,7 +178,7 @@ const HomePage: React.FC = () => {
       finally { setLoading(false); }
     };
     load();
-  }, []);
+  }, [manualLocation]);
 
   useEffect(() => {
     if (!prayerTimes) return;
@@ -254,11 +271,27 @@ const HomePage: React.FC = () => {
 
         {/* Location pill */}
         {locationName && (
-          <div className="flex items-center gap-2 mb-4 text-xs">
-            <div className="flex items-center gap-1.5 text-muted-foreground bg-secondary/60 rounded-full px-3 py-1.5 border border-border/40">
+          <div className="flex items-center gap-2 mb-4 text-xs flex-wrap">
+            <button
+              onClick={() => { setPickerCountry(manualLocation?.country || ''); setPickerCity(manualLocation?.city || ''); setShowLocationPicker(true); }}
+              className="flex items-center gap-1.5 text-muted-foreground bg-secondary/60 hover:bg-secondary rounded-full px-3 py-1.5 border border-border/40 transition-colors"
+              aria-label="تغيير الموقع"
+            >
               <MapPin className="w-3 h-3" />
               <span className="font-medium">{locationName}</span>
-            </div>
+              <ChevronLeft className="w-3 h-3 rotate-90 opacity-60" />
+            </button>
+            {timezone && (
+              <span className="text-[10px] text-muted-foreground bg-secondary/40 rounded-full px-2 py-1 border border-border/40">{timezone}</span>
+            )}
+            {manualLocation && (
+              <button
+                onClick={() => { localStorage.removeItem('manual_location'); setManualLocation(null); }}
+                className="text-[10px] text-accent bg-accent/10 rounded-full px-2.5 py-1.5 font-semibold border border-accent/20"
+              >
+                استخدم موقعي
+              </button>
+            )}
             {prayerTimes && themeMode !== 'auto' && (
               <button onClick={() => setAutoMode({ Fajr: prayerTimes.Fajr, Maghrib: prayerTimes.Maghrib })} className="text-[10px] text-primary bg-primary/10 rounded-full px-2.5 py-1.5 font-semibold border border-primary/15">
                 وضع تلقائي
@@ -266,6 +299,70 @@ const HomePage: React.FC = () => {
             )}
           </div>
         )}
+
+        {/* Location Picker Sheet */}
+        {showLocationPicker && (
+          <>
+            <div className="sheet-overlay" onClick={() => setShowLocationPicker(false)} />
+            <div className="sheet-content" dir="rtl">
+              <div className="sheet-handle" />
+              <div className="px-5 pb-6 pt-2">
+                <h3 className="text-base font-bold text-foreground mb-1">اختر موقعك</h3>
+                <p className="text-xs text-muted-foreground mb-4">حدد الدولة والمدينة لجلب أوقات الصلاة بدقة (يتم احتساب التوقيت تلقائياً)</p>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">الدولة</label>
+                    <select
+                      value={pickerCountry}
+                      onChange={(e) => setPickerCountry(e.target.value)}
+                      className="search-input w-full"
+                    >
+                      <option value="">— اختر دولة —</option>
+                      {[
+                        'Saudi Arabia','Egypt','United Arab Emirates','Kuwait','Qatar','Bahrain','Oman','Yemen',
+                        'Iraq','Jordan','Lebanon','Syria','Palestine','Morocco','Algeria','Tunisia','Libya','Sudan',
+                        'Mauritania','Somalia','Djibouti','Comoros','Turkey','Iran','Pakistan','India','Bangladesh',
+                        'Indonesia','Malaysia','Brunei','Maldives','Afghanistan','United Kingdom','United States',
+                        'Canada','France','Germany','Netherlands','Belgium','Sweden','Norway','Australia',
+                      ].map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">المدينة</label>
+                    <input
+                      type="text"
+                      value={pickerCity}
+                      onChange={(e) => setPickerCity(e.target.value)}
+                      placeholder="مثال: Riyadh, Cairo, London"
+                      className="search-input w-full"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-5">
+                  <button
+                    onClick={() => setShowLocationPicker(false)}
+                    className="flex-1 py-2.5 rounded-xl bg-secondary text-foreground text-sm font-medium"
+                  >
+                    إلغاء
+                  </button>
+                  <button
+                    disabled={!pickerCountry || !pickerCity.trim()}
+                    onClick={() => {
+                      const loc = { city: pickerCity.trim(), country: pickerCountry };
+                      localStorage.setItem('manual_location', JSON.stringify(loc));
+                      setManualLocation(loc);
+                      setShowLocationPicker(false);
+                    }}
+                    className="flex-1 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold disabled:opacity-50"
+                  >
+                    حفظ
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
 
         {/* Hero Prayer Card — Premium */}
         <div className="gradient-hero islamic-pattern islamic-pattern-arabesque rounded-3xl p-6 mb-5 text-primary-foreground relative shadow-emerald">
