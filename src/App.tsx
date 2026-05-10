@@ -80,6 +80,7 @@ const AnimatedRoutes = () => {
         <Route path="/khatm-plan" element={<PageTransition><KhatmPlanPage /></PageTransition>} />
         <Route path="/daily-wird" element={<PageTransition><DailyWirdPage /></PageTransition>} />
         <Route path="/tasbih-stats" element={<PageTransition><TasbihStatsPage /></PageTransition>} />
+        <Route path="/developer-social" element={<PageTransition><DeveloperSocialPage /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
