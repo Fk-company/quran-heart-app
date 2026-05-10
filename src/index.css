@@ -460,6 +460,9 @@
     @apply fixed bottom-0 left-0 right-0 bg-card rounded-t-3xl border-t border-border;
     z-index: 71;
     max-height: 85vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
     box-shadow: 0 -12px 40px -8px hsl(0 0% 0% / 0.2);
     animation: sheet-up 0.35s cubic-bezier(0.32, 0.72, 0, 1);
   }
