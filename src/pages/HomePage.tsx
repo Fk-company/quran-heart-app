@@ -87,6 +87,9 @@ const HomePage: React.FC = () => {
   const [pickerCity, setPickerCity] = useState('');
   const [citySuggestions, setCitySuggestions] = useState<Array<{ name: string; display: string }>>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<number | null>(null);
+  const [fromCache, setFromCache] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const dayOfYear = useMemo(() => Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000), []);
   const dailyVerse = useMemo(() => dailyVerses[dayOfYear % dailyVerses.length], [dayOfYear]);
