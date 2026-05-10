@@ -35,6 +35,8 @@ interface AudioContextType {
   setRepeatMode: (m: RepeatMode) => void;
   toggleShuffle: () => void;
   stop: () => void;
+  sleepTimerEnd: number | null;
+  setSleepTimer: (minutes: number | null) => void;
 }
 
 const AudioCtx = createContext<AudioContextType | null>(null);
@@ -66,7 +68,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return (localStorage.getItem('audio-repeat') as RepeatMode) || 'off';
   });
   const [shuffle, setShuffle] = useState(() => localStorage.getItem('audio-shuffle') === 'true');
-
+  const [sleepTimerEnd, setSleepTimerEndState] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const queueRef = useRef<AudioTrack[]>([]);
   const indexRef = useRef(0);
@@ -266,6 +268,25 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setHasError(false);
   }, []);
 
+  // Sleep timer: pauses playback when reached
+  useEffect(() => {
+    if (!sleepTimerEnd) return;
+    const tick = () => {
+      if (Date.now() >= sleepTimerEnd) {
+        audioRef.current?.pause();
+        setIsPlaying(false);
+        setSleepTimerEndState(null);
+      }
+    };
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [sleepTimerEnd]);
+
+  const setSleepTimer = useCallback((minutes: number | null) => {
+    if (minutes == null || minutes <= 0) setSleepTimerEndState(null);
+    else setSleepTimerEndState(Date.now() + minutes * 60_000);
+  }, []);
+
   return (
     <AudioCtx.Provider value={{
       currentTrack, queue, queueIndex,
@@ -273,6 +294,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       progress, duration, volume, playbackRate, repeatMode, shuffle,
       play, setQueue, pause, resume, next, prev,
       seekTo, setVolume, setPlaybackRate, setRepeatMode, toggleShuffle, stop,
+      sleepTimerEnd, setSleepTimer,
     }}>
       {children}
     </AudioCtx.Provider>

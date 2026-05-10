@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Play, Pause, X, ChevronUp, ChevronDown, SkipBack, SkipForward,
-  Volume2, VolumeX, Volume1, Repeat, Repeat1, Shuffle, Gauge, Loader2, AlertCircle, Radio,
+  Volume2, VolumeX, Volume1, Repeat, Repeat1, Shuffle, Gauge, Loader2, AlertCircle, Radio, Moon, Timer,
 } from 'lucide-react';
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { useAudioListeningTracker } from '@/hooks/useAppStats';
@@ -15,16 +15,20 @@ const formatTime = (seconds: number) => {
 };
 
 const PLAYBACK_RATES = [0.75, 1, 1.25, 1.5, 1.75, 2];
+const SLEEP_OPTIONS = [5, 10, 15, 30, 60];
 
 const MiniPlayer: React.FC = () => {
   const {
     currentTrack, queue, queueIndex,
     isPlaying, isLoading, hasError, progress, duration, volume, playbackRate, repeatMode, shuffle,
     pause, resume, seekTo, setVolume, setPlaybackRate, setRepeatMode, toggleShuffle, next, prev, stop,
+    sleepTimerEnd, setSleepTimer,
   } = useAudioPlayer();
 
   const [expanded, setExpanded] = useState(false);
   const [showRate, setShowRate] = useState(false);
+  const [showSleep, setShowSleep] = useState(false);
+  const [sleepRemaining, setSleepRemaining] = useState<string>('');
 
   // Track listening time to global stats
   useAudioListeningTracker(isPlaying, currentTrack?.id);
@@ -44,6 +48,21 @@ const MiniPlayer: React.FC = () => {
       navigator.mediaSession.setActionHandler('nexttrack', next);
     } catch {}
   }, [currentTrack, resume, pause, prev, next]);
+
+  // Sleep timer countdown display
+  useEffect(() => {
+    if (!sleepTimerEnd) { setSleepRemaining(''); return; }
+    const tick = () => {
+      const ms = sleepTimerEnd - Date.now();
+      if (ms <= 0) { setSleepRemaining(''); return; }
+      const m = Math.floor(ms / 60000);
+      const s = Math.floor((ms % 60000) / 1000);
+      setSleepRemaining(`${m}:${s.toString().padStart(2, '0')}`);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [sleepTimerEnd]);
 
   if (!currentTrack) return null;
   const progressPercent = duration > 0 ? (progress / duration) * 100 : 0;
@@ -195,6 +214,30 @@ const MiniPlayer: React.FC = () => {
                 )}
               </div>
             )}
+            <div className="relative">
+              <button onClick={() => setShowSleep(!showSleep)}
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-colors ${sleepTimerEnd ? 'bg-primary/15 text-primary' : 'bg-secondary text-foreground'}`}
+                title="مؤقّت إيقاف">
+                {sleepTimerEnd ? <Timer className="w-3 h-3" /> : <Moon className="w-3 h-3" />}
+                <span>{sleepTimerEnd && sleepRemaining ? sleepRemaining : 'نوم'}</span>
+              </button>
+              {showSleep && (
+                <div className="absolute bottom-full mb-2 left-0 bg-card border border-border rounded-xl shadow-lg p-1.5 grid grid-cols-3 gap-1 w-44 animate-fade-in z-10">
+                  {SLEEP_OPTIONS.map(m => (
+                    <button key={m}
+                      onClick={() => { setSleepTimer(m); setShowSleep(false); }}
+                      className="text-[10px] py-1.5 rounded-lg font-semibold transition-colors hover:bg-secondary text-foreground">
+                      {m} د
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => { setSleepTimer(null); setShowSleep(false); }}
+                    className="col-span-3 text-[10px] py-1.5 rounded-lg font-semibold bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors">
+                    إلغاء المؤقّت
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

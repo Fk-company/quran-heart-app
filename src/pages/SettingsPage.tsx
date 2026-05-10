@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Settings, Type, Palette, Mic, RotateCcw, Repeat, Volume2,
-  Moon, Sun, Check, Info, Save, BookOpen, Sparkles, ChevronsDown, ChevronsUp
+  Moon, Sun, Check, Info, Save, BookOpen, Sparkles, ChevronsDown, ChevronsUp, Search, X
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useSettings } from '@/hooks/useSettings';
@@ -37,6 +37,7 @@ const SettingsPage: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [openSections, setOpenSections] = useState<string[]>(() => {
     try {
       const raw = localStorage.getItem('settings_open_sections');
@@ -59,6 +60,27 @@ const SettingsPage: React.FC = () => {
     return () => clearTimeout(t);
   }, [settings]);
 
+  // Search keywords map per section
+  const sectionKeywords: Record<string, string> = {
+    appearance: 'المظهر الوضع الليلي ضوء داكن فاتح ثيم',
+    fonts: 'الخطوط حجم الخط القراءة المصحف نص آيات',
+    reciter: 'القارئ التلاوة صوت العفاسي الحصري المنشاوي',
+    memorization: 'الحفظ التكرار اختبار حفظ',
+    colors: 'الألوان نمط ألوان لوحة',
+    about: 'عن التطبيق إصدار حول معلومات',
+  };
+
+  const matchedSections = React.useMemo(() => {
+    const q = searchQuery.trim();
+    if (!q) return ALL_SECTIONS;
+    return ALL_SECTIONS.filter((id) => sectionKeywords[id]?.includes(q) || id.includes(q.toLowerCase()));
+  }, [searchQuery]);
+
+  // When searching, auto-open matched sections
+  useEffect(() => {
+    if (searchQuery.trim() && matchedSections.length) setOpenSections(matchedSections);
+  }, [searchQuery, matchedSections]);
+
   return (
     <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
@@ -76,6 +98,27 @@ const SettingsPage: React.FC = () => {
             <span>الحفظ التلقائي مفعّل — تُستعاد إعداداتك تلقائياً عند فتح التطبيق.</span>
           </span>
           {savedFlash && <span className="text-primary font-medium">تم الحفظ</span>}
+        </div>
+
+        {/* Search settings */}
+        <div className="relative mb-3">
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="ابحث في الإعدادات (مثال: خط، مظهر، قارئ)..."
+            className="w-full bg-secondary/60 border border-border/60 rounded-xl pr-10 pl-9 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary/30"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-muted flex items-center justify-center"
+              aria-label="مسح البحث"
+            >
+              <X className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
+          )}
         </div>
 
         {/* Expand / Collapse all */}
@@ -96,9 +139,15 @@ const SettingsPage: React.FC = () => {
           </button>
         </div>
 
+        {searchQuery && matchedSections.length === 0 && (
+          <div className="card-surface text-center text-sm text-muted-foreground py-6 mb-3">
+            لا توجد نتائج تطابق "{searchQuery}"
+          </div>
+        )}
+
         <Accordion type="multiple" value={openSections} onValueChange={setOpenSections} className="space-y-3">
           {/* Appearance */}
-          <AccordionItem value="appearance" className="card-surface !border-0 !p-0 overflow-hidden">
+          <AccordionItem value="appearance" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("appearance") ? "" : "hidden"}`}>
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Sun className="w-4 h-4 text-accent" />
@@ -125,7 +174,7 @@ const SettingsPage: React.FC = () => {
           </AccordionItem>
 
           {/* Font Size */}
-          <AccordionItem value="fonts" className="card-surface !border-0 !p-0 overflow-hidden">
+          <AccordionItem value="fonts" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("fonts") ? "" : "hidden"}`}>
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Type className="w-4 h-4 text-primary" />
@@ -181,7 +230,7 @@ const SettingsPage: React.FC = () => {
           </AccordionItem>
 
           {/* Default Reciter */}
-          <AccordionItem value="reciter" className="card-surface !border-0 !p-0 overflow-hidden">
+          <AccordionItem value="reciter" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("reciter") ? "" : "hidden"}`}>
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Mic className="w-4 h-4 text-primary" />
@@ -218,7 +267,7 @@ const SettingsPage: React.FC = () => {
           </AccordionItem>
 
           {/* Memorization */}
-          <AccordionItem value="memorization" className="card-surface !border-0 !p-0 overflow-hidden">
+          <AccordionItem value="memorization" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("memorization") ? "" : "hidden"}`}>
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Repeat className="w-4 h-4 text-primary" />
@@ -266,7 +315,7 @@ const SettingsPage: React.FC = () => {
           </AccordionItem>
 
           {/* Color Scheme */}
-          <AccordionItem value="colors" className="card-surface !border-0 !p-0 overflow-hidden">
+          <AccordionItem value="colors" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("colors") ? "" : "hidden"}`}>
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Palette className="w-4 h-4 text-primary" />
@@ -301,7 +350,7 @@ const SettingsPage: React.FC = () => {
           </AccordionItem>
 
           {/* About */}
-          <AccordionItem value="about" className="card-surface !border-0 !p-0 overflow-hidden">
+          <AccordionItem value="about" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("about") ? "" : "hidden"}`}>
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-accent" />
