@@ -35,6 +35,8 @@ interface AudioContextType {
   setRepeatMode: (m: RepeatMode) => void;
   toggleShuffle: () => void;
   stop: () => void;
+  sleepTimerEnd: number | null;
+  setSleepTimer: (minutes: number | null) => void;
 }
 
 const AudioCtx = createContext<AudioContextType | null>(null);
@@ -66,7 +68,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return (localStorage.getItem('audio-repeat') as RepeatMode) || 'off';
   });
   const [shuffle, setShuffle] = useState(() => localStorage.getItem('audio-shuffle') === 'true');
-
+  const [sleepTimerEnd, setSleepTimerEndState] = useState<number | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const queueRef = useRef<AudioTrack[]>([]);
   const indexRef = useRef(0);
