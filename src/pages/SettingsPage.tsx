@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Settings, Type, Palette, Mic, RotateCcw, Repeat, Volume2,
-  Moon, Sun, Check, Info, Save, BookOpen, Sparkles, ChevronsDown, ChevronsUp, Search, X
+  Moon, Sun, Check, Info, Save, BookOpen, Sparkles, ChevronsDown, ChevronsUp, Search, X, LayoutGrid
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useSettings } from '@/hooks/useSettings';
 import { useTheme } from '@/contexts/ThemeContext';
 import PageHeader from '@/components/PageHeader';
+import { NAV_CATALOG, DEFAULT_NAV_IDS, getNavIds, setNavIds } from '@/components/BottomNav';
 
 const RECITERS = [
   { id: 'alafasy', name: 'مشاري العفاسي' },
@@ -24,7 +25,7 @@ const COLOR_SCHEMES = [
   { id: 'highContrast' as const, name: 'تباين عالي', colors: ['hsl(0,0%,10%)', 'hsl(0,0%,90%)'] },
 ];
 
-const ALL_SECTIONS = ['appearance', 'fonts', 'reciter', 'memorization', 'colors', 'about'];
+const ALL_SECTIONS = ['appearance', 'fonts', 'reciter', 'memorization', 'colors', 'navigation', 'about'];
 
 const Hint: React.FC<{ text: string }> = ({ text }) => (
   <span className="inline-flex items-center" title={text} aria-label={text}>
@@ -38,6 +39,7 @@ const SettingsPage: React.FC = () => {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [navIds, setNavIdsState] = useState<string[]>(getNavIds);
   const [openSections, setOpenSections] = useState<string[]>(() => {
     try {
       const raw = localStorage.getItem('settings_open_sections');
@@ -67,6 +69,7 @@ const SettingsPage: React.FC = () => {
     reciter: 'القارئ التلاوة صوت العفاسي الحصري المنشاوي',
     memorization: 'الحفظ التكرار اختبار حفظ',
     colors: 'الألوان نمط ألوان لوحة',
+    navigation: 'التنقل الشريط السفلي تخصيص أيقونات روابط سريعة',
     about: 'عن التطبيق إصدار حول معلومات',
   };
 
@@ -345,6 +348,61 @@ const SettingsPage: React.FC = () => {
                     </span>
                   </button>
                 ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Bottom Navigation Customization */}
+          <AccordionItem value="navigation" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("navigation") ? "" : "hidden"}`}>
+            <AccordionTrigger className="px-4 py-3 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <LayoutGrid className="w-4 h-4 text-primary" />
+                <span className="text-sm font-semibold text-foreground">تخصيص الشريط السفلي</span>
+                <Hint text="اختر 4 أيقونات لتظهر في شريط التنقل السفلي" />
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4">
+              <p className="text-xs text-muted-foreground mb-3">اختر 4 اختصارات لتظهر بجانب زر "المزيد".</p>
+              <div className="grid grid-cols-3 gap-2 mb-3">
+                {NAV_CATALOG.map((item) => {
+                  const selected = navIds.includes(item.id);
+                  const Icon = item.icon;
+                  const disabled = !selected && navIds.length >= 4;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        let next: string[];
+                        if (selected) next = navIds.filter((id) => id !== item.id);
+                        else if (navIds.length < 4) next = [...navIds, item.id];
+                        else return;
+                        setNavIdsState(next);
+                        setNavIds(next);
+                      }}
+                      disabled={disabled}
+                      className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-2xl border transition-all ${
+                        selected
+                          ? 'bg-primary/10 border-primary/40 text-primary'
+                          : disabled
+                          ? 'bg-secondary/30 border-transparent text-muted-foreground/50 opacity-60'
+                          : 'bg-secondary border-transparent text-muted-foreground'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span className="text-[11px] font-medium">{item.label}</span>
+                      {selected && <Check className="w-3 h-3 absolute" style={{ position: 'static' }} />}
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">المختار: {navIds.length}/4</span>
+                <button
+                  onClick={() => { setNavIdsState(DEFAULT_NAV_IDS); setNavIds(DEFAULT_NAV_IDS); }}
+                  className="text-primary font-medium hover:underline"
+                >
+                  استعادة الافتراضي
+                </button>
               </div>
             </AccordionContent>
           </AccordionItem>
