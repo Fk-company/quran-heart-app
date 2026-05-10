@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Heart, Radio, Users, Quote, Search, Star, BookOpen, BarChart3,
   X, Feather, Book, Grid3X3, List, ChevronLeft, TrendingUp, Baby, Sparkles, Mic,
-  Brain, Smile, Lightbulb, Bot, Settings, CalendarDays, Target
+  Brain, Smile, Lightbulb, Bot, Settings, CalendarDays, Target, Send, Globe
 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { MoreHorizontal } from 'lucide-react';
@@ -56,6 +56,12 @@ const moreCategories = [
       { label: 'خطة الختمة', icon: Target, path: '/khatm-plan', desc: 'خطّط لختمتك خلال 30/60/90 يوماً', color: 'bg-primary/10 text-primary', gradient: 'gradient-gold' },
       { label: 'التقويم الهجري', icon: CalendarDays, path: '/hijri-calendar', desc: 'الأشهر والمناسبات الإسلامية', color: 'bg-accent/10 text-accent', gradient: 'gradient-primary' },
       { label: 'البحث', icon: Search, path: '/search', desc: 'البحث في القرآن الكريم', color: 'bg-primary/10 text-primary', gradient: 'gradient-gold' },
+    ]
+  },
+  {
+    title: 'عن التطبيق',
+    items: [
+      { label: 'تواصل مع المطور', icon: Globe, path: '/developer-social', desc: 'فخري عادل - تليجرام وانستغرام', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
     ]
   }
 ];
