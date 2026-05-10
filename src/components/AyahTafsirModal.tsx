@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { X, BookOpen, Loader2, Share2, Copy, Check } from 'lucide-react';
+import { X, BookOpen, Loader2, Share2, Copy, Check, Image as ImageIcon } from 'lucide-react';
+import { shareAyahAsImage } from '@/lib/shareAyahImage';
 
 interface AyahTafsirModalProps {
   ayah: { number: number; text: string; numberInSurah: number; surah: { number: number; name: string } } | null;
@@ -69,13 +70,21 @@ const AyahTafsirModal: React.FC<AyahTafsirModalProps> = ({ ayah, nightMode, onCl
             <span className={`text-sm font-bold ${textColor}`}>التفسير الميسر</span>
           </div>
           <div className="flex items-center gap-1">
-            <button onClick={handleShare} className={`w-8 h-8 rounded-full flex items-center justify-center ${accentBg}`}>
+            <button
+              onClick={() => shareAyahAsImage({ text: ayah.text, surahName: ayah.surah.name, ayahNumber: ayah.numberInSurah })}
+              className={`w-8 h-8 rounded-full flex items-center justify-center ${accentBg}`}
+              aria-label="مشاركة كصورة"
+              title="مشاركة كصورة"
+            >
+              <ImageIcon className={`w-3.5 h-3.5 ${accentColor}`} />
+            </button>
+            <button onClick={handleShare} className={`w-8 h-8 rounded-full flex items-center justify-center ${accentBg}`} aria-label="مشاركة">
               <Share2 className={`w-3.5 h-3.5 ${accentColor}`} />
             </button>
-            <button onClick={handleCopy} className={`w-8 h-8 rounded-full flex items-center justify-center ${accentBg}`}>
+            <button onClick={handleCopy} className={`w-8 h-8 rounded-full flex items-center justify-center ${accentBg}`} aria-label="نسخ">
               {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className={`w-3.5 h-3.5 ${accentColor}`} />}
             </button>
-            <button onClick={onClose} className={`w-8 h-8 rounded-full flex items-center justify-center ${accentBg}`}>
+            <button onClick={onClose} className={`w-8 h-8 rounded-full flex items-center justify-center ${accentBg}`} aria-label="إغلاق">
               <X className={`w-3.5 h-3.5 ${mutedColor}`} />
             </button>
           </div>
