@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Heart, Radio, Users, Quote, Search, Star, BookOpen, BarChart3,
   X, Feather, Book, Grid3X3, List, ChevronLeft, TrendingUp, Baby, Sparkles, Mic,
-  Brain, Smile, Lightbulb, Bot
+  Brain, Smile, Lightbulb, Bot, Settings, CalendarDays, Target
 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { MoreHorizontal } from 'lucide-react';
@@ -139,8 +139,8 @@ const MorePage: React.FC = () => {
             <div className="stat-card-label">خدمة</div>
           </div>
           <button onClick={() => navigate('/settings')} className="stat-card text-right">
-            <div className="stat-card-icon bg-emerald-light"><Star className="w-4 h-4 text-primary" /></div>
-            <div className="stat-card-value text-base mt-1">⚙</div>
+            <div className="stat-card-icon bg-emerald-light"><Settings className="w-4 h-4 text-primary" /></div>
+            <div className="stat-card-value text-base mt-1">—</div>
             <div className="stat-card-label">الإعدادات</div>
           </button>
         </div>
