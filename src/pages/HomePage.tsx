@@ -5,7 +5,7 @@ import {
   CloudSun, Heart, Search, MapPin, ChevronLeft, Star, BookOpen,
   Users, Quote, Calendar, Bell, BellOff, Feather, BarChart3,
   TrendingUp, Sparkles, Baby, Brain, Smile, Lightbulb, Bot, Settings,
-  Flame, Trophy
+  Flame, Trophy, RefreshCw, Database
 } from 'lucide-react';
 import { fetchPrayerTimes, fetchPrayerTimesByCity, fetchSurahs, type PrayerTimes, type Surah } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
