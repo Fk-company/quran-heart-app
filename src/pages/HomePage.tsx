@@ -7,7 +7,7 @@ import {
   TrendingUp, Sparkles, Baby, Brain, Smile, Lightbulb, Bot, Settings,
   Flame, Trophy
 } from 'lucide-react';
-import { fetchPrayerTimes, fetchSurahs, type PrayerTimes, type Surah } from '@/lib/api';
+import { fetchPrayerTimes, fetchPrayerTimesByCity, fetchSurahs, type PrayerTimes, type Surah } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLastRead } from '@/hooks/useLastRead';
 import { useNotifications } from '@/hooks/useNotifications';
