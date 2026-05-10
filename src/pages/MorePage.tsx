@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Heart, Radio, Users, Quote, Search, Star, BookOpen, BarChart3,
   X, Feather, Book, Grid3X3, List, ChevronLeft, TrendingUp, Baby, Sparkles, Mic,
-  Brain, Smile, Lightbulb, Bot
+  Brain, Smile, Lightbulb, Bot, Settings, CalendarDays, Target
 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { MoreHorizontal } from 'lucide-react';
@@ -51,6 +51,8 @@ const moreCategories = [
       { label: 'المفضلة', icon: Heart, path: '/favorites', desc: 'الآيات والأدعية المحفوظة', color: 'bg-destructive/10 text-destructive', gradient: 'gradient-primary' },
       { label: 'تقدم القراءة', icon: TrendingUp, path: '/reading-stats', desc: 'تتبع ختمتك اليومية', color: 'bg-primary/10 text-primary', gradient: 'gradient-gold' },
       { label: 'إحصائيات القرآن', icon: BarChart3, path: '/quran-stats', desc: 'أرقام وحقائق عن القرآن', color: 'bg-accent/10 text-accent', gradient: 'gradient-primary' },
+      { label: 'خطة الختمة', icon: Target, path: '/khatm-plan', desc: 'خطّط لختمتك خلال 30/60/90 يوماً', color: 'bg-primary/10 text-primary', gradient: 'gradient-gold' },
+      { label: 'التقويم الهجري', icon: CalendarDays, path: '/hijri-calendar', desc: 'الأشهر والمناسبات الإسلامية', color: 'bg-accent/10 text-accent', gradient: 'gradient-primary' },
       { label: 'البحث', icon: Search, path: '/search', desc: 'البحث في القرآن الكريم', color: 'bg-primary/10 text-primary', gradient: 'gradient-gold' },
     ]
   }
@@ -139,8 +141,8 @@ const MorePage: React.FC = () => {
             <div className="stat-card-label">خدمة</div>
           </div>
           <button onClick={() => navigate('/settings')} className="stat-card text-right">
-            <div className="stat-card-icon bg-emerald-light"><Star className="w-4 h-4 text-primary" /></div>
-            <div className="stat-card-value text-base mt-1">⚙</div>
+            <div className="stat-card-icon bg-emerald-light"><Settings className="w-4 h-4 text-primary" /></div>
+            <div className="stat-card-value text-base mt-1">—</div>
             <div className="stat-card-label">الإعدادات</div>
           </button>
         </div>
