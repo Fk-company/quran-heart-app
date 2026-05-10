@@ -1,0 +1,16 @@
+{
+  "name": "القرآن الكريم",
+  "short_name": "القرآن",
+  "description": "تطبيق القرآن الكريم - تلاوة، تفسير، أذكار، مواقيت الصلاة",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#064E3B",
+  "theme_color": "#064E3B",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "64x64", "type": "image/x-icon" }
+  ]
+}
