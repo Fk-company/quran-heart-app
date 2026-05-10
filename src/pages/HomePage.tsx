@@ -78,6 +78,13 @@ const HomePage: React.FC = () => {
   const [surahs, setSurahs] = useState<Surah[]>([]);
   const [loading, setLoading] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(() => localStorage.getItem('notifications_enabled') === 'true');
+  const [manualLocation, setManualLocation] = useState<{ city: string; country: string } | null>(() => {
+    try { const raw = localStorage.getItem('manual_location'); return raw ? JSON.parse(raw) : null; } catch { return null; }
+  });
+  const [timezone, setTimezone] = useState<string>('');
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [pickerCountry, setPickerCountry] = useState('');
+  const [pickerCity, setPickerCity] = useState('');
 
   const dayOfYear = useMemo(() => Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000), []);
   const dailyVerse = useMemo(() => dailyVerses[dayOfYear % dailyVerses.length], [dayOfYear]);
