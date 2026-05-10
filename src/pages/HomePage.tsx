@@ -182,6 +182,43 @@ const HomePage: React.FC = () => {
     load();
   }, [manualLocation]);
 
+  // Debounced city autocomplete via Nominatim (OSM)
+  useEffect(() => {
+    if (!showLocationPicker) return;
+    const q = pickerCity.trim();
+    if (q.length < 2) { setCitySuggestions([]); return; }
+    const ctrl = new AbortController();
+    const t = setTimeout(async () => {
+      try {
+        setLoadingSuggestions(true);
+        const params = new URLSearchParams({
+          city: q, format: 'json', limit: '6', 'accept-language': 'ar,en',
+          addressdetails: '1', featuretype: 'city',
+        });
+        if (pickerCountry) params.set('country', pickerCountry);
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
+          signal: ctrl.signal,
+          headers: { 'Accept': 'application/json' },
+        });
+        const data = await res.json();
+        const seen = new Set<string>();
+        const list: Array<{ name: string; display: string }> = [];
+        for (const r of data || []) {
+          const a = r.address || {};
+          const name = a.city || a.town || a.village || a.municipality || a.county || r.name || (r.display_name?.split(',')[0] ?? '').trim();
+          if (!name) continue;
+          const key = name.toLowerCase();
+          if (seen.has(key)) continue;
+          seen.add(key);
+          list.push({ name, display: r.display_name });
+          if (list.length >= 6) break;
+        }
+        setCitySuggestions(list);
+      } catch {} finally { setLoadingSuggestions(false); }
+    }, 300);
+    return () => { clearTimeout(t); ctrl.abort(); };
+  }, [pickerCity, pickerCountry, showLocationPicker]);
+
   useEffect(() => {
     if (!prayerTimes) return;
     calculateNextPrayer(prayerTimes, timezone);
