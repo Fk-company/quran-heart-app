@@ -147,7 +147,7 @@ const SettingsPage: React.FC = () => {
 
         <Accordion type="multiple" value={openSections} onValueChange={setOpenSections} className="space-y-3">
           {/* Appearance */}
-          <AccordionItem value="appearance" className="card-surface !border-0 !p-0 overflow-hidden">
+          <AccordionItem value="appearance" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("appearance") ? "" : "hidden"}`}>
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Sun className="w-4 h-4 text-accent" />
@@ -174,7 +174,7 @@ const SettingsPage: React.FC = () => {
           </AccordionItem>
 
           {/* Font Size */}
-          <AccordionItem value="fonts" className="card-surface !border-0 !p-0 overflow-hidden">
+          <AccordionItem value="fonts" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("fonts") ? "" : "hidden"}`}>
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Type className="w-4 h-4 text-primary" />
@@ -230,7 +230,7 @@ const SettingsPage: React.FC = () => {
           </AccordionItem>
 
           {/* Default Reciter */}
-          <AccordionItem value="reciter" className="card-surface !border-0 !p-0 overflow-hidden">
+          <AccordionItem value="reciter" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("reciter") ? "" : "hidden"}`}>
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Mic className="w-4 h-4 text-primary" />
@@ -267,7 +267,7 @@ const SettingsPage: React.FC = () => {
           </AccordionItem>
 
           {/* Memorization */}
-          <AccordionItem value="memorization" className="card-surface !border-0 !p-0 overflow-hidden">
+          <AccordionItem value="memorization" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("memorization") ? "" : "hidden"}`}>
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Repeat className="w-4 h-4 text-primary" />
@@ -315,7 +315,7 @@ const SettingsPage: React.FC = () => {
           </AccordionItem>
 
           {/* Color Scheme */}
-          <AccordionItem value="colors" className="card-surface !border-0 !p-0 overflow-hidden">
+          <AccordionItem value="colors" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("colors") ? "" : "hidden"}`}>
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Palette className="w-4 h-4 text-primary" />
@@ -350,7 +350,7 @@ const SettingsPage: React.FC = () => {
           </AccordionItem>
 
           {/* About */}
-          <AccordionItem value="about" className="card-surface !border-0 !p-0 overflow-hidden">
+          <AccordionItem value="about" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("about") ? "" : "hidden"}`}>
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-accent" />
