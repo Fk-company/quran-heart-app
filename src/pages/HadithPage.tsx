@@ -10,13 +10,16 @@ const HadithPage: React.FC = () => {
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [selectedHadith, setSelectedHadith] = useState<typeof hadiths[0] | null>(null);
+  const [showFavOnly, setShowFavOnly] = useState(false);
   const { addItem, removeItem, isItemFav } = useFavorites();
 
-  const filteredHadiths = selectedCat
+  const filteredHadiths = (showFavOnly
+    ? hadiths.filter((h) => isItemFav(`hadith-${h.id}`))
+    : selectedCat
     ? hadiths.filter((h) => h.category === selectedCat)
     : search.trim()
     ? hadiths.filter((h) => h.text.includes(search) || h.narrator.includes(search))
-    : hadiths;
+    : hadiths);
 
   const shareHadith = (hadith: typeof hadiths[0]) => {
     const text = `${hadith.text}\n\nالراوي: ${hadith.narrator}\n${hadith.source}`;
