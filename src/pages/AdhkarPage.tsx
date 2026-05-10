@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { adhkarCategories, adhkarData } from '@/data/adhkar';
+import { recordTasbih } from '@/lib/tasbihHistory';
 import { ArrowRight, RotateCcw, Sunrise, Sunset, Moon, Circle, Heart, Trophy, Zap, Target, ChevronLeft, Search, X } from 'lucide-react';
 
 const categoryIcons: Record<string, React.ElementType> = {
