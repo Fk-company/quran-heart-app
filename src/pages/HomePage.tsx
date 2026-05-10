@@ -5,7 +5,7 @@ import {
   CloudSun, Heart, Search, MapPin, ChevronLeft, Star, BookOpen,
   Users, Quote, Calendar, Bell, BellOff, Feather, BarChart3,
   TrendingUp, Sparkles, Baby, Brain, Smile, Lightbulb, Bot, Settings,
-  Flame, Trophy
+  Flame, Trophy, RefreshCw, Database
 } from 'lucide-react';
 import { fetchPrayerTimes, fetchPrayerTimesByCity, fetchSurahs, type PrayerTimes, type Surah } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -87,6 +87,9 @@ const HomePage: React.FC = () => {
   const [pickerCity, setPickerCity] = useState('');
   const [citySuggestions, setCitySuggestions] = useState<Array<{ name: string; display: string }>>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<number | null>(null);
+  const [fromCache, setFromCache] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const dayOfYear = useMemo(() => Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000), []);
   const dailyVerse = useMemo(() => dailyVerses[dayOfYear % dailyVerses.length], [dayOfYear]);
@@ -130,8 +133,7 @@ const HomePage: React.FC = () => {
       try { const raw = localStorage.getItem(k); return raw ? JSON.parse(raw) : null; } catch { return null; }
     };
     const writeCache = (k: string, data: any) => {
-      try { localStorage.setItem(k, JSON.stringify(data)); } catch {}
-      // Light cleanup: drop stale prayer_cache entries from previous days
+      try { localStorage.setItem(k, JSON.stringify({ data, ts: Date.now() })); } catch {}
       try {
         for (let i = localStorage.length - 1; i >= 0; i--) {
           const key = localStorage.key(i);
@@ -143,7 +145,7 @@ const HomePage: React.FC = () => {
     const load = async () => {
       setLoading(true);
       try {
-        const handlePrayerData = (data: any, locName: string) => {
+        const handlePrayerData = (data: any, locName: string, opts: { cached?: boolean; ts?: number } = {}) => {
           setPrayerTimes(data.timings);
           setLocationName(locName);
           if (data.meta?.timezone) setTimezone(data.meta.timezone);
@@ -154,19 +156,22 @@ const HomePage: React.FC = () => {
           const g = data.date?.gregorian;
           if (g) setGregorianDate(`${g.weekday?.en || ''}, ${g.day} ${g.month?.en || ''} ${g.year}`);
           calculateNextPrayer(data.timings, data.meta?.timezone);
+          setFromCache(!!opts.cached);
+          setLastUpdated(opts.ts ?? Date.now());
         };
 
         if (manualLocation) {
           const ck = cacheKey(manualLocation.country, manualLocation.city);
-          const cached = readCache(ck);
+          const cachedRaw = readCache(ck);
+          const cached = cachedRaw?.data ? cachedRaw : (cachedRaw ? { data: cachedRaw, ts: Date.now() } : null);
           if (cached) {
-            handlePrayerData(cached, `${manualLocation.city}، ${manualLocation.country}`);
+            handlePrayerData(cached.data, `${manualLocation.city}، ${manualLocation.country}`, { cached: true, ts: cached.ts });
             setLoading(false);
           }
           try {
             const data = await fetchPrayerTimesByCity(manualLocation.city, manualLocation.country);
             writeCache(ck, data);
-            handlePrayerData(data, `${manualLocation.city}، ${manualLocation.country}`);
+            handlePrayerData(data, `${manualLocation.city}، ${manualLocation.country}`, { cached: false, ts: Date.now() });
           } catch {
             if (!cached) {
               const data = await fetchPrayerTimes(21.4225, 39.8262);
@@ -205,7 +210,7 @@ const HomePage: React.FC = () => {
       finally { setLoading(false); }
     };
     load();
-  }, [manualLocation]);
+  }, [manualLocation, refreshKey]);
 
   // Debounced city autocomplete via Nominatim (OSM)
   useEffect(() => {
@@ -495,7 +500,7 @@ const HomePage: React.FC = () => {
                 <span className="w-1.5 h-1.5 rounded-full bg-accent live-pulse" />
                 <span>متبقي {nextPrayer.remaining}</span>
               </div>
-              {(locationName || timezone) && (
+              {(locationName || timezone || lastUpdated) && (
                 <div className="flex items-center gap-2 mt-3 flex-wrap text-[11px] opacity-85 relative z-10">
                   {locationName && (
                     <span className="inline-flex items-center gap-1 bg-primary-foreground/10 backdrop-blur-sm rounded-full px-2.5 py-1 border border-primary-foreground/15">
@@ -509,11 +514,38 @@ const HomePage: React.FC = () => {
                       <span className="font-medium">{timezone}</span>
                     </span>
                   )}
+                  {lastUpdated && (
+                    <span className="inline-flex items-center gap-1 bg-primary-foreground/10 backdrop-blur-sm rounded-full px-2.5 py-1 border border-primary-foreground/15">
+                      {fromCache ? <Database className="w-3 h-3" /> : <RefreshCw className="w-3 h-3" />}
+                      <span className="font-medium">
+                        {fromCache ? 'كاش' : 'API'} · {new Date(lastUpdated).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </span>
+                  )}
                 </div>
               )}
             </>
           )}
         </div>
+
+        {/* Cache notice with retry */}
+        {fromCache && !loading && (
+          <div className="mb-4 flex items-center gap-2 bg-accent/10 border border-accent/25 rounded-2xl px-3 py-2 text-[11px] text-foreground">
+            <Database className="w-3.5 h-3.5 text-accent flex-shrink-0" />
+            <span className="flex-1 leading-snug">
+              تم العرض من البيانات المخزّنة مؤقتاً
+              {lastUpdated ? ` · آخر تحديث ${new Date(lastUpdated).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}` : ''}
+            </span>
+            <button
+              onClick={() => setRefreshKey((k) => k + 1)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent/20 hover:bg-accent/30 text-accent font-semibold transition-colors"
+              aria-label="إعادة المحاولة"
+            >
+              <RefreshCw className="w-3 h-3" />
+              <span>إعادة المحاولة</span>
+            </button>
+          </div>
+        )}
 
         {/* Prayer Times Strip */}
         {prayerTimes && (
