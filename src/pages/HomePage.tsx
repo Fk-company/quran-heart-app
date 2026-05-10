@@ -135,7 +135,7 @@ const HomePage: React.FC = () => {
           }
           const g = data.date?.gregorian;
           if (g) setGregorianDate(`${g.weekday?.en || ''}, ${g.day} ${g.month?.en || ''} ${g.year}`);
-          calculateNextPrayer(data.timings);
+          calculateNextPrayer(data.timings, data.meta?.timezone);
         };
 
         if (manualLocation) {
