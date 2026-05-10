@@ -85,6 +85,8 @@ const HomePage: React.FC = () => {
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [pickerCountry, setPickerCountry] = useState('');
   const [pickerCity, setPickerCity] = useState('');
+  const [citySuggestions, setCitySuggestions] = useState<Array<{ name: string; display: string }>>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
   const dayOfYear = useMemo(() => Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000), []);
   const dailyVerse = useMemo(() => dailyVerses[dayOfYear % dailyVerses.length], [dayOfYear]);
@@ -135,7 +137,7 @@ const HomePage: React.FC = () => {
           }
           const g = data.date?.gregorian;
           if (g) setGregorianDate(`${g.weekday?.en || ''}, ${g.day} ${g.month?.en || ''} ${g.year}`);
-          calculateNextPrayer(data.timings);
+          calculateNextPrayer(data.timings, data.meta?.timezone);
         };
 
         if (manualLocation) {
@@ -180,27 +182,87 @@ const HomePage: React.FC = () => {
     load();
   }, [manualLocation]);
 
+  // Debounced city autocomplete via Nominatim (OSM)
+  useEffect(() => {
+    if (!showLocationPicker) return;
+    const q = pickerCity.trim();
+    if (q.length < 2) { setCitySuggestions([]); return; }
+    const ctrl = new AbortController();
+    const t = setTimeout(async () => {
+      try {
+        setLoadingSuggestions(true);
+        const params = new URLSearchParams({
+          city: q, format: 'json', limit: '6', 'accept-language': 'ar,en',
+          addressdetails: '1', featuretype: 'city',
+        });
+        if (pickerCountry) params.set('country', pickerCountry);
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?${params.toString()}`, {
+          signal: ctrl.signal,
+          headers: { 'Accept': 'application/json' },
+        });
+        const data = await res.json();
+        const seen = new Set<string>();
+        const list: Array<{ name: string; display: string }> = [];
+        for (const r of data || []) {
+          const a = r.address || {};
+          const name = a.city || a.town || a.village || a.municipality || a.county || r.name || (r.display_name?.split(',')[0] ?? '').trim();
+          if (!name) continue;
+          const key = name.toLowerCase();
+          if (seen.has(key)) continue;
+          seen.add(key);
+          list.push({ name, display: r.display_name });
+          if (list.length >= 6) break;
+        }
+        setCitySuggestions(list);
+      } catch {} finally { setLoadingSuggestions(false); }
+    }, 300);
+    return () => { clearTimeout(t); ctrl.abort(); };
+  }, [pickerCity, pickerCountry, showLocationPicker]);
+
   useEffect(() => {
     if (!prayerTimes) return;
-    const interval = setInterval(() => calculateNextPrayer(prayerTimes), 30000);
+    calculateNextPrayer(prayerTimes, timezone);
+    const interval = setInterval(() => calculateNextPrayer(prayerTimes, timezone), 15000);
     return () => clearInterval(interval);
-  }, [prayerTimes]);
+  }, [prayerTimes, timezone]);
 
-  const calculateNextPrayer = (timings: PrayerTimes) => {
-    const now = new Date();
+  const getNowInTz = (tz: string) => {
+    try {
+      const parts = new Intl.DateTimeFormat('en-US', {
+        timeZone: tz, hour12: false,
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+      }).formatToParts(new Date());
+      const obj: Record<string, string> = {};
+      for (const p of parts) obj[p.type] = p.value;
+      return {
+        h: (parseInt(obj.hour, 10) || 0) % 24,
+        m: parseInt(obj.minute, 10) || 0,
+        s: parseInt(obj.second, 10) || 0,
+      };
+    } catch {
+      const d = new Date();
+      return { h: d.getHours(), m: d.getMinutes(), s: d.getSeconds() };
+    }
+  };
+
+  const calculateNextPrayer = (timings: PrayerTimes, tz?: string) => {
+    const { h: nowH, m: nowM, s: nowS } = tz ? getNowInTz(tz) : (() => { const d = new Date(); return { h: d.getHours(), m: d.getMinutes(), s: d.getSeconds() }; })();
+    const nowSec = nowH * 3600 + nowM * 60 + nowS;
     for (const prayer of prayerOrder) {
       const timeStr = timings[prayer];
       if (!timeStr) continue;
       const cleanTime = timeStr.split(' ')[0];
       const [h, m] = cleanTime.split(':').map(Number);
       if (isNaN(h) || isNaN(m)) continue;
-      const prayerDate = new Date();
-      prayerDate.setHours(h, m, 0, 0);
-      if (prayerDate > now) {
-        const diff = prayerDate.getTime() - now.getTime();
-        const hours = Math.floor(diff / 3600000);
-        const mins = Math.floor((diff % 3600000) / 60000);
-        const remaining = hours > 0 ? `${hours} ساعة و ${mins} دقيقة` : `${mins} دقيقة`;
+      const prayerSec = h * 3600 + m * 60;
+      if (prayerSec > nowSec) {
+        const diff = prayerSec - nowSec;
+        const hours = Math.floor(diff / 3600);
+        const mins = Math.floor((diff % 3600) / 60);
+        const secs = diff % 60;
+        const remaining = hours > 0
+          ? `${hours} ساعة و ${mins} دقيقة`
+          : mins > 0 ? `${mins} دقيقة و ${secs} ثانية` : `${secs} ثانية`;
         setNextPrayer({ name: prayerNames[prayer], time: cleanTime, remaining });
         setNextPrayerKey(prayer);
         return;
@@ -329,13 +391,34 @@ const HomePage: React.FC = () => {
                   </div>
                   <div>
                     <label className="text-xs text-muted-foreground mb-1 block">المدينة</label>
-                    <input
-                      type="text"
-                      value={pickerCity}
-                      onChange={(e) => setPickerCity(e.target.value)}
-                      placeholder="مثال: Riyadh, Cairo, London"
-                      className="search-input w-full"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={pickerCity}
+                        onChange={(e) => setPickerCity(e.target.value)}
+                        placeholder="ابدأ بالكتابة لرؤية الاقتراحات..."
+                        className="search-input w-full"
+                        autoComplete="off"
+                      />
+                      {loadingSuggestions && (
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">جارٍ البحث...</span>
+                      )}
+                      {citySuggestions.length > 0 && (
+                        <div className="absolute z-10 left-0 right-0 mt-1 bg-popover border border-border rounded-xl shadow-lg overflow-hidden max-h-60 overflow-y-auto">
+                          {citySuggestions.map((s, i) => (
+                            <button
+                              key={i}
+                              type="button"
+                              onClick={() => { setPickerCity(s.name); setCitySuggestions([]); }}
+                              className="w-full text-right px-3 py-2 hover:bg-secondary border-b border-border/40 last:border-0 transition-colors"
+                            >
+                              <div className="text-sm font-medium text-foreground">{s.name}</div>
+                              <div className="text-[10px] text-muted-foreground line-clamp-1">{s.display}</div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex gap-2 mt-5">
