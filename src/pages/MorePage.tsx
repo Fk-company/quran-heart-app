@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Heart, Radio, Users, Quote, Search, Star, BookOpen, BarChart3,
   X, Feather, Book, Grid3X3, List, ChevronLeft, TrendingUp, Baby, Sparkles, Mic,
-  Brain, Smile, Lightbulb, Bot, Settings, CalendarDays, Target
+  Brain, Smile, Lightbulb, Bot, Settings, CalendarDays, Target, Send, Globe
 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { MoreHorizontal } from 'lucide-react';
