@@ -1,6 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { adhkarCategories, adhkarData } from '@/data/adhkar';
-import { ArrowRight, RotateCcw, Sunrise, Sunset, Moon, Circle, Heart, Trophy, Zap, Target, ChevronLeft } from 'lucide-react';
+import { ArrowRight, RotateCcw, Sunrise, Sunset, Moon, Circle, Heart, Trophy, Zap, Target, ChevronLeft, Search, X } from 'lucide-react';
 
 const categoryIcons: Record<string, React.ElementType> = {
   sunrise: Sunrise, sunset: Sunset, moon: Moon, prayer: Circle, circle: Circle, tasbih: Heart,
