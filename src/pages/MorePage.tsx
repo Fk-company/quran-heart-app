@@ -22,6 +22,7 @@ const moreCategories = [
   {
     title: 'القلب والروح',
     items: [
+      { label: 'وردي اليومي', icon: Sparkles, path: '/daily-wird', desc: 'تتبع وردك اليومي بسلاسة', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
       { label: 'كيف يشعر قلبك؟', icon: Smile, path: '/emotion-quran', desc: 'آيات حسب حالتك النفسية', color: 'bg-pink-500/10 text-pink-500', gradient: 'gradient-gold' },
       { label: 'قلب القرآن', icon: Heart, path: '/heart-quran', desc: 'سورة يس وآيات القلب', color: 'bg-red-500/10 text-red-500', gradient: 'gradient-primary' },
       { label: 'تأملات يومية', icon: Lightbulb, path: '/daily-reflection', desc: 'آية وتدبر وعمل', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-gold' },
