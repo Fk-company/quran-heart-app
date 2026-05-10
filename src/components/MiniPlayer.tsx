@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Play, Pause, X, ChevronUp, ChevronDown, SkipBack, SkipForward,
-  Volume2, VolumeX, Volume1, Repeat, Repeat1, Shuffle, Gauge, Loader2, AlertCircle, Radio,
+  Volume2, VolumeX, Volume1, Repeat, Repeat1, Shuffle, Gauge, Loader2, AlertCircle, Radio, Moon, Timer,
 } from 'lucide-react';
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { useAudioListeningTracker } from '@/hooks/useAppStats';
@@ -15,16 +15,20 @@ const formatTime = (seconds: number) => {
 };
 
 const PLAYBACK_RATES = [0.75, 1, 1.25, 1.5, 1.75, 2];
+const SLEEP_OPTIONS = [5, 10, 15, 30, 60];
 
 const MiniPlayer: React.FC = () => {
   const {
     currentTrack, queue, queueIndex,
     isPlaying, isLoading, hasError, progress, duration, volume, playbackRate, repeatMode, shuffle,
     pause, resume, seekTo, setVolume, setPlaybackRate, setRepeatMode, toggleShuffle, next, prev, stop,
+    sleepTimerEnd, setSleepTimer,
   } = useAudioPlayer();
 
   const [expanded, setExpanded] = useState(false);
   const [showRate, setShowRate] = useState(false);
+  const [showSleep, setShowSleep] = useState(false);
+  const [sleepRemaining, setSleepRemaining] = useState<string>('');
 
   // Track listening time to global stats
   useAudioListeningTracker(isPlaying, currentTrack?.id);
