@@ -57,6 +57,12 @@ const moreCategories = [
       { label: 'التقويم الهجري', icon: CalendarDays, path: '/hijri-calendar', desc: 'الأشهر والمناسبات الإسلامية', color: 'bg-accent/10 text-accent', gradient: 'gradient-primary' },
       { label: 'البحث', icon: Search, path: '/search', desc: 'البحث في القرآن الكريم', color: 'bg-primary/10 text-primary', gradient: 'gradient-gold' },
     ]
+  },
+  {
+    title: 'عن التطبيق',
+    items: [
+      { label: 'تواصل مع المطور', icon: Globe, path: '/developer-social', desc: 'فخري عادل - تليجرام وانستغرام', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
+    ]
   }
 ];
 
