@@ -51,6 +51,8 @@ const moreCategories = [
       { label: 'المفضلة', icon: Heart, path: '/favorites', desc: 'الآيات والأدعية المحفوظة', color: 'bg-destructive/10 text-destructive', gradient: 'gradient-primary' },
       { label: 'تقدم القراءة', icon: TrendingUp, path: '/reading-stats', desc: 'تتبع ختمتك اليومية', color: 'bg-primary/10 text-primary', gradient: 'gradient-gold' },
       { label: 'إحصائيات القرآن', icon: BarChart3, path: '/quran-stats', desc: 'أرقام وحقائق عن القرآن', color: 'bg-accent/10 text-accent', gradient: 'gradient-primary' },
+      { label: 'خطة الختمة', icon: Target, path: '/khatm-plan', desc: 'خطّط لختمتك خلال 30/60/90 يوماً', color: 'bg-primary/10 text-primary', gradient: 'gradient-gold' },
+      { label: 'التقويم الهجري', icon: CalendarDays, path: '/hijri-calendar', desc: 'الأشهر والمناسبات الإسلامية', color: 'bg-accent/10 text-accent', gradient: 'gradient-primary' },
       { label: 'البحث', icon: Search, path: '/search', desc: 'البحث في القرآن الكريم', color: 'bg-primary/10 text-primary', gradient: 'gradient-gold' },
     ]
   }
