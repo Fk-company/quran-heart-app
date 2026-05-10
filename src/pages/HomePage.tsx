@@ -123,10 +123,12 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     const load = async () => {
+      setLoading(true);
       try {
         const handlePrayerData = (data: any, locName: string) => {
           setPrayerTimes(data.timings);
           setLocationName(locName);
+          if (data.meta?.timezone) setTimezone(data.meta.timezone);
           if (data.date?.hijri) {
             const h = data.date.hijri;
             setHijriDate(`${h.day} ${h.month?.ar || ''} ${h.year}`);
@@ -136,7 +138,15 @@ const HomePage: React.FC = () => {
           calculateNextPrayer(data.timings);
         };
 
-        if (navigator.geolocation) {
+        if (manualLocation) {
+          try {
+            const data = await fetchPrayerTimesByCity(manualLocation.city, manualLocation.country);
+            handlePrayerData(data, `${manualLocation.city}، ${manualLocation.country}`);
+          } catch {
+            const data = await fetchPrayerTimes(21.4225, 39.8262);
+            handlePrayerData(data, 'مكة المكرمة');
+          }
+        } else if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
             async (pos) => {
               try {
@@ -168,7 +178,7 @@ const HomePage: React.FC = () => {
       finally { setLoading(false); }
     };
     load();
-  }, []);
+  }, [manualLocation]);
 
   useEffect(() => {
     if (!prayerTimes) return;
