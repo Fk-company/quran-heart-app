@@ -49,6 +49,21 @@ const MiniPlayer: React.FC = () => {
     } catch {}
   }, [currentTrack, resume, pause, prev, next]);
 
+  // Sleep timer countdown display
+  useEffect(() => {
+    if (!sleepTimerEnd) { setSleepRemaining(''); return; }
+    const tick = () => {
+      const ms = sleepTimerEnd - Date.now();
+      if (ms <= 0) { setSleepRemaining(''); return; }
+      const m = Math.floor(ms / 60000);
+      const s = Math.floor((ms % 60000) / 1000);
+      setSleepRemaining(`${m}:${s.toString().padStart(2, '0')}`);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [sleepTimerEnd]);
+
   if (!currentTrack) return null;
   const progressPercent = duration > 0 ? (progress / duration) * 100 : 0;
   const isLive = currentTrack.id.startsWith('radio-');
