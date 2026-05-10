@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -9,6 +10,7 @@ import TopBar from "@/components/TopBar";
 import BottomNav from "@/components/BottomNav";
 import MiniPlayer from "@/components/MiniPlayer";
 import PageTransition from "@/components/PageTransition";
+import SplashScreen from "@/components/SplashScreen";
 import HomePage from "./pages/HomePage";
 import QuranPage from "./pages/QuranPage";
 import SurahDetailPage from "./pages/SurahDetailPage";
