@@ -391,13 +391,34 @@ const HomePage: React.FC = () => {
                   </div>
                   <div>
                     <label className="text-xs text-muted-foreground mb-1 block">المدينة</label>
-                    <input
-                      type="text"
-                      value={pickerCity}
-                      onChange={(e) => setPickerCity(e.target.value)}
-                      placeholder="مثال: Riyadh, Cairo, London"
-                      className="search-input w-full"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={pickerCity}
+                        onChange={(e) => setPickerCity(e.target.value)}
+                        placeholder="ابدأ بالكتابة لرؤية الاقتراحات..."
+                        className="search-input w-full"
+                        autoComplete="off"
+                      />
+                      {loadingSuggestions && (
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">جارٍ البحث...</span>
+                      )}
+                      {citySuggestions.length > 0 && (
+                        <div className="absolute z-10 left-0 right-0 mt-1 bg-popover border border-border rounded-xl shadow-lg overflow-hidden max-h-60 overflow-y-auto">
+                          {citySuggestions.map((s, i) => (
+                            <button
+                              key={i}
+                              type="button"
+                              onClick={() => { setPickerCity(s.name); setCitySuggestions([]); }}
+                              className="w-full text-right px-3 py-2 hover:bg-secondary border-b border-border/40 last:border-0 transition-colors"
+                            >
+                              <div className="text-sm font-medium text-foreground">{s.name}</div>
+                              <div className="text-[10px] text-muted-foreground line-clamp-1">{s.display}</div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <div className="flex gap-2 mt-5">
