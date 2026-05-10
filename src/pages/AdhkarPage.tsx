@@ -34,6 +34,23 @@ const AdhkarPage: React.FC = () => {
   const [tasbihCount, setTasbihCount] = useState(0);
   const [tasbihTarget, setTasbihTarget] = useState(33);
   const [tasbihText, setTasbihText] = useState('سُبْحَانَ اللهِ');
+  const [search, setSearch] = useState('');
+  const [quickFilter, setQuickFilter] = useState<string | null>(null);
+
+  const searchResults = useMemo(() => {
+    const q = search.trim();
+    if (!q) return [] as Array<{ category: string; categoryName: string; item: any }>;
+    const all: Array<{ category: string; categoryName: string; item: any }> = [];
+    for (const cat of adhkarCategories) {
+      const items = adhkarData[cat.id] || [];
+      for (const it of items) {
+        if (it.text.includes(q) || (it.reference || '').includes(q)) {
+          all.push({ category: cat.id, categoryName: cat.name, item: it });
+        }
+      }
+    }
+    return all.slice(0, 50);
+  }, [search]);
 
   const tasbihOptions = [
     { text: 'سُبْحَانَ اللهِ', target: 33 },
