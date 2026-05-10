@@ -27,6 +27,7 @@ export const NAV_CATALOG: NavItemDef[] = [
   { id: 'hijri', label: 'التقويم', icon: CalendarDays, path: '/hijri-calendar' },
   { id: 'hadith', label: 'الأحاديث', icon: Quote, path: '/hadith' },
   { id: 'stats', label: 'إحصائياتي', icon: BarChart3, path: '/reading-stats' },
+  { id: 'tasbih-stats', label: 'إحصاء التسبيح', icon: Heart, path: '/tasbih-stats' },
 ];
 
 export const DEFAULT_NAV_IDS = ['home', 'quran', 'reciters', 'favorites'];
