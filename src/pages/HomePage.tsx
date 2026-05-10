@@ -133,8 +133,7 @@ const HomePage: React.FC = () => {
       try { const raw = localStorage.getItem(k); return raw ? JSON.parse(raw) : null; } catch { return null; }
     };
     const writeCache = (k: string, data: any) => {
-      try { localStorage.setItem(k, JSON.stringify(data)); } catch {}
-      // Light cleanup: drop stale prayer_cache entries from previous days
+      try { localStorage.setItem(k, JSON.stringify({ data, ts: Date.now() })); } catch {}
       try {
         for (let i = localStorage.length - 1; i >= 0; i--) {
           const key = localStorage.key(i);
@@ -146,7 +145,7 @@ const HomePage: React.FC = () => {
     const load = async () => {
       setLoading(true);
       try {
-        const handlePrayerData = (data: any, locName: string) => {
+        const handlePrayerData = (data: any, locName: string, opts: { cached?: boolean; ts?: number } = {}) => {
           setPrayerTimes(data.timings);
           setLocationName(locName);
           if (data.meta?.timezone) setTimezone(data.meta.timezone);
@@ -157,19 +156,22 @@ const HomePage: React.FC = () => {
           const g = data.date?.gregorian;
           if (g) setGregorianDate(`${g.weekday?.en || ''}, ${g.day} ${g.month?.en || ''} ${g.year}`);
           calculateNextPrayer(data.timings, data.meta?.timezone);
+          setFromCache(!!opts.cached);
+          setLastUpdated(opts.ts ?? Date.now());
         };
 
         if (manualLocation) {
           const ck = cacheKey(manualLocation.country, manualLocation.city);
-          const cached = readCache(ck);
+          const cachedRaw = readCache(ck);
+          const cached = cachedRaw?.data ? cachedRaw : (cachedRaw ? { data: cachedRaw, ts: Date.now() } : null);
           if (cached) {
-            handlePrayerData(cached, `${manualLocation.city}، ${manualLocation.country}`);
+            handlePrayerData(cached.data, `${manualLocation.city}، ${manualLocation.country}`, { cached: true, ts: cached.ts });
             setLoading(false);
           }
           try {
             const data = await fetchPrayerTimesByCity(manualLocation.city, manualLocation.country);
             writeCache(ck, data);
-            handlePrayerData(data, `${manualLocation.city}، ${manualLocation.country}`);
+            handlePrayerData(data, `${manualLocation.city}، ${manualLocation.country}`, { cached: false, ts: Date.now() });
           } catch {
             if (!cached) {
               const data = await fetchPrayerTimes(21.4225, 39.8262);
@@ -208,7 +210,7 @@ const HomePage: React.FC = () => {
       finally { setLoading(false); }
     };
     load();
-  }, [manualLocation]);
+  }, [manualLocation, refreshKey]);
 
   // Debounced city autocomplete via Nominatim (OSM)
   useEffect(() => {
