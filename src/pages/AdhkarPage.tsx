@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { adhkarCategories, adhkarData } from '@/data/adhkar';
+import { recordTasbih } from '@/lib/tasbihHistory';
 import { ArrowRight, RotateCcw, Sunrise, Sunset, Moon, Circle, Heart, Trophy, Zap, Target, ChevronLeft, Search, X } from 'lucide-react';
 
 const categoryIcons: Record<string, React.ElementType> = {
@@ -74,6 +75,7 @@ const AdhkarPage: React.FC = () => {
     setTasbihCount(c => c + 1);
     playClickSound();
     setDailyStats(prev => { const u = { ...prev, [tasbihText]: (prev[tasbihText] || 0) + 1 }; saveDailyStats(u); return u; });
+    recordTasbih(tasbihText, 1);
   }, [tasbihCount, tasbihTarget, tasbihText]);
 
   const tasbihProgress = tasbihTarget > 0 ? (tasbihCount / tasbihTarget) * 100 : 0;

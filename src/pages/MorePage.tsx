@@ -33,6 +33,7 @@ const moreCategories = [
     title: 'الأذكار والأدعية',
     items: [
       { label: 'الأذكار والتسبيح', icon: Heart, path: '/adhkar', desc: 'أذكار الصباح والمساء', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
+      { label: 'إحصاء التسبيح', icon: BarChart3, path: '/tasbih-stats', desc: 'تتبع ذكرك بالأرقام', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
       { label: 'الأدعية', icon: Feather, path: '/dua', desc: 'أدعية لكل مناسبة', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
     ]
   },
