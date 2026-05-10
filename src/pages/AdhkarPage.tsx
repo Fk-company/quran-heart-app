@@ -75,6 +75,7 @@ const AdhkarPage: React.FC = () => {
     setTasbihCount(c => c + 1);
     playClickSound();
     setDailyStats(prev => { const u = { ...prev, [tasbihText]: (prev[tasbihText] || 0) + 1 }; saveDailyStats(u); return u; });
+    recordTasbih(tasbihText, 1);
   }, [tasbihCount, tasbihTarget, tasbihText]);
 
   const tasbihProgress = tasbihTarget > 0 ? (tasbihCount / tasbihTarget) * 100 : 0;
