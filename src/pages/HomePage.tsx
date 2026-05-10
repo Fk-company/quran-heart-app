@@ -495,6 +495,22 @@ const HomePage: React.FC = () => {
                 <span className="w-1.5 h-1.5 rounded-full bg-accent live-pulse" />
                 <span>متبقي {nextPrayer.remaining}</span>
               </div>
+              {(locationName || timezone) && (
+                <div className="flex items-center gap-2 mt-3 flex-wrap text-[11px] opacity-85 relative z-10">
+                  {locationName && (
+                    <span className="inline-flex items-center gap-1 bg-primary-foreground/10 backdrop-blur-sm rounded-full px-2.5 py-1 border border-primary-foreground/15">
+                      <MapPin className="w-3 h-3" />
+                      <span className="font-semibold">{locationName}</span>
+                    </span>
+                  )}
+                  {timezone && (
+                    <span className="inline-flex items-center gap-1 bg-primary-foreground/10 backdrop-blur-sm rounded-full px-2.5 py-1 border border-primary-foreground/15">
+                      <Clock className="w-3 h-3" />
+                      <span className="font-medium">{timezone}</span>
+                    </span>
+                  )}
+                </div>
+              )}
             </>
           )}
         </div>
