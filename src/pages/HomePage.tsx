@@ -528,6 +528,25 @@ const HomePage: React.FC = () => {
           )}
         </div>
 
+        {/* Cache notice with retry */}
+        {fromCache && !loading && (
+          <div className="mb-4 flex items-center gap-2 bg-accent/10 border border-accent/25 rounded-2xl px-3 py-2 text-[11px] text-foreground">
+            <Database className="w-3.5 h-3.5 text-accent flex-shrink-0" />
+            <span className="flex-1 leading-snug">
+              تم العرض من البيانات المخزّنة مؤقتاً
+              {lastUpdated ? ` · آخر تحديث ${new Date(lastUpdated).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}` : ''}
+            </span>
+            <button
+              onClick={() => setRefreshKey((k) => k + 1)}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent/20 hover:bg-accent/30 text-accent font-semibold transition-colors"
+              aria-label="إعادة المحاولة"
+            >
+              <RefreshCw className="w-3 h-3" />
+              <span>إعادة المحاولة</span>
+            </button>
+          </div>
+        )}
+
         {/* Prayer Times Strip */}
         {prayerTimes && (
           <div className="grid grid-cols-6 gap-1.5 mb-5">
