@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Moon, Sun, Settings, Search } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
+import appLogo from '@/assets/app-logo.png';
 
 const TopBar: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
