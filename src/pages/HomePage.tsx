@@ -124,6 +124,22 @@ const HomePage: React.FC = () => {
   }, [prayerTimes, notificationsEnabled]);
 
   useEffect(() => {
+    const todayKey = (() => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; })();
+    const cacheKey = (country: string, city: string) => `prayer_cache:${country.toLowerCase()}:${city.toLowerCase()}:${todayKey}`;
+    const readCache = (k: string) => {
+      try { const raw = localStorage.getItem(k); return raw ? JSON.parse(raw) : null; } catch { return null; }
+    };
+    const writeCache = (k: string, data: any) => {
+      try { localStorage.setItem(k, JSON.stringify(data)); } catch {}
+      // Light cleanup: drop stale prayer_cache entries from previous days
+      try {
+        for (let i = localStorage.length - 1; i >= 0; i--) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('prayer_cache:') && !key.endsWith(`:${todayKey}`)) localStorage.removeItem(key);
+        }
+      } catch {}
+    };
+
     const load = async () => {
       setLoading(true);
       try {
@@ -141,12 +157,21 @@ const HomePage: React.FC = () => {
         };
 
         if (manualLocation) {
+          const ck = cacheKey(manualLocation.country, manualLocation.city);
+          const cached = readCache(ck);
+          if (cached) {
+            handlePrayerData(cached, `${manualLocation.city}، ${manualLocation.country}`);
+            setLoading(false);
+          }
           try {
             const data = await fetchPrayerTimesByCity(manualLocation.city, manualLocation.country);
+            writeCache(ck, data);
             handlePrayerData(data, `${manualLocation.city}، ${manualLocation.country}`);
           } catch {
-            const data = await fetchPrayerTimes(21.4225, 39.8262);
-            handlePrayerData(data, 'مكة المكرمة');
+            if (!cached) {
+              const data = await fetchPrayerTimes(21.4225, 39.8262);
+              handlePrayerData(data, 'مكة المكرمة');
+            }
           }
         } else if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
