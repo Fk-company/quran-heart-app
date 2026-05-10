@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Settings, Type, Palette, Mic, RotateCcw, Repeat, Volume2,
-  Moon, Sun, Check, Info, Save, BookOpen, Sparkles, ChevronsDown, ChevronsUp, Search, X
+  Moon, Sun, Check, Info, Save, BookOpen, Sparkles, ChevronsDown, ChevronsUp, Search, X, LayoutGrid
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useSettings } from '@/hooks/useSettings';
 import { useTheme } from '@/contexts/ThemeContext';
 import PageHeader from '@/components/PageHeader';
+import { NAV_CATALOG, DEFAULT_NAV_IDS, getNavIds, setNavIds } from '@/components/BottomNav';
 
 const RECITERS = [
   { id: 'alafasy', name: 'مشاري العفاسي' },
@@ -24,7 +25,7 @@ const COLOR_SCHEMES = [
   { id: 'highContrast' as const, name: 'تباين عالي', colors: ['hsl(0,0%,10%)', 'hsl(0,0%,90%)'] },
 ];
 
-const ALL_SECTIONS = ['appearance', 'fonts', 'reciter', 'memorization', 'colors', 'about'];
+const ALL_SECTIONS = ['appearance', 'fonts', 'reciter', 'memorization', 'colors', 'navigation', 'about'];
 
 const Hint: React.FC<{ text: string }> = ({ text }) => (
   <span className="inline-flex items-center" title={text} aria-label={text}>
@@ -67,6 +68,7 @@ const SettingsPage: React.FC = () => {
     reciter: 'القارئ التلاوة صوت العفاسي الحصري المنشاوي',
     memorization: 'الحفظ التكرار اختبار حفظ',
     colors: 'الألوان نمط ألوان لوحة',
+    navigation: 'التنقل الشريط السفلي تخصيص أيقونات روابط سريعة',
     about: 'عن التطبيق إصدار حول معلومات',
   };
 
