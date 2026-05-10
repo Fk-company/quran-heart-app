@@ -214,6 +214,30 @@ const MiniPlayer: React.FC = () => {
                 )}
               </div>
             )}
+            <div className="relative">
+              <button onClick={() => setShowSleep(!showSleep)}
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-colors ${sleepTimerEnd ? 'bg-primary/15 text-primary' : 'bg-secondary text-foreground'}`}
+                title="مؤقّت إيقاف">
+                {sleepTimerEnd ? <Timer className="w-3 h-3" /> : <Moon className="w-3 h-3" />}
+                <span>{sleepTimerEnd && sleepRemaining ? sleepRemaining : 'نوم'}</span>
+              </button>
+              {showSleep && (
+                <div className="absolute bottom-full mb-2 left-0 bg-card border border-border rounded-xl shadow-lg p-1.5 grid grid-cols-3 gap-1 w-44 animate-fade-in z-10">
+                  {SLEEP_OPTIONS.map(m => (
+                    <button key={m}
+                      onClick={() => { setSleepTimer(m); setShowSleep(false); }}
+                      className="text-[10px] py-1.5 rounded-lg font-semibold transition-colors hover:bg-secondary text-foreground">
+                      {m} د
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => { setSleepTimer(null); setShowSleep(false); }}
+                    className="col-span-3 text-[10px] py-1.5 rounded-lg font-semibold bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors">
+                    إلغاء المؤقّت
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
