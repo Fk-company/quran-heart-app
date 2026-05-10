@@ -291,26 +291,84 @@ const AdhkarPage: React.FC = () => {
           <ChevronLeft className="w-5 h-5 text-muted-foreground" />
         </button>
 
-        <h2 className="section-title">الأذكار</h2>
-        <div className="space-y-2.5">
-          {adhkarCategories.map(cat => {
-            const Icon = categoryIcons[cat.icon] || Circle;
-            const count = adhkarData[cat.id]?.length || 0;
-            return (
-              <button key={cat.id} onClick={() => setSelectedCategory(cat.id)}
-                className="card-surface-hover w-full flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-5 h-5 text-primary" />
-                </div>
-                <div className="flex-1 text-right">
-                  <div className="font-semibold text-foreground text-sm">{cat.name}</div>
-                  <div className="text-xs text-muted-foreground">{count} ذكر</div>
-                </div>
-                <ChevronLeft className="w-4 h-4 text-muted-foreground" />
-              </button>
-            );
-          })}
+        {/* Search */}
+        <div className="relative mb-3">
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="ابحث في الأذكار والأدعية..."
+            className="search-input pr-10 pl-9"
+          />
+          {search && (
+            <button onClick={() => setSearch('')} className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-secondary flex items-center justify-center" aria-label="مسح">
+              <X className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
+          )}
         </div>
+
+        {/* Quick filters */}
+        {!search && (
+          <div className="flex flex-wrap gap-2 mb-5">
+            <button onClick={() => setQuickFilter(null)} className={`filter-chip ${!quickFilter ? 'active' : ''}`}>الكل</button>
+            {['morning', 'evening', 'wakeup', 'sleep', 'tasbih', 'prayer'].map((id) => {
+              const cat = adhkarCategories.find(c => c.id === id);
+              if (!cat) return null;
+              return (
+                <button key={id} onClick={() => setQuickFilter(id === quickFilter ? null : id)} className={`filter-chip ${quickFilter === id ? 'active' : ''}`}>
+                  {cat.name}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {search ? (
+          <>
+            <h2 className="section-title">نتائج البحث ({searchResults.length})</h2>
+            {searchResults.length === 0 ? (
+              <div className="card-surface text-center py-8 text-sm text-muted-foreground">لا توجد نتائج مطابقة</div>
+            ) : (
+              <div className="space-y-2.5">
+                {searchResults.map(({ category, categoryName, item }) => (
+                  <button key={`${category}-${item.id}`} onClick={() => { setSearch(''); setSelectedCategory(category); }} className="card-surface-hover w-full text-right">
+                    <p className="font-amiri text-base leading-[1.9] text-foreground mb-2">{item.text}</p>
+                    <div className="flex items-center justify-between">
+                      <span className="stat-badge text-[10px]">{categoryName}</span>
+                      <span className="text-[10px] text-muted-foreground">{item.reference}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <h2 className="section-title">الأذكار</h2>
+            <div className="space-y-2.5">
+              {adhkarCategories
+                .filter(cat => !quickFilter || cat.id === quickFilter)
+                .map(cat => {
+                  const Icon = categoryIcons[cat.icon] || Circle;
+                  const count = adhkarData[cat.id]?.length || 0;
+                  return (
+                    <button key={cat.id} onClick={() => setSelectedCategory(cat.id)}
+                      className="card-surface-hover w-full flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1 text-right">
+                        <div className="font-semibold text-foreground text-sm">{cat.name}</div>
+                        <div className="text-xs text-muted-foreground">{count} ذكر</div>
+                      </div>
+                      <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+                    </button>
+                  );
+                })}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
