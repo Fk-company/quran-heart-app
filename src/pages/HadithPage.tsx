@@ -54,9 +54,12 @@ const HadithPage: React.FC = () => {
         </div>
 
         <div className="flex flex-wrap gap-2 mb-5">
-          <button onClick={() => { setSelectedCat(null); setSearch(''); }} className={`filter-chip ${!selectedCat ? 'active' : ''}`}>الكل</button>
+          <button onClick={() => { setSelectedCat(null); setSearch(''); setShowFavOnly(false); }} className={`filter-chip ${!selectedCat && !showFavOnly ? 'active' : ''}`}>الكل</button>
+          <button onClick={() => { setShowFavOnly(!showFavOnly); setSelectedCat(null); setSearch(''); }} className={`filter-chip ${showFavOnly ? 'active' : ''}`}>
+            <Heart className="w-3 h-3 inline -mt-0.5 ml-1" fill={showFavOnly ? 'currentColor' : 'none'} /> المفضلة
+          </button>
           {hadithCategories.map((cat) => (
-            <button key={cat.id} onClick={() => { setSelectedCat(cat.id); setSearch(''); }} className={`filter-chip ${selectedCat === cat.id ? 'active' : ''}`}>{cat.name}</button>
+            <button key={cat.id} onClick={() => { setSelectedCat(cat.id); setSearch(''); setShowFavOnly(false); }} className={`filter-chip ${selectedCat === cat.id ? 'active' : ''}`}>{cat.name}</button>
           ))}
         </div>
 
