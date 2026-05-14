@@ -297,6 +297,19 @@ const MushafPage: React.FC = () => {
     }
   }, [currentTrack?.id, isPlaying]);
 
+  // Sync inline tafsir + scroll with currently playing ayah
+  useEffect(() => {
+    const num = ayahPlayer.playingAyahNumber;
+    if (num === null) return;
+    if (inlineTafsir) {
+      setExpandedTafsir(prev => (prev[num] ? prev : { ...prev, [num]: true }));
+    }
+    requestAnimationFrame(() => {
+      const el = document.querySelector(`[data-ayah-num="${num}"]`) as HTMLElement | null;
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }, [ayahPlayer.playingAyahNumber, inlineTafsir]);
+
   const goToPage = (p: number) => { if (p >= 1 && p <= TOTAL_PAGES) setCurrentPage(p); };
 
   const handleJump = () => {
