@@ -547,9 +547,91 @@ const MushafPage: React.FC = () => {
           ))}
         </div>
 
+        {/* Reading Toolbar */}
+        <div className={`card-surface mb-3 ${nightMode ? 'bg-[hsl(220,18%,10%)] border-amber-700/30' : ''}`}>
+          <button onClick={() => setShowToolbar(s => !s)}
+            className="w-full flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${nightMode ? 'bg-amber-500/15 text-amber-300' : 'bg-primary/10 text-primary'}`}>
+                <Settings2 className="w-3.5 h-3.5" />
+              </div>
+              <span className={`text-xs font-bold ${nightMode ? 'text-amber-100' : 'text-foreground'}`}>أدوات القراءة</span>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full ${nightMode ? 'bg-amber-900/30 text-amber-400/70' : 'bg-secondary text-muted-foreground'}`}>
+                {settings.mushafFontSize}px · ×{lineHeight.toFixed(1)}
+              </span>
+              {inlineTafsir && (
+                <span className={`text-[10px] px-2 py-0.5 rounded-full ${nightMode ? 'bg-amber-500/20 text-amber-300' : 'bg-primary/15 text-primary'}`}>
+                  تفسير
+                </span>
+              )}
+            </div>
+            {showToolbar ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+          </button>
+
+          {showToolbar && (
+            <div className="mt-3 pt-3 border-t border-border space-y-3 animate-fade-in">
+              {/* Font size */}
+              <div className="flex items-center gap-2">
+                <Type className={`w-3.5 h-3.5 ${nightMode ? 'text-amber-300' : 'text-primary'}`} />
+                <span className={`text-[11px] font-semibold flex-1 ${nightMode ? 'text-amber-100' : 'text-foreground'}`}>حجم الخط</span>
+                <button onClick={() => updateSetting('mushafFontSize', Math.max(16, settings.mushafFontSize - 2))}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${nightMode ? 'bg-amber-900/20 text-amber-300' : 'bg-secondary text-foreground'}`}>
+                  <Minus className="w-3.5 h-3.5" />
+                </button>
+                <span className={`text-xs font-bold min-w-[3rem] text-center ${nightMode ? 'text-amber-300' : 'text-primary'}`}>{settings.mushafFontSize}px</span>
+                <button onClick={() => updateSetting('mushafFontSize', Math.min(40, settings.mushafFontSize + 2))}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${nightMode ? 'bg-amber-900/20 text-amber-300' : 'bg-secondary text-foreground'}`}>
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Line height */}
+              <div className="flex items-center gap-2">
+                <AlignJustify className={`w-3.5 h-3.5 ${nightMode ? 'text-amber-300' : 'text-primary'}`} />
+                <span className={`text-[11px] font-semibold flex-1 ${nightMode ? 'text-amber-100' : 'text-foreground'}`}>تباعد الأسطر</span>
+                <button onClick={() => setLineHeight(v => Math.max(2.0, +(v - 0.2).toFixed(1)))}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${nightMode ? 'bg-amber-900/20 text-amber-300' : 'bg-secondary text-foreground'}`}>
+                  <Minus className="w-3.5 h-3.5" />
+                </button>
+                <span className={`text-xs font-bold min-w-[3rem] text-center ${nightMode ? 'text-amber-300' : 'text-primary'}`}>×{lineHeight.toFixed(1)}</span>
+                <button onClick={() => setLineHeight(v => Math.min(4.0, +(v + 0.2).toFixed(1)))}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${nightMode ? 'bg-amber-900/20 text-amber-300' : 'bg-secondary text-foreground'}`}>
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Toggles */}
+              <div className="grid grid-cols-2 gap-2">
+                <button onClick={() => setInlineTafsir(v => !v)}
+                  className={`flex items-center justify-center gap-1.5 py-2 rounded-xl text-[11px] font-semibold transition-colors ${
+                    inlineTafsir
+                      ? nightMode ? 'bg-amber-500/20 text-amber-300' : 'bg-primary/15 text-primary'
+                      : nightMode ? 'bg-amber-900/15 text-amber-400/60' : 'bg-secondary text-muted-foreground'
+                  }`}>
+                  <BookOpen className="w-3.5 h-3.5" />
+                  {inlineTafsir ? 'التفسير مفعّل' : 'إظهار التفسير'}
+                </button>
+                <button onClick={() => setSmoothing(v => !v)}
+                  className={`flex items-center justify-center gap-1.5 py-2 rounded-xl text-[11px] font-semibold transition-colors ${
+                    smoothing
+                      ? nightMode ? 'bg-amber-500/20 text-amber-300' : 'bg-primary/15 text-primary'
+                      : nightMode ? 'bg-amber-900/15 text-amber-400/60' : 'bg-secondary text-muted-foreground'
+                  }`}>
+                  <Sparkles className="w-3.5 h-3.5" />
+                  {smoothing ? 'نعومة مفعّلة' : 'نعومة العرض'}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Hint */}
         <p className="text-center text-[10px] text-muted-foreground mb-2">
-          {isAyahPlayerActive ? '🎧 اضغط على آية للانتقال إليها' : '💡 اضغط على أي آية لعرض التفسير'}
+          {isAyahPlayerActive
+            ? 'اضغط على آية للانتقال إليها'
+            : inlineTafsir
+              ? 'اضغط على أي آية لإظهار/إخفاء التفسير تحتها'
+              : 'اضغط على أي آية لعرض التفسير'}
         </p>
 
         {/* Page Content */}
