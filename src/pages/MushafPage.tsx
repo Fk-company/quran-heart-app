@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ChevronRight, ChevronLeft, BookOpen, ArrowRight, Moon, Sun, Mic, Play, Pause, X, SkipBack, SkipForward, Square, Volume2, Bookmark, BookmarkCheck, Repeat, Minus, Plus } from 'lucide-react';
+import { ChevronRight, ChevronLeft, BookOpen, ArrowRight, Moon, Sun, Mic, Play, Pause, X, SkipBack, SkipForward, Square, Volume2, Bookmark, BookmarkCheck, Repeat, Minus, Plus, Type, AlignJustify, Sparkles, Settings2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { fetchReciters, type Reciter } from '@/lib/api';
 import MushafSearch from '@/components/MushafSearch';
@@ -174,7 +174,18 @@ const MushafPage: React.FC = () => {
   const { play, pause, currentTrack, isPlaying } = useAudioPlayer();
   const ayahPlayer = useAyahByAyahPlayer();
   const { bookmarks, isBookmarked, toggleBookmark } = useBookmarks();
-  const { settings } = useSettings();
+  const { settings, updateSetting } = useSettings();
+
+  // Toolbar + reading prefs (persisted locally)
+  const [showToolbar, setShowToolbar] = useState(false);
+  const [lineHeight, setLineHeight] = useState(() => Number(localStorage.getItem('mushaf_lh') || 2.8));
+  const [smoothing, setSmoothing] = useState(() => localStorage.getItem('mushaf_smooth') !== 'false');
+  const [inlineTafsir, setInlineTafsir] = useState(() => localStorage.getItem('mushaf_inline_tafsir') === 'true');
+  const [expandedTafsir, setExpandedTafsir] = useState<Record<number, boolean>>({});
+  const [tafsirMap, setTafsirMap] = useState<Record<number, string>>({});
+  useEffect(() => { localStorage.setItem('mushaf_lh', String(lineHeight)); }, [lineHeight]);
+  useEffect(() => { localStorage.setItem('mushaf_smooth', String(smoothing)); }, [smoothing]);
+  useEffect(() => { localStorage.setItem('mushaf_inline_tafsir', String(inlineTafsir)); }, [inlineTafsir]);
 
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
@@ -235,6 +246,24 @@ const MushafPage: React.FC = () => {
     setSearchParams({ page: String(currentPage) });
     localStorage.setItem('mushaf_last_page', String(currentPage));
   }, [currentPage, fetchPage, setSearchParams]);
+
+  // Fetch tafsir for the page when inline mode is on
+  useEffect(() => {
+    if (!inlineTafsir || ayahs.length === 0) return;
+    setExpandedTafsir({});
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`https://api.alquran.cloud/v1/page/${currentPage}/ar.muyassar`);
+        const data = await res.json();
+        if (cancelled) return;
+        const map: Record<number, string> = {};
+        (data.data?.ayahs || []).forEach((a: any) => { map[a.number] = a.text; });
+        setTafsirMap(map);
+      } catch (e) { console.error(e); }
+    })();
+    return () => { cancelled = true; };
+  }, [inlineTafsir, currentPage, ayahs]);
 
   useEffect(() => {
     if (!searchParams.get('page')) {
@@ -334,6 +363,8 @@ const MushafPage: React.FC = () => {
       }));
       setCurrentRepeat(1);
       ayahPlayer.playFromAyah(queue, ayah.number);
+    } else if (inlineTafsir) {
+      setExpandedTafsir(prev => ({ ...prev, [ayah.number]: !prev[ayah.number] }));
     } else {
       setSelectedAyah(ayah);
     }
@@ -516,9 +547,91 @@ const MushafPage: React.FC = () => {
           ))}
         </div>
 
+        {/* Reading Toolbar */}
+        <div className={`card-surface mb-3 ${nightMode ? 'bg-[hsl(220,18%,10%)] border-amber-700/30' : ''}`}>
+          <button onClick={() => setShowToolbar(s => !s)}
+            className="w-full flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${nightMode ? 'bg-amber-500/15 text-amber-300' : 'bg-primary/10 text-primary'}`}>
+                <Settings2 className="w-3.5 h-3.5" />
+              </div>
+              <span className={`text-xs font-bold ${nightMode ? 'text-amber-100' : 'text-foreground'}`}>أدوات القراءة</span>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full ${nightMode ? 'bg-amber-900/30 text-amber-400/70' : 'bg-secondary text-muted-foreground'}`}>
+                {settings.mushafFontSize}px · ×{lineHeight.toFixed(1)}
+              </span>
+              {inlineTafsir && (
+                <span className={`text-[10px] px-2 py-0.5 rounded-full ${nightMode ? 'bg-amber-500/20 text-amber-300' : 'bg-primary/15 text-primary'}`}>
+                  تفسير
+                </span>
+              )}
+            </div>
+            {showToolbar ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+          </button>
+
+          {showToolbar && (
+            <div className="mt-3 pt-3 border-t border-border space-y-3 animate-fade-in">
+              {/* Font size */}
+              <div className="flex items-center gap-2">
+                <Type className={`w-3.5 h-3.5 ${nightMode ? 'text-amber-300' : 'text-primary'}`} />
+                <span className={`text-[11px] font-semibold flex-1 ${nightMode ? 'text-amber-100' : 'text-foreground'}`}>حجم الخط</span>
+                <button onClick={() => updateSetting('mushafFontSize', Math.max(16, settings.mushafFontSize - 2))}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${nightMode ? 'bg-amber-900/20 text-amber-300' : 'bg-secondary text-foreground'}`}>
+                  <Minus className="w-3.5 h-3.5" />
+                </button>
+                <span className={`text-xs font-bold min-w-[3rem] text-center ${nightMode ? 'text-amber-300' : 'text-primary'}`}>{settings.mushafFontSize}px</span>
+                <button onClick={() => updateSetting('mushafFontSize', Math.min(40, settings.mushafFontSize + 2))}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${nightMode ? 'bg-amber-900/20 text-amber-300' : 'bg-secondary text-foreground'}`}>
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Line height */}
+              <div className="flex items-center gap-2">
+                <AlignJustify className={`w-3.5 h-3.5 ${nightMode ? 'text-amber-300' : 'text-primary'}`} />
+                <span className={`text-[11px] font-semibold flex-1 ${nightMode ? 'text-amber-100' : 'text-foreground'}`}>تباعد الأسطر</span>
+                <button onClick={() => setLineHeight(v => Math.max(2.0, +(v - 0.2).toFixed(1)))}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${nightMode ? 'bg-amber-900/20 text-amber-300' : 'bg-secondary text-foreground'}`}>
+                  <Minus className="w-3.5 h-3.5" />
+                </button>
+                <span className={`text-xs font-bold min-w-[3rem] text-center ${nightMode ? 'text-amber-300' : 'text-primary'}`}>×{lineHeight.toFixed(1)}</span>
+                <button onClick={() => setLineHeight(v => Math.min(4.0, +(v + 0.2).toFixed(1)))}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${nightMode ? 'bg-amber-900/20 text-amber-300' : 'bg-secondary text-foreground'}`}>
+                  <Plus className="w-3.5 h-3.5" />
+                </button>
+              </div>
+
+              {/* Toggles */}
+              <div className="grid grid-cols-2 gap-2">
+                <button onClick={() => setInlineTafsir(v => !v)}
+                  className={`flex items-center justify-center gap-1.5 py-2 rounded-xl text-[11px] font-semibold transition-colors ${
+                    inlineTafsir
+                      ? nightMode ? 'bg-amber-500/20 text-amber-300' : 'bg-primary/15 text-primary'
+                      : nightMode ? 'bg-amber-900/15 text-amber-400/60' : 'bg-secondary text-muted-foreground'
+                  }`}>
+                  <BookOpen className="w-3.5 h-3.5" />
+                  {inlineTafsir ? 'التفسير مفعّل' : 'إظهار التفسير'}
+                </button>
+                <button onClick={() => setSmoothing(v => !v)}
+                  className={`flex items-center justify-center gap-1.5 py-2 rounded-xl text-[11px] font-semibold transition-colors ${
+                    smoothing
+                      ? nightMode ? 'bg-amber-500/20 text-amber-300' : 'bg-primary/15 text-primary'
+                      : nightMode ? 'bg-amber-900/15 text-amber-400/60' : 'bg-secondary text-muted-foreground'
+                  }`}>
+                  <Sparkles className="w-3.5 h-3.5" />
+                  {smoothing ? 'نعومة مفعّلة' : 'نعومة العرض'}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Hint */}
         <p className="text-center text-[10px] text-muted-foreground mb-2">
-          {isAyahPlayerActive ? '🎧 اضغط على آية للانتقال إليها' : '💡 اضغط على أي آية لعرض التفسير'}
+          {isAyahPlayerActive
+            ? 'اضغط على آية للانتقال إليها'
+            : inlineTafsir
+              ? 'اضغط على أي آية لإظهار/إخفاء التفسير تحتها'
+              : 'اضغط على أي آية لعرض التفسير'}
         </p>
 
         {/* Page Content */}
@@ -552,49 +665,129 @@ const MushafPage: React.FC = () => {
                 <div className="mushaf-bismillah">بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</div>
               )}
 
-              <p className={`font-amiri leading-[2.6] sm:leading-[2.8] text-center text-justify ${nightMode ? 'mushaf-night-text' : 'text-foreground'}`}
-                style={{ textAlignLast: 'center', fontSize: settings.mushafFontSize }}>
-                {ayahs.map((ayah, idx) => {
-                  const showSurahHeader = ayah.numberInSurah === 1 && idx > 0;
-                  const isHighlighted = ayahPlayer.playingAyahNumber === ayah.number;
-
-                  return (
-                    <React.Fragment key={ayah.number}>
-                      {showSurahHeader && (
-                        <>
-                          <br />
-                          <span className="block my-3">
-                            <span className="mushaf-surah-banner inline-block w-full">
+              {inlineTafsir ? (
+                /* ===== Inline Tafsir Mode — ayah-by-ayah with tafsir card under each ===== */
+                <div className="space-y-3">
+                  {ayahs.map((ayah, idx) => {
+                    const showSurahHeader = ayah.numberInSurah === 1 && idx > 0;
+                    const isHighlighted = ayahPlayer.playingAyahNumber === ayah.number;
+                    const isExpanded = expandedTafsir[ayah.number];
+                    const tafsirText = tafsirMap[ayah.number];
+                    return (
+                      <React.Fragment key={ayah.number}>
+                        {showSurahHeader && (
+                          <div className="my-3">
+                            <div className="mushaf-surah-banner">
                               <span className="name">سورة {ayah.surah.name}</span>
                               <span className="meta">{ayah.surah.englishName} · رقم {ayah.surah.number}</span>
-                            </span>
-                          </span>
-                          {ayah.surah.number !== 9 && (
-                            <span className="mushaf-bismillah block">بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</span>
-                          )}
-                        </>
-                      )}
-                      <span
-                        className={`mushaf-ayah-text cursor-pointer transition-all duration-300 ${
+                            </div>
+                            {ayah.surah.number !== 9 && (
+                              <div className="mushaf-bismillah">بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</div>
+                            )}
+                          </div>
+                        )}
+                        <div className={`rounded-xl p-3 transition-colors ${
                           isHighlighted
-                            ? nightMode ? 'ayah-highlighted-night' : 'ayah-highlighted'
-                            : 'hover:underline decoration-primary/30 underline-offset-4'
-                        }`}
-                        onClick={(e) => { e.stopPropagation(); handleAyahClick(ayah); }}
-                      >{ayah.text}</span>{' '}
-                      <span className={`verse-number inline-flex w-6 h-6 text-[10px] mx-0.5 align-middle transition-all duration-300 ${
-                        isHighlighted
-                          ? nightMode
-                            ? 'bg-amber-500/30 text-amber-200 border-amber-400/50 scale-110'
-                            : 'bg-primary/20 text-primary border-primary/40 scale-110'
-                          : nightMode ? 'mushaf-night-verse' : ''
-                      }`}>
-                        {ayah.numberInSurah}
-                      </span>{' '}
-                    </React.Fragment>
-                  );
-                })}
-              </p>
+                            ? nightMode ? 'bg-amber-500/10 ring-1 ring-amber-400/40' : 'bg-primary/5 ring-1 ring-primary/20'
+                            : 'hover:bg-secondary/40'
+                        }`}>
+                          <div className="flex items-start gap-2">
+                            <span className={`verse-number flex-shrink-0 mt-1 ${nightMode ? 'mushaf-night-verse' : ''}`}>
+                              {ayah.numberInSurah}
+                            </span>
+                            <p
+                              onClick={() => handleAyahClick(ayah)}
+                              className={`font-amiri flex-1 cursor-pointer ${nightMode ? 'mushaf-night-text' : 'text-foreground'}`}
+                              style={{
+                                fontSize: settings.mushafFontSize,
+                                lineHeight,
+                                WebkitFontSmoothing: smoothing ? 'antialiased' : 'auto',
+                                MozOsxFontSmoothing: smoothing ? 'grayscale' : 'auto',
+                                textRendering: smoothing ? 'optimizeLegibility' : 'auto',
+                                wordSpacing: '0.05em',
+                              }}
+                            >
+                              {ayah.text}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => setExpandedTafsir(p => ({ ...p, [ayah.number]: !p[ayah.number] }))}
+                            className={`mt-2 flex items-center gap-1.5 text-[11px] font-semibold ${nightMode ? 'text-amber-300' : 'text-primary'}`}
+                          >
+                            <BookOpen className="w-3 h-3" />
+                            {isExpanded ? 'إخفاء التفسير' : 'عرض التفسير'}
+                            {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                          </button>
+                          {isExpanded && (
+                            <div className={`mt-2 p-3 rounded-lg text-[13px] leading-relaxed animate-fade-in ${
+                              nightMode
+                                ? 'bg-amber-900/15 text-amber-100/90 border border-amber-700/20'
+                                : 'bg-secondary/60 text-foreground border border-border'
+                            }`}>
+                              {tafsirText || 'جاري تحميل التفسير...'}
+                            </div>
+                          )}
+                        </div>
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* ===== Classic Continuous Page Mode — flowing text like a real Mushaf ===== */
+                <p className={`font-amiri text-center text-justify ${nightMode ? 'mushaf-night-text' : 'text-foreground'}`}
+                  style={{
+                    textAlignLast: 'center',
+                    fontSize: settings.mushafFontSize,
+                    lineHeight,
+                    wordSpacing: '0.05em',
+                    hyphens: 'none',
+                    WebkitFontSmoothing: smoothing ? 'antialiased' : 'auto',
+                    MozOsxFontSmoothing: smoothing ? 'grayscale' : 'auto',
+                    textRendering: smoothing ? 'optimizeLegibility' : 'auto',
+                  }}>
+                  {ayahs.map((ayah, idx) => {
+                    const showSurahHeader = ayah.numberInSurah === 1 && idx > 0;
+                    const isHighlighted = ayahPlayer.playingAyahNumber === ayah.number;
+
+                    return (
+                      <React.Fragment key={ayah.number}>
+                        {showSurahHeader && (
+                          <>
+                            <br />
+                            <span className="block my-3">
+                              <span className="mushaf-surah-banner inline-block w-full">
+                                <span className="name">سورة {ayah.surah.name}</span>
+                                <span className="meta">{ayah.surah.englishName} · رقم {ayah.surah.number}</span>
+                              </span>
+                            </span>
+                            {ayah.surah.number !== 9 && (
+                              <span className="mushaf-bismillah block">بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</span>
+                            )}
+                          </>
+                        )}
+                        <span
+                          className={`mushaf-ayah-text cursor-pointer transition-all duration-300 ${
+                            isHighlighted
+                              ? nightMode ? 'ayah-highlighted-night' : 'ayah-highlighted'
+                              : 'hover:underline decoration-primary/30 underline-offset-4'
+                          }`}
+                          style={{ whiteSpace: 'normal', wordBreak: 'keep-all' }}
+                          onClick={(e) => { e.stopPropagation(); handleAyahClick(ayah); }}
+                        >{ayah.text}</span>{' '}
+                        <span className={`verse-number inline-flex w-6 h-6 text-[10px] mx-0.5 align-middle transition-all duration-300 ${
+                          isHighlighted
+                            ? nightMode
+                              ? 'bg-amber-500/30 text-amber-200 border-amber-400/50 scale-110'
+                              : 'bg-primary/20 text-primary border-primary/40 scale-110'
+                            : nightMode ? 'mushaf-night-verse' : ''
+                        }`}>
+                          {ayah.numberInSurah}
+                        </span>{' '}
+                      </React.Fragment>
+                    );
+                  })}
+                </p>
+              )}
             </div>
 
             <div className="mushaf-page-foot">
@@ -603,28 +796,43 @@ const MushafPage: React.FC = () => {
           </div>
         )}
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between mt-5 mb-4">
-          <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage >= TOTAL_PAGES}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium disabled:opacity-40 transition-colors">
-            <ChevronRight className="w-4 h-4" />التالية
-          </button>
-          <div className="flex items-center gap-1">
+        {/* Navigation — clear prev/next with progress dots */}
+        <div className="mt-5 mb-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage >= TOTAL_PAGES}
+              className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-2xl text-sm font-bold shadow-sm transition-all active:scale-95 disabled:opacity-40 ${
+                nightMode ? 'bg-amber-500/15 text-amber-200 border border-amber-700/30' : 'bg-secondary text-foreground border border-border'
+              }`}>
+              <ChevronRight className="w-5 h-5" />
+              الصفحة التالية
+            </button>
+            <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage <= 1}
+              className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-2xl text-sm font-bold shadow-md transition-all active:scale-95 disabled:opacity-40 ${
+                nightMode ? 'bg-amber-500/25 text-amber-100 border border-amber-500/40' : 'gradient-primary text-primary-foreground'
+              }`}>
+              الصفحة السابقة
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-center gap-1.5">
             {[currentPage - 2, currentPage - 1, currentPage, currentPage + 1, currentPage + 2]
               .filter(p => p >= 1 && p <= TOTAL_PAGES).map(p => (
                 <button key={p} onClick={() => goToPage(p)}
-                  className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${p === currentPage ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-muted'}`}>
+                  className={`min-w-[2.25rem] h-9 px-2 rounded-lg text-xs font-bold transition-all ${
+                    p === currentPage
+                      ? nightMode ? 'bg-amber-500/30 text-amber-100 scale-110 shadow' : 'bg-primary text-primary-foreground scale-110 shadow'
+                      : nightMode ? 'bg-amber-900/20 text-amber-300/70 hover:bg-amber-900/30' : 'bg-secondary text-secondary-foreground hover:bg-muted'
+                  }`}>
                   {p}
                 </button>
               ))}
           </div>
-          <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage <= 1}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium disabled:opacity-40 transition-colors">
-            السابقة<ChevronLeft className="w-4 h-4" />
-          </button>
         </div>
 
-        <p className="text-center text-[10px] text-muted-foreground mb-4">اسحب يميناً أو يساراً للتنقل بين الصفحات</p>
+        <p className={`text-center text-[10px] mb-4 ${nightMode ? 'text-amber-400/50' : 'text-muted-foreground'}`}>
+          اسحب يميناً أو يساراً للتنقل بين الصفحات
+        </p>
       </div>
 
       {/* Tafsir Modal */}
