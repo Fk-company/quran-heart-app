@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ChevronRight, ChevronLeft, BookOpen, ArrowRight, Moon, Sun, Mic, Play, Pause, X, SkipBack, SkipForward, Square, Volume2, Bookmark, BookmarkCheck, Repeat, Minus, Plus } from 'lucide-react';
+import { ChevronRight, ChevronLeft, BookOpen, ArrowRight, Moon, Sun, Mic, Play, Pause, X, SkipBack, SkipForward, Square, Volume2, Bookmark, BookmarkCheck, Repeat, Minus, Plus, Type, AlignJustify, Sparkles, Settings2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { fetchReciters, type Reciter } from '@/lib/api';
 import MushafSearch from '@/components/MushafSearch';
