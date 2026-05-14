@@ -665,49 +665,129 @@ const MushafPage: React.FC = () => {
                 <div className="mushaf-bismillah">بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</div>
               )}
 
-              <p className={`font-amiri leading-[2.6] sm:leading-[2.8] text-center text-justify ${nightMode ? 'mushaf-night-text' : 'text-foreground'}`}
-                style={{ textAlignLast: 'center', fontSize: settings.mushafFontSize }}>
-                {ayahs.map((ayah, idx) => {
-                  const showSurahHeader = ayah.numberInSurah === 1 && idx > 0;
-                  const isHighlighted = ayahPlayer.playingAyahNumber === ayah.number;
-
-                  return (
-                    <React.Fragment key={ayah.number}>
-                      {showSurahHeader && (
-                        <>
-                          <br />
-                          <span className="block my-3">
-                            <span className="mushaf-surah-banner inline-block w-full">
+              {inlineTafsir ? (
+                /* ===== Inline Tafsir Mode — ayah-by-ayah with tafsir card under each ===== */
+                <div className="space-y-3">
+                  {ayahs.map((ayah, idx) => {
+                    const showSurahHeader = ayah.numberInSurah === 1 && idx > 0;
+                    const isHighlighted = ayahPlayer.playingAyahNumber === ayah.number;
+                    const isExpanded = expandedTafsir[ayah.number];
+                    const tafsirText = tafsirMap[ayah.number];
+                    return (
+                      <React.Fragment key={ayah.number}>
+                        {showSurahHeader && (
+                          <div className="my-3">
+                            <div className="mushaf-surah-banner">
                               <span className="name">سورة {ayah.surah.name}</span>
                               <span className="meta">{ayah.surah.englishName} · رقم {ayah.surah.number}</span>
-                            </span>
-                          </span>
-                          {ayah.surah.number !== 9 && (
-                            <span className="mushaf-bismillah block">بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</span>
-                          )}
-                        </>
-                      )}
-                      <span
-                        className={`mushaf-ayah-text cursor-pointer transition-all duration-300 ${
+                            </div>
+                            {ayah.surah.number !== 9 && (
+                              <div className="mushaf-bismillah">بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</div>
+                            )}
+                          </div>
+                        )}
+                        <div className={`rounded-xl p-3 transition-colors ${
                           isHighlighted
-                            ? nightMode ? 'ayah-highlighted-night' : 'ayah-highlighted'
-                            : 'hover:underline decoration-primary/30 underline-offset-4'
-                        }`}
-                        onClick={(e) => { e.stopPropagation(); handleAyahClick(ayah); }}
-                      >{ayah.text}</span>{' '}
-                      <span className={`verse-number inline-flex w-6 h-6 text-[10px] mx-0.5 align-middle transition-all duration-300 ${
-                        isHighlighted
-                          ? nightMode
-                            ? 'bg-amber-500/30 text-amber-200 border-amber-400/50 scale-110'
-                            : 'bg-primary/20 text-primary border-primary/40 scale-110'
-                          : nightMode ? 'mushaf-night-verse' : ''
-                      }`}>
-                        {ayah.numberInSurah}
-                      </span>{' '}
-                    </React.Fragment>
-                  );
-                })}
-              </p>
+                            ? nightMode ? 'bg-amber-500/10 ring-1 ring-amber-400/40' : 'bg-primary/5 ring-1 ring-primary/20'
+                            : 'hover:bg-secondary/40'
+                        }`}>
+                          <div className="flex items-start gap-2">
+                            <span className={`verse-number flex-shrink-0 mt-1 ${nightMode ? 'mushaf-night-verse' : ''}`}>
+                              {ayah.numberInSurah}
+                            </span>
+                            <p
+                              onClick={() => handleAyahClick(ayah)}
+                              className={`font-amiri flex-1 cursor-pointer ${nightMode ? 'mushaf-night-text' : 'text-foreground'}`}
+                              style={{
+                                fontSize: settings.mushafFontSize,
+                                lineHeight,
+                                WebkitFontSmoothing: smoothing ? 'antialiased' : 'auto',
+                                MozOsxFontSmoothing: smoothing ? 'grayscale' : 'auto',
+                                textRendering: smoothing ? 'optimizeLegibility' : 'auto',
+                                wordSpacing: '0.05em',
+                              }}
+                            >
+                              {ayah.text}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => setExpandedTafsir(p => ({ ...p, [ayah.number]: !p[ayah.number] }))}
+                            className={`mt-2 flex items-center gap-1.5 text-[11px] font-semibold ${nightMode ? 'text-amber-300' : 'text-primary'}`}
+                          >
+                            <BookOpen className="w-3 h-3" />
+                            {isExpanded ? 'إخفاء التفسير' : 'عرض التفسير'}
+                            {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                          </button>
+                          {isExpanded && (
+                            <div className={`mt-2 p-3 rounded-lg text-[13px] leading-relaxed animate-fade-in ${
+                              nightMode
+                                ? 'bg-amber-900/15 text-amber-100/90 border border-amber-700/20'
+                                : 'bg-secondary/60 text-foreground border border-border'
+                            }`}>
+                              {tafsirText || 'جاري تحميل التفسير...'}
+                            </div>
+                          )}
+                        </div>
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* ===== Classic Continuous Page Mode — flowing text like a real Mushaf ===== */
+                <p className={`font-amiri text-center text-justify ${nightMode ? 'mushaf-night-text' : 'text-foreground'}`}
+                  style={{
+                    textAlignLast: 'center',
+                    fontSize: settings.mushafFontSize,
+                    lineHeight,
+                    wordSpacing: '0.05em',
+                    hyphens: 'none',
+                    WebkitFontSmoothing: smoothing ? 'antialiased' : 'auto',
+                    MozOsxFontSmoothing: smoothing ? 'grayscale' : 'auto',
+                    textRendering: smoothing ? 'optimizeLegibility' : 'auto',
+                  }}>
+                  {ayahs.map((ayah, idx) => {
+                    const showSurahHeader = ayah.numberInSurah === 1 && idx > 0;
+                    const isHighlighted = ayahPlayer.playingAyahNumber === ayah.number;
+
+                    return (
+                      <React.Fragment key={ayah.number}>
+                        {showSurahHeader && (
+                          <>
+                            <br />
+                            <span className="block my-3">
+                              <span className="mushaf-surah-banner inline-block w-full">
+                                <span className="name">سورة {ayah.surah.name}</span>
+                                <span className="meta">{ayah.surah.englishName} · رقم {ayah.surah.number}</span>
+                              </span>
+                            </span>
+                            {ayah.surah.number !== 9 && (
+                              <span className="mushaf-bismillah block">بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</span>
+                            )}
+                          </>
+                        )}
+                        <span
+                          className={`mushaf-ayah-text cursor-pointer transition-all duration-300 ${
+                            isHighlighted
+                              ? nightMode ? 'ayah-highlighted-night' : 'ayah-highlighted'
+                              : 'hover:underline decoration-primary/30 underline-offset-4'
+                          }`}
+                          style={{ whiteSpace: 'normal', wordBreak: 'keep-all' }}
+                          onClick={(e) => { e.stopPropagation(); handleAyahClick(ayah); }}
+                        >{ayah.text}</span>{' '}
+                        <span className={`verse-number inline-flex w-6 h-6 text-[10px] mx-0.5 align-middle transition-all duration-300 ${
+                          isHighlighted
+                            ? nightMode
+                              ? 'bg-amber-500/30 text-amber-200 border-amber-400/50 scale-110'
+                              : 'bg-primary/20 text-primary border-primary/40 scale-110'
+                            : nightMode ? 'mushaf-night-verse' : ''
+                        }`}>
+                          {ayah.numberInSurah}
+                        </span>{' '}
+                      </React.Fragment>
+                    );
+                  })}
+                </p>
+              )}
             </div>
 
             <div className="mushaf-page-foot">
