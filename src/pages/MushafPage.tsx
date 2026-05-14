@@ -779,6 +779,7 @@ const MushafPage: React.FC = () => {
                           </>
                         )}
                         <span
+                          data-ayah-num={ayah.number}
                           className={`mushaf-ayah-text cursor-pointer transition-all duration-300 ${
                             isHighlighted
                               ? nightMode ? 'ayah-highlighted-night' : 'ayah-highlighted'
