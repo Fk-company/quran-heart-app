@@ -297,6 +297,19 @@ const MushafPage: React.FC = () => {
     }
   }, [currentTrack?.id, isPlaying]);
 
+  // Sync inline tafsir + scroll with currently playing ayah
+  useEffect(() => {
+    const num = ayahPlayer.playingAyahNumber;
+    if (num === null) return;
+    if (inlineTafsir) {
+      setExpandedTafsir(prev => (prev[num] ? prev : { ...prev, [num]: true }));
+    }
+    requestAnimationFrame(() => {
+      const el = document.querySelector(`[data-ayah-num="${num}"]`) as HTMLElement | null;
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }, [ayahPlayer.playingAyahNumber, inlineTafsir]);
+
   const goToPage = (p: number) => { if (p >= 1 && p <= TOTAL_PAGES) setCurrentPage(p); };
 
   const handleJump = () => {
@@ -686,7 +699,7 @@ const MushafPage: React.FC = () => {
                             )}
                           </div>
                         )}
-                        <div className={`rounded-xl p-3 transition-colors ${
+                        <div data-ayah-num={ayah.number} className={`rounded-xl p-3 transition-colors ${
                           isHighlighted
                             ? nightMode ? 'bg-amber-500/10 ring-1 ring-amber-400/40' : 'bg-primary/5 ring-1 ring-primary/20'
                             : 'hover:bg-secondary/40'
@@ -766,6 +779,7 @@ const MushafPage: React.FC = () => {
                           </>
                         )}
                         <span
+                          data-ayah-num={ayah.number}
                           className={`mushaf-ayah-text cursor-pointer transition-all duration-300 ${
                             isHighlighted
                               ? nightMode ? 'ayah-highlighted-night' : 'ayah-highlighted'
