@@ -523,20 +523,35 @@ const MushafPage: React.FC = () => {
 
         {/* Page Content */}
         {loading ? (
-          <div className="mushaf-page-frame"><div className="space-y-3 p-6">
-            {Array.from({ length: 8 }).map((_, i) => <div key={i} className="skeleton-pulse h-6 w-full" />)}
-          </div></div>
+          <div className="mushaf-page-frame">
+            <span className="mushaf-corner tl" /><span className="mushaf-corner tr" />
+            <span className="mushaf-corner bl" /><span className="mushaf-corner br" />
+            <div className="space-y-3 p-6">
+              {Array.from({ length: 8 }).map((_, i) => <div key={i} className="skeleton-pulse h-6 w-full" />)}
+            </div>
+          </div>
         ) : (
           <div className={`mushaf-page-frame ${nightMode ? 'mushaf-night-frame' : ''} animate-fade-in`} key={currentPage}>
-            <div className="mushaf-ornament-top" />
-            <div className="px-5 py-6 sm:px-8 sm:py-8">
-              {ayahs.length > 0 && ayahs[0].numberInSurah === 1 && ayahs[0].surah.number !== 1 && ayahs[0].surah.number !== 9 && (
-                <div className="text-center mb-5 pb-4 border-b border-primary/10">
-                  <span className={`font-amiri text-xl leading-relaxed ${nightMode ? 'text-amber-300' : 'text-primary'}`}>
-                    بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ
-                  </span>
+            <span className="mushaf-corner tl" /><span className="mushaf-corner tr" />
+            <span className="mushaf-corner bl" /><span className="mushaf-corner br" />
+
+            <div className="mushaf-page-head">
+              <span className="h-side">{ayahs[0]?.surah.name || ''}</span>
+              <span className="h-center">الجزء {juzNumber}</span>
+              <span className="h-side">حزب {Math.ceil(currentPage / 10) || 1}</span>
+            </div>
+
+            <div className="px-4 sm:px-6 pb-2">
+              {ayahs.length > 0 && ayahs[0].numberInSurah === 1 && (
+                <div className="mushaf-surah-banner">
+                  <span className="name">سورة {ayahs[0].surah.name}</span>
+                  <span className="meta">{ayahs[0].surah.englishName} · رقم {ayahs[0].surah.number}</span>
                 </div>
               )}
+              {ayahs.length > 0 && ayahs[0].numberInSurah === 1 && ayahs[0].surah.number !== 1 && ayahs[0].surah.number !== 9 && (
+                <div className="mushaf-bismillah">بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</div>
+              )}
+
               <p className={`font-amiri leading-[2.6] sm:leading-[2.8] text-center text-justify ${nightMode ? 'mushaf-night-text' : 'text-foreground'}`}
                 style={{ textAlignLast: 'center', fontSize: settings.mushafFontSize }}>
                 {ayahs.map((ayah, idx) => {
@@ -548,22 +563,21 @@ const MushafPage: React.FC = () => {
                       {showSurahHeader && (
                         <>
                           <br />
-                          <span className={`block text-center my-4 py-3 px-4 rounded-xl ${nightMode ? 'bg-amber-900/20 border border-amber-700/20' : 'bg-primary/5 border border-primary/10'}`}>
-                            <span className={`font-amiri text-lg font-bold ${nightMode ? 'text-amber-300' : 'text-primary'}`}>{ayah.surah.name}</span>
+                          <span className="block my-3">
+                            <span className="mushaf-surah-banner inline-block w-full">
+                              <span className="name">سورة {ayah.surah.name}</span>
+                              <span className="meta">{ayah.surah.englishName} · رقم {ayah.surah.number}</span>
+                            </span>
                           </span>
                           {ayah.surah.number !== 9 && (
-                            <span className="block text-center mb-4">
-                              <span className={`font-amiri text-lg ${nightMode ? 'text-amber-300' : 'text-primary'}`}>بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</span>
-                            </span>
+                            <span className="mushaf-bismillah block">بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</span>
                           )}
                         </>
                       )}
                       <span
                         className={`mushaf-ayah-text cursor-pointer transition-all duration-300 ${
                           isHighlighted
-                            ? nightMode
-                              ? 'ayah-highlighted-night'
-                              : 'ayah-highlighted'
+                            ? nightMode ? 'ayah-highlighted-night' : 'ayah-highlighted'
                             : 'hover:underline decoration-primary/30 underline-offset-4'
                         }`}
                         onClick={(e) => { e.stopPropagation(); handleAyahClick(ayah); }}
@@ -582,9 +596,9 @@ const MushafPage: React.FC = () => {
                 })}
               </p>
             </div>
-            <div className="mushaf-ornament-bottom" />
-            <div className="text-center py-2">
-              <span className={`text-xs font-medium ${nightMode ? 'text-amber-400/60' : 'text-muted-foreground'}`}>{currentPage}</span>
+
+            <div className="mushaf-page-foot">
+              <span className="mushaf-page-number">{currentPage}</span>
             </div>
           </div>
         )}
