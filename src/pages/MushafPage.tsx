@@ -247,6 +247,24 @@ const MushafPage: React.FC = () => {
     localStorage.setItem('mushaf_last_page', String(currentPage));
   }, [currentPage, fetchPage, setSearchParams]);
 
+  // Fetch tafsir for the page when inline mode is on
+  useEffect(() => {
+    if (!inlineTafsir || ayahs.length === 0) return;
+    setExpandedTafsir({});
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`https://api.alquran.cloud/v1/page/${currentPage}/ar.muyassar`);
+        const data = await res.json();
+        if (cancelled) return;
+        const map: Record<number, string> = {};
+        (data.data?.ayahs || []).forEach((a: any) => { map[a.number] = a.text; });
+        setTafsirMap(map);
+      } catch (e) { console.error(e); }
+    })();
+    return () => { cancelled = true; };
+  }, [inlineTafsir, currentPage, ayahs]);
+
   useEffect(() => {
     if (!searchParams.get('page')) {
       const saved = localStorage.getItem('mushaf_last_page');
