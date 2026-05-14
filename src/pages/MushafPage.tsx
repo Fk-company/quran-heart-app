@@ -699,7 +699,7 @@ const MushafPage: React.FC = () => {
                             )}
                           </div>
                         )}
-                        <div className={`rounded-xl p-3 transition-colors ${
+                        <div data-ayah-num={ayah.number} className={`rounded-xl p-3 transition-colors ${
                           isHighlighted
                             ? nightMode ? 'bg-amber-500/10 ring-1 ring-amber-400/40' : 'bg-primary/5 ring-1 ring-primary/20'
                             : 'hover:bg-secondary/40'
