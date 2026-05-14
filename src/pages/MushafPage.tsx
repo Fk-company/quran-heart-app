@@ -796,28 +796,43 @@ const MushafPage: React.FC = () => {
           </div>
         )}
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between mt-5 mb-4">
-          <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage >= TOTAL_PAGES}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium disabled:opacity-40 transition-colors">
-            <ChevronRight className="w-4 h-4" />التالية
-          </button>
-          <div className="flex items-center gap-1">
+        {/* Navigation — clear prev/next with progress dots */}
+        <div className="mt-5 mb-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage >= TOTAL_PAGES}
+              className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-2xl text-sm font-bold shadow-sm transition-all active:scale-95 disabled:opacity-40 ${
+                nightMode ? 'bg-amber-500/15 text-amber-200 border border-amber-700/30' : 'bg-secondary text-foreground border border-border'
+              }`}>
+              <ChevronRight className="w-5 h-5" />
+              الصفحة التالية
+            </button>
+            <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage <= 1}
+              className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-2xl text-sm font-bold shadow-md transition-all active:scale-95 disabled:opacity-40 ${
+                nightMode ? 'bg-amber-500/25 text-amber-100 border border-amber-500/40' : 'gradient-primary text-primary-foreground'
+              }`}>
+              الصفحة السابقة
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-center gap-1.5">
             {[currentPage - 2, currentPage - 1, currentPage, currentPage + 1, currentPage + 2]
               .filter(p => p >= 1 && p <= TOTAL_PAGES).map(p => (
                 <button key={p} onClick={() => goToPage(p)}
-                  className={`w-8 h-8 rounded-lg text-xs font-medium transition-colors ${p === currentPage ? 'bg-primary text-primary-foreground' : 'bg-secondary text-secondary-foreground hover:bg-muted'}`}>
+                  className={`min-w-[2.25rem] h-9 px-2 rounded-lg text-xs font-bold transition-all ${
+                    p === currentPage
+                      ? nightMode ? 'bg-amber-500/30 text-amber-100 scale-110 shadow' : 'bg-primary text-primary-foreground scale-110 shadow'
+                      : nightMode ? 'bg-amber-900/20 text-amber-300/70 hover:bg-amber-900/30' : 'bg-secondary text-secondary-foreground hover:bg-muted'
+                  }`}>
                   {p}
                 </button>
               ))}
           </div>
-          <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage <= 1}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium disabled:opacity-40 transition-colors">
-            السابقة<ChevronLeft className="w-4 h-4" />
-          </button>
         </div>
 
-        <p className="text-center text-[10px] text-muted-foreground mb-4">اسحب يميناً أو يساراً للتنقل بين الصفحات</p>
+        <p className={`text-center text-[10px] mb-4 ${nightMode ? 'text-amber-400/50' : 'text-muted-foreground'}`}>
+          اسحب يميناً أو يساراً للتنقل بين الصفحات
+        </p>
       </div>
 
       {/* Tafsir Modal */}
