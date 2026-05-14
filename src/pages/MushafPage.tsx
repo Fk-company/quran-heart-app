@@ -174,7 +174,18 @@ const MushafPage: React.FC = () => {
   const { play, pause, currentTrack, isPlaying } = useAudioPlayer();
   const ayahPlayer = useAyahByAyahPlayer();
   const { bookmarks, isBookmarked, toggleBookmark } = useBookmarks();
-  const { settings } = useSettings();
+  const { settings, updateSetting } = useSettings();
+
+  // Toolbar + reading prefs (persisted locally)
+  const [showToolbar, setShowToolbar] = useState(false);
+  const [lineHeight, setLineHeight] = useState(() => Number(localStorage.getItem('mushaf_lh') || 2.8));
+  const [smoothing, setSmoothing] = useState(() => localStorage.getItem('mushaf_smooth') !== 'false');
+  const [inlineTafsir, setInlineTafsir] = useState(() => localStorage.getItem('mushaf_inline_tafsir') === 'true');
+  const [expandedTafsir, setExpandedTafsir] = useState<Record<number, boolean>>({});
+  const [tafsirMap, setTafsirMap] = useState<Record<number, string>>({});
+  useEffect(() => { localStorage.setItem('mushaf_lh', String(lineHeight)); }, [lineHeight]);
+  useEffect(() => { localStorage.setItem('mushaf_smooth', String(smoothing)); }, [smoothing]);
+  useEffect(() => { localStorage.setItem('mushaf_inline_tafsir', String(inlineTafsir)); }, [inlineTafsir]);
 
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
