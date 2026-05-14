@@ -363,6 +363,8 @@ const MushafPage: React.FC = () => {
       }));
       setCurrentRepeat(1);
       ayahPlayer.playFromAyah(queue, ayah.number);
+    } else if (inlineTafsir) {
+      setExpandedTafsir(prev => ({ ...prev, [ayah.number]: !prev[ayah.number] }));
     } else {
       setSelectedAyah(ayah);
     }
