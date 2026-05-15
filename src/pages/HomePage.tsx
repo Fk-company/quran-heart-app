@@ -13,6 +13,7 @@ import { useLastRead } from '@/hooks/useLastRead';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useReadingTracker } from '@/hooks/useReadingTracker';
 import { useFavorites } from '@/hooks/useFavorites';
+import { getCached, setCached } from '@/lib/dataCache';
 
 const prayerIcons: Record<string, React.ElementType> = {
   Fajr: Sunrise, Sunrise: Sun, Dhuhr: CloudSun, Asr: Sun, Maghrib: Sunset, Isha: Moon,
@@ -75,8 +76,9 @@ const HomePage: React.FC = () => {
   const [hijriDate, setHijriDate] = useState('');
   const [gregorianDate, setGregorianDate] = useState('');
   const [locationName, setLocationName] = useState('');
-  const [surahs, setSurahs] = useState<Surah[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cachedHomeSurahs = getCached<Surah[]>('surahs');
+  const [surahs, setSurahs] = useState<Surah[]>(cachedHomeSurahs ?? []);
+  const [loading, setLoading] = useState(!cachedHomeSurahs);
   const [notificationsEnabled, setNotificationsEnabled] = useState(() => localStorage.getItem('notifications_enabled') === 'true');
   const [manualLocation, setManualLocation] = useState<{ city: string; country: string } | null>(() => {
     try { const raw = localStorage.getItem('manual_location'); return raw ? JSON.parse(raw) : null; } catch { return null; }
@@ -143,7 +145,7 @@ const HomePage: React.FC = () => {
     };
 
     const load = async () => {
-      setLoading(true);
+      if (!getCached<Surah[]>('surahs')) setLoading(true);
       try {
         const handlePrayerData = (data: any, locName: string, opts: { cached?: boolean; ts?: number } = {}) => {
           setPrayerTimes(data.timings);
@@ -205,6 +207,7 @@ const HomePage: React.FC = () => {
           handlePrayerData(data, 'مكة المكرمة');
         }
         const surahData = await fetchSurahs();
+        setCached('surahs', surahData);
         setSurahs(surahData);
       } catch (e) { console.error(e); }
       finally { setLoading(false); }
