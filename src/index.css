@@ -218,12 +218,121 @@
   .font-kufi { font-family: 'Reem Kufi', sans-serif; }
 
   .verse-number {
-    @apply inline-flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold;
-    background: radial-gradient(circle at 30% 30%, hsl(var(--gold-light)), hsl(var(--emerald-light)));
+    @apply inline-flex items-center justify-center w-9 h-9 rounded-full text-xs font-bold relative;
+    background:
+      radial-gradient(circle at 30% 30%, hsl(var(--gold-light)) 0%, hsl(var(--gold) / 0.55) 55%, hsl(var(--primary) / 0.25) 100%);
     color: hsl(var(--primary));
     font-family: 'IBM Plex Sans Arabic', sans-serif;
-    border: 1.5px solid hsl(var(--accent) / 0.35);
-    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.1), 0 2px 6px hsl(var(--primary) / 0.1);
+    border: 1.5px solid hsl(var(--gold) / 0.65);
+    box-shadow:
+      0 0 0 2px hsl(var(--background)),
+      0 0 0 3px hsl(var(--gold) / 0.45),
+      0 4px 12px -2px hsl(var(--primary) / 0.25),
+      inset 0 1px 0 hsl(40 80% 98% / 0.7);
+    text-shadow: 0 1px 0 hsl(40 60% 100% / 0.6);
+  }
+  .verse-number::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 9999px;
+    border: 1px dashed hsl(var(--gold) / 0.35);
+    pointer-events: none;
+  }
+
+  /* ===== Luxurious Ayah Card (inline tafsir mode) ===== */
+  .ayah-card {
+    position: relative;
+    border-radius: 18px;
+    padding: 16px 18px 14px;
+    background:
+      linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--gold-light) / 0.18) 100%);
+    border: 1px solid hsl(var(--gold) / 0.28);
+    box-shadow:
+      0 1px 0 hsl(40 70% 100% / 0.6) inset,
+      0 6px 18px -10px hsl(var(--primary) / 0.18);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+  .ayah-card::before {
+    content: '';
+    position: absolute;
+    top: 10px; bottom: 10px;
+    right: 6px;
+    width: 3px;
+    border-radius: 3px;
+    background: linear-gradient(180deg, transparent, hsl(var(--gold) / 0.7), hsl(var(--primary) / 0.6), hsl(var(--gold) / 0.7), transparent);
+  }
+  .ayah-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(var(--gold) / 0.5), transparent);
+  }
+  .ayah-card:hover {
+    transform: translateY(-1px);
+    border-color: hsl(var(--gold) / 0.5);
+    box-shadow:
+      0 1px 0 hsl(40 70% 100% / 0.6) inset,
+      0 10px 28px -12px hsl(var(--primary) / 0.28);
+  }
+  .ayah-card-active {
+    background:
+      linear-gradient(180deg, hsl(var(--primary) / 0.06) 0%, hsl(var(--gold-light) / 0.35) 100%) !important;
+    border-color: hsl(var(--primary) / 0.4) !important;
+    box-shadow:
+      0 0 0 2px hsl(var(--primary) / 0.15),
+      0 12px 32px -10px hsl(var(--primary) / 0.3) !important;
+  }
+  .mushaf-night .ayah-card {
+    background: linear-gradient(180deg, hsl(222 22% 10%) 0%, hsl(32 40% 12% / 0.4) 100%);
+    border-color: hsl(32 60% 35% / 0.35);
+    box-shadow: 0 6px 18px -10px hsl(0 0% 0% / 0.6);
+  }
+  .mushaf-night .ayah-card::before {
+    background: linear-gradient(180deg, transparent, hsl(38 70% 55% / 0.7), hsl(38 70% 55% / 0.5), transparent);
+  }
+  .mushaf-night .ayah-card-active {
+    background: linear-gradient(180deg, hsl(32 60% 25% / 0.3) 0%, hsl(32 60% 18% / 0.4) 100%) !important;
+    border-color: hsl(38 70% 55% / 0.5) !important;
+    box-shadow: 0 0 0 2px hsl(38 70% 55% / 0.2), 0 12px 32px -10px hsl(38 70% 30% / 0.4) !important;
+  }
+
+  .ayah-tafsir-box {
+    position: relative;
+    margin-top: 12px;
+    padding: 14px 16px 14px 16px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, hsl(var(--secondary) / 0.5), hsl(var(--gold-light) / 0.15));
+    border: 1px solid hsl(var(--gold) / 0.22);
+    font-size: 13.5px;
+    line-height: 1.85;
+    color: hsl(var(--foreground));
+  }
+  .ayah-tafsir-box::before {
+    content: 'التفسير الميسّر';
+    position: absolute;
+    top: -9px;
+    right: 14px;
+    padding: 2px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    color: hsl(var(--primary));
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--gold) / 0.4);
+    border-radius: 9999px;
+    letter-spacing: 0.3px;
+  }
+  .mushaf-night .ayah-tafsir-box {
+    background: linear-gradient(180deg, hsl(222 22% 8%), hsl(32 40% 12% / 0.3));
+    border-color: hsl(32 60% 35% / 0.35);
+    color: hsl(38 60% 78%);
+  }
+  .mushaf-night .ayah-tafsir-box::before {
+    background: hsl(222 22% 9%);
+    color: hsl(38 70% 65%);
+    border-color: hsl(32 60% 40% / 0.5);
   }
 
   /* ===== Cards ===== */
