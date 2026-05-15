@@ -648,7 +648,7 @@ const MushafPage: React.FC = () => {
         </p>
 
         {/* Page Content */}
-        {loading ? (
+        {loading && ayahs.length === 0 ? (
           <div className="mushaf-page-frame">
             <span className="mushaf-corner tl" /><span className="mushaf-corner tr" />
             <span className="mushaf-corner bl" /><span className="mushaf-corner br" />
