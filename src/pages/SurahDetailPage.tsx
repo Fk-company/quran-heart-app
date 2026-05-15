@@ -6,16 +6,19 @@ import { useLastRead } from '@/hooks/useLastRead';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useReadingTracker } from '@/hooks/useReadingTracker';
 import { ArrowRight, BookOpen, Play, Pause, Mic, Heart, Share2, Layers, Download } from 'lucide-react';
+import { getCached, setCached } from '@/lib/dataCache';
 
 const SurahDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [ayahs, setAyahs] = useState<Ayah[]>([]);
-  const [tafsir, setTafsir] = useState<Ayah[]>([]);
-  const [surah, setSurah] = useState<Surah | null>(null);
+  const surahNumInit = Number(id);
+  const cachedBundle = getCached<{ ayahs: Ayah[]; tafsir: Ayah[]; surah: Surah | null; reciters: Reciter[] }>(`surah-${surahNumInit}`);
+  const [ayahs, setAyahs] = useState<Ayah[]>(cachedBundle?.ayahs ?? []);
+  const [tafsir, setTafsir] = useState<Ayah[]>(cachedBundle?.tafsir ?? []);
+  const [surah, setSurah] = useState<Surah | null>(cachedBundle?.surah ?? null);
   const [showTafsir, setShowTafsir] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [reciters, setReciters] = useState<Reciter[]>([]);
+  const [loading, setLoading] = useState(!cachedBundle);
+  const [reciters, setReciters] = useState<Reciter[]>(cachedBundle?.reciters ?? []);
   const [selectedReciter, setSelectedReciter] = useState<Reciter | null>(null);
   const [showReciterPicker, setShowReciterPicker] = useState(false);
   const [viewMode, setViewMode] = useState<'ayah' | 'full'>('ayah');
