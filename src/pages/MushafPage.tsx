@@ -699,18 +699,14 @@ const MushafPage: React.FC = () => {
                             )}
                           </div>
                         )}
-                        <div data-ayah-num={ayah.number} className={`rounded-xl p-3 transition-colors ${
-                          isHighlighted
-                            ? nightMode ? 'bg-amber-500/10 ring-1 ring-amber-400/40' : 'bg-primary/5 ring-1 ring-primary/20'
-                            : 'hover:bg-secondary/40'
-                        }`}>
-                          <div className="flex items-start gap-2">
+                        <div data-ayah-num={ayah.number} className={`ayah-card ${isHighlighted ? 'ayah-card-active' : ''}`}>
+                          <div className="flex items-start gap-3">
                             <span className={`verse-number flex-shrink-0 mt-1 ${nightMode ? 'mushaf-night-verse' : ''}`}>
                               {ayah.numberInSurah}
                             </span>
                             <p
                               onClick={() => handleAyahClick(ayah)}
-                              className={`font-amiri flex-1 cursor-pointer ${nightMode ? 'mushaf-night-text' : 'text-foreground'}`}
+                              className={`font-amiri flex-1 cursor-pointer text-justify ${nightMode ? 'mushaf-night-text' : 'text-foreground'}`}
                               style={{
                                 fontSize: settings.mushafFontSize,
                                 lineHeight,
@@ -718,25 +714,31 @@ const MushafPage: React.FC = () => {
                                 MozOsxFontSmoothing: smoothing ? 'grayscale' : 'auto',
                                 textRendering: smoothing ? 'optimizeLegibility' : 'auto',
                                 wordSpacing: '0.05em',
+                                textAlignLast: 'right',
                               }}
                             >
                               {ayah.text}
                             </p>
                           </div>
-                          <button
-                            onClick={() => setExpandedTafsir(p => ({ ...p, [ayah.number]: !p[ayah.number] }))}
-                            className={`mt-2 flex items-center gap-1.5 text-[11px] font-semibold ${nightMode ? 'text-amber-300' : 'text-primary'}`}
-                          >
-                            <BookOpen className="w-3 h-3" />
-                            {isExpanded ? 'إخفاء التفسير' : 'عرض التفسير'}
-                            {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                          </button>
+                          <div className="flex items-center justify-between mt-3 pt-2.5 border-t border-dashed border-border/60">
+                            <button
+                              onClick={() => setExpandedTafsir(p => ({ ...p, [ayah.number]: !p[ayah.number] }))}
+                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-colors ${
+                                isExpanded
+                                  ? nightMode ? 'bg-amber-500/20 text-amber-300' : 'bg-primary/10 text-primary'
+                                  : nightMode ? 'bg-amber-900/15 text-amber-400/70' : 'bg-secondary text-foreground'
+                              }`}
+                            >
+                              <BookOpen className="w-3 h-3" />
+                              {isExpanded ? 'إخفاء التفسير' : 'عرض التفسير'}
+                              {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                            </button>
+                            <span className={`text-[10px] font-semibold ${nightMode ? 'text-amber-400/60' : 'text-muted-foreground'}`}>
+                              {ayah.surah.name} · آية {ayah.numberInSurah}
+                            </span>
+                          </div>
                           {isExpanded && (
-                            <div className={`mt-2 p-3 rounded-lg text-[13px] leading-relaxed animate-fade-in ${
-                              nightMode
-                                ? 'bg-amber-900/15 text-amber-100/90 border border-amber-700/20'
-                                : 'bg-secondary/60 text-foreground border border-border'
-                            }`}>
+                            <div className="ayah-tafsir-box animate-fade-in">
                               {tafsirText || 'جاري تحميل التفسير...'}
                             </div>
                           )}
