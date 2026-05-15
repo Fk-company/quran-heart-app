@@ -5,6 +5,7 @@ import { Play, Pause, Radio, Signal, Search, Grid3X3, List, ArrowDownAZ, Filter,
 import PageHeader from '@/components/PageHeader';
 import SkeletonGrid from '@/components/SkeletonGrid';
 import EmptyState from '@/components/EmptyState';
+import { getCached, setCached } from '@/lib/dataCache';
 import { useAppStats, formatListenTime } from '@/hooks/useAppStats';
 
 type SortKey = 'default' | 'name' | 'recent';
@@ -28,8 +29,9 @@ const toggleFav = (id: number): number[] => {
 };
 
 const RadioPage: React.FC = () => {
-  const [stations, setStations] = useState<RadioStation[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cachedStations = getCached<RadioStation[]>('radio_stations');
+  const [stations, setStations] = useState<RadioStation[]>(cachedStations ?? []);
+  const [loading, setLoading] = useState(!cachedStations);
   const [search, setSearch] = useState('');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>(() => (localStorage.getItem('radio-view') as any) || 'list');
   const [filter, setFilter] = useState<'all' | 'favorites' | 'recent'>('all');
@@ -44,7 +46,7 @@ const RadioPage: React.FC = () => {
   useEffect(() => { localStorage.setItem(SORT_KEY, sortKey); }, [sortKey]);
 
   useEffect(() => {
-    fetchRadioStations().then((data) => { setStations(data); setLoading(false); }).catch(() => setLoading(false));
+    fetchRadioStations().then((data) => { setCached('radio_stations', data); setStations(data); setLoading(false); }).catch(() => setLoading(false));
   }, []);
 
   const filtered = useMemo(() => {

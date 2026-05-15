@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { fetchSurahs, type Surah } from '@/lib/api';
 import { BarChart3, BookOpen, Hash, FileText, Type } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
+import { getCached, setCached } from '@/lib/dataCache';
 
 const QuranStatsPage: React.FC = () => {
-  const [surahs, setSurahs] = useState<Surah[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cachedSurahs = getCached<Surah[]>('surahs');
+  const [surahs, setSurahs] = useState<Surah[]>(cachedSurahs ?? []);
+  const [loading, setLoading] = useState(!cachedSurahs);
 
   useEffect(() => {
-    fetchSurahs().then(data => { setSurahs(data); setLoading(false); });
+    fetchSurahs().then(data => { setCached('surahs', data); setSurahs(data); setLoading(false); });
   }, []);
 
   const totalAyahs = surahs.reduce((a, s) => a + s.numberOfAyahs, 0);

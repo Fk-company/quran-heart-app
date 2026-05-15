@@ -6,17 +6,20 @@ import { useLastRead } from '@/hooks/useLastRead';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useReadingTracker } from '@/hooks/useReadingTracker';
 import { ArrowRight, BookOpen, Play, Pause, Mic, Heart, Share2, Layers, Download } from 'lucide-react';
+import { getCached, setCached } from '@/lib/dataCache';
 
 const SurahDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [ayahs, setAyahs] = useState<Ayah[]>([]);
-  const [tafsir, setTafsir] = useState<Ayah[]>([]);
-  const [surah, setSurah] = useState<Surah | null>(null);
+  const surahNumInit = Number(id);
+  const cachedBundle = getCached<{ ayahs: Ayah[]; tafsir: Ayah[]; surah: Surah | null; reciters: Reciter[] }>(`surah-${surahNumInit}`);
+  const [ayahs, setAyahs] = useState<Ayah[]>(cachedBundle?.ayahs ?? []);
+  const [tafsir, setTafsir] = useState<Ayah[]>(cachedBundle?.tafsir ?? []);
+  const [surah, setSurah] = useState<Surah | null>(cachedBundle?.surah ?? null);
   const [showTafsir, setShowTafsir] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [reciters, setReciters] = useState<Reciter[]>([]);
-  const [selectedReciter, setSelectedReciter] = useState<Reciter | null>(null);
+  const [loading, setLoading] = useState(!cachedBundle);
+  const [reciters, setReciters] = useState<Reciter[]>(cachedBundle?.reciters ?? []);
+  const [selectedReciter, setSelectedReciter] = useState<Reciter | null>(cachedBundle?.reciters?.[0] ?? null);
   const [showReciterPicker, setShowReciterPicker] = useState(false);
   const [viewMode, setViewMode] = useState<'ayah' | 'full'>('ayah');
   const { play, pause, currentTrack, isPlaying } = useAudioPlayer();
@@ -28,14 +31,31 @@ const SurahDetailPage: React.FC = () => {
 
   useEffect(() => {
     if (!surahNum) return;
+    const cached = getCached<{ ayahs: Ayah[]; tafsir: Ayah[]; surah: Surah | null; reciters: Reciter[] }>(`surah-${surahNum}`);
+    if (cached) {
+      setAyahs(cached.ayahs);
+      setTafsir(cached.tafsir);
+      setSurah(cached.surah);
+      setReciters(cached.reciters);
+      if (cached.reciters.length > 0) setSelectedReciter(prev => prev ?? cached.reciters[0]);
+      setLoading(false);
+      if (cached.surah) {
+        savePosition(surahNum, cached.surah.name, 1);
+        recordReading(surahNum, cached.surah.numberOfAyahs, Math.ceil(cached.surah.numberOfAyahs / 15));
+      }
+      return;
+    }
     setLoading(true);
     Promise.all([fetchSurahAyahs(surahNum), fetchTafsir(surahNum), fetchSurahs(), fetchReciters()])
       .then(([ayahData, tafsirData, surahsData, recitersData]) => {
+        const s = surahsData.find((s) => s.number === surahNum) || null;
+        const reciterSlice = recitersData.slice(0, 30);
+        setCached('surahs', surahsData);
+        setCached(`surah-${surahNum}`, { ayahs: ayahData, tafsir: tafsirData, surah: s, reciters: reciterSlice });
         setAyahs(ayahData);
         setTafsir(tafsirData);
-        const s = surahsData.find((s) => s.number === surahNum) || null;
         setSurah(s);
-        setReciters(recitersData.slice(0, 30));
+        setReciters(reciterSlice);
         if (recitersData.length > 0) setSelectedReciter(recitersData[0]);
         setLoading(false);
         if (s) {

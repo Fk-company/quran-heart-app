@@ -7,6 +7,7 @@ import PageHeader from '@/components/PageHeader';
 import SearchFilterBar from '@/components/SearchFilterBar';
 import SkeletonGrid from '@/components/SkeletonGrid';
 import EmptyState from '@/components/EmptyState';
+import { getCached, setCached } from '@/lib/dataCache';
 
 type SortKey = 'number' | 'number-desc' | 'name' | 'most-ayahs' | 'least-ayahs' | 'favorites-first';
 const SORT_KEY = 'quran-sort';
@@ -22,9 +23,10 @@ const sortLabels: Record<SortKey, string> = {
 
 const QuranPage: React.FC = () => {
   const navigate = useNavigate();
-  const [surahs, setSurahs] = useState<Surah[]>([]);
+  const cachedSurahs = getCached<Surah[]>('surahs');
+  const [surahs, setSurahs] = useState<Surah[]>(cachedSurahs ?? []);
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!cachedSurahs);
   const [filter, setFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>(() => (localStorage.getItem('quran-view') as any) || 'list');
   const [sortKey, setSortKey] = useState<SortKey>(() => (localStorage.getItem(SORT_KEY) as SortKey) || 'number');
@@ -34,7 +36,7 @@ const QuranPage: React.FC = () => {
   useEffect(() => { localStorage.setItem('quran-view', viewMode); }, [viewMode]);
   useEffect(() => { localStorage.setItem(SORT_KEY, sortKey); }, [sortKey]);
   useEffect(() => {
-    fetchSurahs().then((data) => { setSurahs(data); setLoading(false); });
+    fetchSurahs().then((data) => { setCached('surahs', data); setSurahs(data); setLoading(false); });
   }, []);
 
   const counts = useMemo(() => ({
