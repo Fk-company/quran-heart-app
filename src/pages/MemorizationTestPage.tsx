@@ -2,9 +2,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { fetchSurahs, fetchSurahAyahs, type Surah, type Ayah } from '@/lib/api';
 import PageHeader from '@/components/PageHeader';
 import { Brain, RefreshCw, Eye, EyeOff, ChevronLeft, ChevronRight, Check, X, Loader2, Trophy, RotateCcw } from 'lucide-react';
+import { getCached, setCached } from '@/lib/dataCache';
 
 const MemorizationTestPage: React.FC = () => {
-  const [surahs, setSurahs] = useState<Surah[]>([]);
+  const cachedSurahs = getCached<Surah[]>('surahs');
+  const [surahs, setSurahs] = useState<Surah[]>(cachedSurahs ?? []);
   const [selectedSurah, setSelectedSurah] = useState<number | null>(null);
   const [ayahs, setAyahs] = useState<Ayah[]>([]);
   const [currentAyahIndex, setCurrentAyahIndex] = useState(0);
@@ -14,11 +16,11 @@ const MemorizationTestPage: React.FC = () => {
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!cachedSurahs);
   const [loadingAyahs, setLoadingAyahs] = useState(false);
 
   useEffect(() => {
-    fetchSurahs().then(s => { setSurahs(s); setLoading(false); });
+    fetchSurahs().then(s => { setCached('surahs', s); setSurahs(s); setLoading(false); });
   }, []);
 
   const getHideRatio = () => {

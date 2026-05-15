@@ -10,6 +10,7 @@ import PageHeader from '@/components/PageHeader';
 import SearchFilterBar from '@/components/SearchFilterBar';
 import SkeletonGrid from '@/components/SkeletonGrid';
 import EmptyState from '@/components/EmptyState';
+import { getCached, setCached } from '@/lib/dataCache';
 
 type SortKey = 'default' | 'name' | 'most-surahs' | 'recent';
 const RECENT_KEY = 'reciters_recent';
@@ -25,11 +26,13 @@ const pushRecent = (id: number) => {
 };
 
 const RecitersPage: React.FC = () => {
-  const [reciters, setReciters] = useState<Reciter[]>([]);
-  const [surahs, setSurahs] = useState<Surah[]>([]);
+  const cachedReciters = getCached<Reciter[]>('reciters');
+  const cachedSurahs = getCached<Surah[]>('surahs');
+  const [reciters, setReciters] = useState<Reciter[]>(cachedReciters ?? []);
+  const [surahs, setSurahs] = useState<Surah[]>(cachedSurahs ?? []);
   const [search, setSearch] = useState('');
   const [expandedReciter, setExpandedReciter] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!(cachedReciters && cachedSurahs));
   const [filter, setFilter] = useState<'all' | 'favorites' | 'recent'>('all');
   const [viewMode, setViewMode] = useState<'list' | 'grid'>(() => (localStorage.getItem('reciters-view') as any) || 'list');
   const [sortKey, setSortKey] = useState<SortKey>(() => (localStorage.getItem(SORT_KEY) as SortKey) || 'default');
@@ -42,7 +45,7 @@ const RecitersPage: React.FC = () => {
   useEffect(() => { localStorage.setItem(SORT_KEY, sortKey); }, [sortKey]);
 
   useEffect(() => {
-    Promise.all([fetchReciters(), fetchSurahs()]).then(([r, s]) => { setReciters(r); setSurahs(s); setLoading(false); });
+    Promise.all([fetchReciters(), fetchSurahs()]).then(([r, s]) => { setCached('reciters', r); setCached('surahs', s); setReciters(r); setSurahs(s); setLoading(false); });
   }, []);
 
   const getSurahNums = (r: Reciter): number[] => {

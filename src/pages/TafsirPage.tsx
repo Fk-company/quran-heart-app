@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchSurahs, type Surah } from '@/lib/api';
 import { Search, BookOpen, ArrowRight } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
+import { getCached, setCached } from '@/lib/dataCache';
 
 const TAFSIR_EDITIONS = [
   { id: 'ar.muyassar', name: 'التفسير الميسر' },
@@ -13,15 +14,16 @@ const ALQURAN_BASE = 'https://api.alquran.cloud/v1';
 
 const TafsirPage: React.FC = () => {
   const navigate = useNavigate();
-  const [surahs, setSurahs] = useState<Surah[]>([]);
+  const cachedSurahs = getCached<Surah[]>('surahs');
+  const [surahs, setSurahs] = useState<Surah[]>(cachedSurahs ?? []);
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!cachedSurahs);
   const [selectedSurah, setSelectedSurah] = useState<number | null>(null);
   const [tafsirData, setTafsirData] = useState<Record<string, any[]>>({});
   const [tafsirLoading, setTafsirLoading] = useState(false);
   const [activeEditions, setActiveEditions] = useState<string[]>(['ar.muyassar']);
 
-  useEffect(() => { fetchSurahs().then(d => { setSurahs(d); setLoading(false); }); }, []);
+  useEffect(() => { fetchSurahs().then(d => { setCached('surahs', d); setSurahs(d); setLoading(false); }); }, []);
 
   const loadTafsir = async (surahNum: number) => {
     setSelectedSurah(surahNum);
