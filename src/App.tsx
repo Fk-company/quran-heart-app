@@ -41,6 +41,15 @@ import KhatmPlanPage from "./pages/KhatmPlanPage";
 import DailyWirdPage from "./pages/DailyWirdPage";
 import TasbihStatsPage from "./pages/TasbihStatsPage";
 import DeveloperSocialPage from "./pages/DeveloperSocialPage";
+import SmartWirdPage from "./pages/SmartWirdPage";
+import WeeklyChallengePage from "./pages/WeeklyChallengePage";
+import ReciterComparePage from "./pages/ReciterComparePage";
+import RevelationMapPage from "./pages/RevelationMapPage";
+import MutashabihatPage from "./pages/MutashabihatPage";
+import GuidedTadabburPage from "./pages/GuidedTadabburPage";
+import HeartAmbientPage from "./pages/HeartAmbientPage";
+import DailyImanPage from "./pages/DailyImanPage";
+import SurahSummaryPage from "./pages/SurahSummaryPage";
 import NotFound from "./pages/NotFound";
 import { useSettings } from "@/hooks/useSettings";
 
@@ -81,6 +90,15 @@ const AnimatedRoutes = () => {
         <Route path="/daily-wird" element={<PageTransition><DailyWirdPage /></PageTransition>} />
         <Route path="/tasbih-stats" element={<PageTransition><TasbihStatsPage /></PageTransition>} />
         <Route path="/developer-social" element={<PageTransition><DeveloperSocialPage /></PageTransition>} />
+        <Route path="/smart-wird" element={<PageTransition><SmartWirdPage /></PageTransition>} />
+        <Route path="/weekly-challenge" element={<PageTransition><WeeklyChallengePage /></PageTransition>} />
+        <Route path="/reciter-compare" element={<PageTransition><ReciterComparePage /></PageTransition>} />
+        <Route path="/revelation-map" element={<PageTransition><RevelationMapPage /></PageTransition>} />
+        <Route path="/mutashabihat" element={<PageTransition><MutashabihatPage /></PageTransition>} />
+        <Route path="/guided-tadabbur" element={<PageTransition><GuidedTadabburPage /></PageTransition>} />
+        <Route path="/heart-ambient" element={<PageTransition><HeartAmbientPage /></PageTransition>} />
+        <Route path="/daily-iman" element={<PageTransition><DailyImanPage /></PageTransition>} />
+        <Route path="/surah-summary" element={<PageTransition><SurahSummaryPage /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
