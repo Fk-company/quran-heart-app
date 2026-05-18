@@ -23,19 +23,22 @@ const ReciterComparePage: React.FC = () => {
   const [surah, setSurah] = useState(1);
   const [ayah, setAyah] = useState(1);
   const [text, setText] = useState('');
+  const [globalNum, setGlobalNum] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const { play, pause, currentTrack, isPlaying } = useAudioPlayer();
 
   useEffect(() => {
     setLoading(true);
+    setGlobalNum(null);
     fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/ar.alafasy`)
       .then((r) => r.json())
-      .then((d) => { if (d.code === 200) setText(d.data.text); })
+      .then((d) => { if (d.code === 200) { setText(d.data.text); setGlobalNum(d.data.number); } })
       .finally(() => setLoading(false));
   }, [surah, ayah]);
 
   const playEdition = (e: Edition) => {
-    const url = `https://cdn.islamic.network/quran/audio/128/${e.id}/${ayahNumber(surah, ayah)}.mp3`;
+    if (!globalNum) return;
+    const url = `https://cdn.islamic.network/quran/audio/128/${e.id}/${globalNum}.mp3`;
     const id = `compare-${e.id}-${surah}-${ayah}`;
     if (currentTrack?.id === id && isPlaying) { pause(); return; }
     play({ id, title: `${surah}:${ayah}`, reciter: e.label, url });
