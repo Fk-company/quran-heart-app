@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import {
   Heart, Radio, Users, Quote, Search, Star, BookOpen, BarChart3,
   X, Feather, Book, Grid3X3, List, ChevronLeft, TrendingUp, Baby, Sparkles, Mic,
-  Brain, Smile, Lightbulb, Bot, Settings, CalendarDays, Target, Send, Globe
+  Brain, Smile, Lightbulb, Bot, Settings, CalendarDays, Target, Send, Globe,
+  Trophy, Mic2, Map as MapIcon, Layers, Waves, Sunrise, FileText
 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { MoreHorizontal } from 'lucide-react';
@@ -27,6 +28,10 @@ const moreCategories = [
       { label: 'قلب القرآن', icon: Heart, path: '/heart-quran', desc: 'سورة يس وآيات القلب', color: 'bg-red-500/10 text-red-500', gradient: 'gradient-primary' },
       { label: 'تأملات يومية', icon: Lightbulb, path: '/daily-reflection', desc: 'آية وتدبر وعمل', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-gold' },
       { label: 'آيات السكينة', icon: Star, path: '/sakinah', desc: 'آيات الراحة والطمأنينة', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
+      { label: 'الورد الذكي', icon: Target, path: '/smart-wird', desc: 'اقتراح يومي حسب وقتك', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
+      { label: 'جلسة تدبر', icon: Lightbulb, path: '/guided-tadabbur', desc: 'تدبر موجه 5-10 دقائق', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-primary' },
+      { label: 'خلفية قلبية', icon: Waves, path: '/heart-ambient', desc: 'أصوات وتلاوة للتركيز', color: 'bg-sky-500/10 text-sky-500', gradient: 'gradient-gold' },
+      { label: 'رسالة الصباح', icon: Sunrise, path: '/daily-iman', desc: 'آية وتفسير كل يوم', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-primary' },
     ]
   },
   {
@@ -45,6 +50,8 @@ const moreCategories = [
       { label: 'أسماء الله الحسنى', icon: Sparkles, path: '/asma-al-husna', desc: '99 اسماً لله تعالى', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
       { label: 'قصص الأطفال', icon: Baby, path: '/kids-stories', desc: 'قصص إسلامية للأطفال', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
       { label: 'اختبار الحفظ', icon: Brain, path: '/memorization-test', desc: 'اختبر حفظك للقرآن', color: 'bg-purple-500/10 text-purple-500', gradient: 'gradient-primary' },
+      { label: 'المتشابهات', icon: Layers, path: '/mutashabihat', desc: 'تمييز الآيات المتشابهة', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
+      { label: 'التحدي الأسبوعي', icon: Trophy, path: '/weekly-challenge', desc: 'تحديات وشارات إنجاز', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-primary' },
     ]
   },
   {
