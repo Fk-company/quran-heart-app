@@ -50,6 +50,8 @@ const moreCategories = [
       { label: 'أسماء الله الحسنى', icon: Sparkles, path: '/asma-al-husna', desc: '99 اسماً لله تعالى', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
       { label: 'قصص الأطفال', icon: Baby, path: '/kids-stories', desc: 'قصص إسلامية للأطفال', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
       { label: 'اختبار الحفظ', icon: Brain, path: '/memorization-test', desc: 'اختبر حفظك للقرآن', color: 'bg-purple-500/10 text-purple-500', gradient: 'gradient-primary' },
+      { label: 'المتشابهات', icon: Layers, path: '/mutashabihat', desc: 'تمييز الآيات المتشابهة', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
+      { label: 'التحدي الأسبوعي', icon: Trophy, path: '/weekly-challenge', desc: 'تحديات وشارات إنجاز', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-primary' },
     ]
   },
   {
