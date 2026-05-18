@@ -93,10 +93,4 @@ const ReciterComparePage: React.FC = () => {
   );
 };
 
-// Ayah numbering for alquran cdn: 1-based across whole Quran
-// We use API to resolve global number if needed - simplified using global number from API
-function ayahNumber(surah: number, ayah: number): string {
-  return `${surah}:${ayah}` as any;
-}
-
 export default ReciterComparePage;
