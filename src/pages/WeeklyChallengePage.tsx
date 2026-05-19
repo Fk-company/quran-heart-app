@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Trophy, Flame, Check, Lock, Star, Award, Target, Calendar } from 'lucide-react';
+import { Trophy, Flame, Check, Lock, Award, Target, Calendar, Zap } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
+import { useReadingTracker } from '@/hooks/useReadingTracker';
+import { getLastDays } from '@/lib/tasbihHistory';
 
 interface Challenge {
   id: string;
@@ -9,13 +11,14 @@ interface Challenge {
   goal: number;
   unit: string;
   reward: string;
+  auto?: boolean;
 }
 
 const CHALLENGES: Challenge[] = [
-  { id: 'pages-7', title: 'قارئ الأسبوع', desc: 'اقرأ 7 صفحات خلال الأسبوع', goal: 7, unit: 'صفحة', reward: 'قارئ' },
-  { id: 'memorize-3', title: 'حافظ ناشئ', desc: 'احفظ 3 آيات جديدة', goal: 3, unit: 'آية', reward: 'حافظ' },
-  { id: 'tasbih-700', title: 'مُسبِّح', desc: 'سبّح 700 مرة هذا الأسبوع', goal: 700, unit: 'تسبيحة', reward: 'مسبّح' },
-  { id: 'adhkar-7', title: 'مداوم على الأذكار', desc: 'أتمّ أذكار الصباح/المساء 7 أيام', goal: 7, unit: 'يوم', reward: 'مداوم' },
+  { id: 'pages-7', title: 'قارئ الأسبوع', desc: 'اقرأ 7 صفحات خلال الأسبوع', goal: 7, unit: 'صفحة', reward: 'قارئ', auto: true },
+  { id: 'ayahs-50', title: 'حافظ ناشئ', desc: 'اقرأ/راجع 50 آية', goal: 50, unit: 'آية', reward: 'حافظ', auto: true },
+  { id: 'tasbih-700', title: 'مُسبِّح', desc: 'سبّح 700 مرة هذا الأسبوع', goal: 700, unit: 'تسبيحة', reward: 'مسبّح', auto: true },
+  { id: 'adhkar-7', title: 'مداوم على الأذكار', desc: 'أتمّ أذكاراً في 7 أيام', goal: 7, unit: 'يوم', reward: 'مداوم', auto: true },
 ];
 
 interface State {
@@ -43,10 +46,47 @@ const load = (): State => {
 
 const WeeklyChallengePage: React.FC = () => {
   const [state, setState] = useState<State>(load);
+  const { tracker } = useReadingTracker();
+
+  // Auto-sync with reading tracker + tasbih history (last 7 days)
+  const auto = useMemo(() => {
+    const ws = new Date(state.weekStart);
+    const weekRecords = (tracker?.dailyRecords || []).filter(r => new Date(r.date) >= ws);
+    const pages = weekRecords.reduce((a, r) => a + (r.pagesRead || 0), 0);
+    const ayahs = weekRecords.reduce((a, r) => a + (r.ayahsRead || 0), 0);
+    const tasbihDays = getLastDays(7);
+    const tasbih = tasbihDays.reduce((a, d) => a + d.total, 0);
+    let adhkarDays = 0;
+    try {
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        const key = `adhkar_done_${d.toISOString().slice(0, 10)}`;
+        if (localStorage.getItem(key)) adhkarDays++;
+      }
+    } catch {}
+    return { 'pages-7': pages, 'ayahs-50': ayahs, 'tasbih-700': tasbih, 'adhkar-7': adhkarDays } as Record<string, number>;
+  }, [tracker, state.weekStart]);
+
+  // Auto-award badges based on synced progress
+  useEffect(() => {
+    setState(s => {
+      const newBadges = [...s.badges];
+      let changed = false;
+      for (const c of CHALLENGES) {
+        const cur = Math.max(s.progress[c.id] || 0, auto[c.id] || 0);
+        if (cur >= c.goal && !newBadges.includes(c.reward)) {
+          newBadges.push(c.reward); changed = true;
+        }
+      }
+      return changed ? { ...s, badges: newBadges } : s;
+    });
+  }, [auto]);
 
   useEffect(() => {
     localStorage.setItem(KEY, JSON.stringify(state));
   }, [state]);
+
+  const getProgress = (c: Challenge) => Math.max(state.progress[c.id] || 0, auto[c.id] || 0);
 
   const totalProgress = useMemo(() => {
     const pct = CHALLENGES.reduce((acc, c) => acc + Math.min(1, (state.progress[c.id] || 0) / c.goal), 0);
