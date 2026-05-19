@@ -89,15 +89,16 @@ const WeeklyChallengePage: React.FC = () => {
   const getProgress = (c: Challenge) => Math.max(state.progress[c.id] || 0, auto[c.id] || 0);
 
   const totalProgress = useMemo(() => {
-    const pct = CHALLENGES.reduce((acc, c) => acc + Math.min(1, (state.progress[c.id] || 0) / c.goal), 0);
+    const pct = CHALLENGES.reduce((acc, c) => acc + Math.min(1, getProgress(c) / c.goal), 0);
     return Math.round((pct / CHALLENGES.length) * 100);
-  }, [state]);
+  }, [state, auto]);
 
   const increment = (c: Challenge, amount = 1) => {
     setState((s) => {
       const cur = (s.progress[c.id] || 0) + amount;
       const next = { ...s, progress: { ...s.progress, [c.id]: cur } };
-      if (cur >= c.goal && !s.badges.includes(c.reward)) {
+      const effective = Math.max(cur, auto[c.id] || 0);
+      if (effective >= c.goal && !s.badges.includes(c.reward)) {
         next.badges = [...s.badges, c.reward];
       }
       return next;
@@ -128,9 +129,10 @@ const WeeklyChallengePage: React.FC = () => {
 
         <div className="space-y-2.5 mb-6">
           {CHALLENGES.map((c) => {
-            const cur = state.progress[c.id] || 0;
+            const cur = getProgress(c);
             const pct = Math.min(100, Math.round((cur / c.goal) * 100));
             const done = cur >= c.goal;
+            const isAuto = (auto[c.id] || 0) >= (state.progress[c.id] || 0);
             return (
               <div key={c.id} className={`card-surface ${done ? 'border-primary/30 bg-primary/5' : ''}`}>
                 <div className="flex items-start gap-3 mb-2">
@@ -138,7 +140,14 @@ const WeeklyChallengePage: React.FC = () => {
                     {done ? <Check className="w-5 h-5 text-primary-foreground" /> : <Target className="w-5 h-5 text-muted-foreground" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-bold font-kufi text-foreground">{c.title}</div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="text-sm font-bold font-kufi text-foreground">{c.title}</div>
+                      {c.auto && isAuto && (
+                        <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-primary bg-primary/10 rounded-full px-1.5 py-0.5">
+                          <Zap className="w-2.5 h-2.5" /> تلقائي
+                        </span>
+                      )}
+                    </div>
                     <div className="text-[11px] text-muted-foreground">{c.desc}</div>
                   </div>
                   <span className="text-[11px] font-bold text-primary whitespace-nowrap">{cur}/{c.goal}</span>
@@ -156,6 +165,7 @@ const WeeklyChallengePage: React.FC = () => {
             );
           })}
         </div>
+
 
         <h2 className="section-title">شاراتي ({state.badges.length})</h2>
         <div className="grid grid-cols-4 gap-2 mb-6">
