@@ -3,6 +3,7 @@ import { Trophy, Flame, Check, Lock, Award, Target, Calendar, Zap } from 'lucide
 import PageHeader from '@/components/PageHeader';
 import { useReadingTracker } from '@/hooks/useReadingTracker';
 import { getLastDays } from '@/lib/tasbihHistory';
+import { useNotifications } from '@/hooks/useNotifications';
 
 interface Challenge {
   id: string;
@@ -47,6 +48,29 @@ const load = (): State => {
 const WeeklyChallengePage: React.FC = () => {
   const [state, setState] = useState<State>(load);
   const { tracker } = useReadingTracker();
+  const { sendNotification, scheduleDailyReminder, permission } = useNotifications();
+
+  // Weekly challenge notifications: start-of-week kickoff + daily wird reminder (~09:00).
+  useEffect(() => {
+    if (permission !== 'granted') return;
+    if (localStorage.getItem('notifications_enabled') !== 'true') return;
+    const startKey = `wc_start_notified_${state.weekStart}`;
+    if (!localStorage.getItem(startKey)) {
+      sendNotification('بدأ التحدي الأسبوعي 🏆', 'تحديات جديدة تنتظرك هذا الأسبوع — ابدأ الآن واكسب شاراتك');
+      localStorage.setItem(startKey, '1');
+    }
+    const dayKey = new Date().toISOString().slice(0, 10);
+    const dailyKey = `wc_wird_notified_${dayKey}`;
+    if (!localStorage.getItem(dailyKey)) {
+      scheduleDailyReminder(
+        '09:00',
+        'تذكير الورد اليومي',
+        'لا تنسَ وردك ضمن التحدي الأسبوعي — صفحة واحدة تكفي لإكمال هدفك',
+        `wc-wird-${dayKey}`,
+      );
+      localStorage.setItem(dailyKey, '1');
+    }
+  }, [state.weekStart, permission, sendNotification, scheduleDailyReminder]);
 
   // Auto-sync with reading tracker + tasbih history (last 7 days)
   const auto = useMemo(() => {
