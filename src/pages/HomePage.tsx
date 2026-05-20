@@ -112,21 +112,21 @@ const HomePage: React.FC = () => {
         prayerOrder.forEach(key => {
           if (key === 'Sunrise') return;
           const time = prayerTimes[key]?.split(' ')[0];
-          if (time) schedulePrayerNotification(prayerNames[key], time);
+          if (time) schedulePrayerNotification(prayerNames[key], time, timezone || undefined);
         });
       }
     }
-  }, [notificationsEnabled, requestPermission, prayerTimes, schedulePrayerNotification, sendAdhkarReminder]);
+  }, [notificationsEnabled, requestPermission, prayerTimes, timezone, schedulePrayerNotification, sendAdhkarReminder]);
 
   useEffect(() => {
     if (prayerTimes && notificationsEnabled) {
       prayerOrder.forEach(key => {
         if (key === 'Sunrise') return;
         const time = prayerTimes[key]?.split(' ')[0];
-        if (time) schedulePrayerNotification(prayerNames[key], time);
+        if (time) schedulePrayerNotification(prayerNames[key], time, timezone || undefined);
       });
     }
-  }, [prayerTimes, notificationsEnabled]);
+  }, [prayerTimes, timezone, notificationsEnabled]);
 
   useEffect(() => {
     const todayKey = (() => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; })();
