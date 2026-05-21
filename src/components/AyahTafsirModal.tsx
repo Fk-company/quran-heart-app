@@ -57,7 +57,7 @@ const AyahTafsirModal: React.FC<AyahTafsirModalProps> = ({ ayah, nightMode, onCl
     <div className="fixed inset-0 z-50 flex items-end justify-center" dir="rtl" onClick={onClose}>
       <div className="absolute inset-0 bg-foreground/40 backdrop-blur-sm" />
       <div
-        className={`relative w-full max-w-lg ${bg} rounded-t-3xl border-t ${border} max-h-[80vh] overflow-hidden animate-fade-in`}
+        className={`relative w-full max-w-lg ${bg} rounded-t-3xl border-t ${border} max-h-[92vh] overflow-hidden animate-fade-in flex flex-col`}
         style={{ animation: 'sheet-up 0.3s cubic-bezier(0.32, 0.72, 0, 1)' }}
         onClick={e => e.stopPropagation()}
       >
