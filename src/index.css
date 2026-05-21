@@ -741,14 +741,39 @@
     box-shadow: 0 0 0 3px hsl(222 22% 9%), 0 0 0 4px hsl(32 60% 40% / 0.45);
     color: hsl(38 70% 65%);
   }
-  .mushaf-night-frame { border-color: hsl(32 60% 25% / 0.3) !important; }
-  .mushaf-night-text { color: hsl(38 60% 72%) !important; }
-  .mushaf-night .mushaf-ayah-text { color: hsl(38 60% 72%); }
-  .mushaf-night-verse { background: hsl(32 40% 15%) !important; color: hsl(38 70% 65%) !important; border-color: hsl(32 50% 30% / 0.4) !important; }
-  .mushaf-night .card-surface { background: hsl(222 22% 9%); border-color: hsl(220 15% 18%); }
-  .mushaf-night .text-foreground { color: hsl(40 20% 85%); }
-  .mushaf-night .text-muted-foreground { color: hsl(220 10% 50%); }
+  .mushaf-night-frame { border-color: hsl(38 60% 35% / 0.4) !important; }
+  .mushaf-night-text { color: hsl(42 85% 92%) !important; text-shadow: 0 0 1px hsl(38 70% 60% / 0.25); }
+  .mushaf-night .mushaf-ayah-text { color: hsl(42 85% 92%); text-shadow: 0 0 1px hsl(38 70% 60% / 0.25); }
+  .mushaf-night-verse { background: hsl(38 60% 22%) !important; color: hsl(42 95% 80%) !important; border-color: hsl(38 70% 45% / 0.6) !important; }
+  .mushaf-night .card-surface { background: hsl(222 22% 9%); border-color: hsl(38 40% 28% / 0.45); }
+  .mushaf-night .text-foreground { color: hsl(42 60% 92%); }
+  .mushaf-night .text-muted-foreground { color: hsl(38 35% 72%); }
   .mushaf-night .bg-secondary { background: hsl(220 18% 14%); }
+  .mushaf-night .ayah-tafsir-box {
+    background: linear-gradient(180deg, hsl(222 22% 10%), hsl(38 40% 14% / 0.5)) !important;
+    border-color: hsl(38 60% 40% / 0.5) !important;
+    color: hsl(42 70% 90%) !important;
+    font-size: 15px;
+    line-height: 2;
+  }
+  .mushaf-night .ayah-tafsir-box::before {
+    background: hsl(222 22% 10%) !important;
+    color: hsl(42 95% 75%) !important;
+    border-color: hsl(38 70% 50% / 0.7) !important;
+  }
+  /* Brighter dark theme prayer chip */
+  .dark .prayer-chip { background: hsl(162 28% 11%); border-color: hsl(162 30% 22%); color: hsl(42 60% 92%); }
+  .dark .prayer-chip.next-prayer {
+    background: linear-gradient(160deg, hsl(38 60% 22%), hsl(162 50% 16%));
+    border-color: hsl(42 80% 55% / 0.6);
+    color: hsl(42 90% 92%);
+    box-shadow: 0 6px 24px -6px hsl(42 80% 45% / 0.45);
+  }
+  .dark .daily-verse-card {
+    background: linear-gradient(135deg, hsl(38 50% 16%) 0%, hsl(162 50% 12%) 100%);
+    border-color: hsl(42 70% 45% / 0.35);
+    color: hsl(42 60% 92%);
+  }
 
   /* ===== Page Header ===== */
   .page-header-wrapper { @apply mb-6 relative; }
