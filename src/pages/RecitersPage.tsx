@@ -11,6 +11,7 @@ import SearchFilterBar from '@/components/SearchFilterBar';
 import SkeletonGrid from '@/components/SkeletonGrid';
 import EmptyState from '@/components/EmptyState';
 import { getCached, setCached } from '@/lib/dataCache';
+import appLogo from '@/assets/app-logo.png';
 
 type SortKey = 'default' | 'name' | 'most-surahs' | 'recent';
 const RECENT_KEY = 'reciters_recent';
