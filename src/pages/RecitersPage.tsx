@@ -11,6 +11,7 @@ import SearchFilterBar from '@/components/SearchFilterBar';
 import SkeletonGrid from '@/components/SkeletonGrid';
 import EmptyState from '@/components/EmptyState';
 import { getCached, setCached } from '@/lib/dataCache';
+import appLogo from '@/assets/app-logo.png';
 
 type SortKey = 'default' | 'name' | 'most-surahs' | 'recent';
 const RECENT_KEY = 'reciters_recent';
@@ -110,8 +111,7 @@ const RecitersPage: React.FC = () => {
     setRecent(getRecent());
   };
 
-  const getReciterImage = (r: Reciter) =>
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(r.name)}&background=0d3b2e&color=fff&size=128&font-size=0.4&bold=true`;
+  const getReciterImage = (_r: Reciter) => appLogo;
 
   const sortLabels: Record<SortKey, string> = {
     'default': 'الافتراضي',

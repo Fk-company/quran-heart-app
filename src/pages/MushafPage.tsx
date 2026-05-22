@@ -8,6 +8,7 @@ import AyahTafsirModal from '@/components/AyahTafsirModal';
 import { useAyahByAyahPlayer } from '@/hooks/useAyahByAyahPlayer';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { useSettings } from '@/hooks/useSettings';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface PageAyah {
   number: number;
@@ -162,7 +163,8 @@ const MushafPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [pageInput, setPageInput] = useState('');
   const [showJumpInput, setShowJumpInput] = useState(false);
-  const [nightMode, setNightMode] = useState(() => localStorage.getItem('mushaf_night') === 'true');
+  const { theme, toggleTheme } = useTheme();
+  const nightMode = theme === 'dark';
   const [reciters, setReciters] = useState<Reciter[]>([]);
   const [selectedReciter, setSelectedReciter] = useState<Reciter | null>(null);
   const [showReciterPicker, setShowReciterPicker] = useState(false);
@@ -272,9 +274,7 @@ const MushafPage: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('mushaf_night', String(nightMode));
-  }, [nightMode]);
+  // Night mode is unified with global theme (useTheme)
 
   useEffect(() => {
     ayahPlayer.stopPlayback();
@@ -433,9 +433,9 @@ const MushafPage: React.FC = () => {
           >
             {bookmarks.length} 🔖
           </button>
-          <button onClick={() => setNightMode(!nightMode)}
-            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${nightMode ? 'bg-amber-500/20 text-amber-400' : 'bg-secondary text-foreground'}`}
-            title="وضع القراءة الليلي">
+          <button onClick={toggleTheme}
+            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${nightMode ? 'bg-amber-500/20 text-amber-300' : 'bg-secondary text-foreground'}`}
+            title="تبديل الوضع الليلي">
             {nightMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
           <button onClick={() => setShowJumpInput(!showJumpInput)}
