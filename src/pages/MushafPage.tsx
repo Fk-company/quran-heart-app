@@ -8,6 +8,7 @@ import AyahTafsirModal from '@/components/AyahTafsirModal';
 import { useAyahByAyahPlayer } from '@/hooks/useAyahByAyahPlayer';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { useSettings } from '@/hooks/useSettings';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface PageAyah {
   number: number;
