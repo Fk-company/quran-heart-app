@@ -163,7 +163,8 @@ const MushafPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [pageInput, setPageInput] = useState('');
   const [showJumpInput, setShowJumpInput] = useState(false);
-  const [nightMode, setNightMode] = useState(() => localStorage.getItem('mushaf_night') === 'true');
+  const { theme, toggleTheme } = useTheme();
+  const nightMode = theme === 'dark';
   const [reciters, setReciters] = useState<Reciter[]>([]);
   const [selectedReciter, setSelectedReciter] = useState<Reciter | null>(null);
   const [showReciterPicker, setShowReciterPicker] = useState(false);
