@@ -93,7 +93,7 @@ const AyahTafsirModal: React.FC<AyahTafsirModalProps> = ({ ayah, nightMode, onCl
           </div>
         </div>
 
-        <div className="overflow-y-auto px-5 py-4 flex-1" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}>
+        <div className="overflow-y-auto px-5 py-4 flex-1" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 32px)' }}>
           {/* Ayah info */}
           <div className={`text-center mb-3 px-3 py-1.5 rounded-full ${accentBg} inline-flex items-center gap-2 mx-auto`}
             style={{ display: 'flex', justifyContent: 'center' }}>
