@@ -775,6 +775,29 @@
     color: hsl(42 60% 92%);
   }
 
+  /* ===== Dark mode global readability fixes ===== */
+  .dark .gradient-hero,
+  .dark .gradient-primary,
+  .dark .gradient-gold { color: hsl(40 60% 96%) !important; }
+  .dark .gradient-hero .text-primary-foreground,
+  .dark .gradient-primary .text-primary-foreground,
+  .dark .gradient-gold .text-primary-foreground,
+  .dark .gradient-hero [class*="text-primary-foreground"],
+  .dark .gradient-primary [class*="text-primary-foreground"] { color: hsl(40 60% 96%) !important; }
+  .dark .gradient-hero .opacity-80,
+  .dark .gradient-primary .opacity-80 { opacity: 0.9; }
+
+  /* Bottom-nav / dark contrast for navigation & icon buttons */
+  .dark .page-header-back { color: hsl(40 60% 94%); background: hsl(162 25% 16%); border-color: hsl(162 25% 28%); }
+  .dark .page-header-back:hover { background: hsl(162 28% 22%); }
+
+  /* Bottom nav buttons clearer in dark */
+  .dark .bottom-nav-item { color: hsl(40 30% 80%); }
+  .dark .bottom-nav-item.active { color: hsl(42 90% 70%); }
+
+  /* Modal sheets must clear bottom-nav + mini-player */
+  .modal-sheet-safe { padding-bottom: calc(var(--nav-height) + var(--player-height) + env(safe-area-inset-bottom, 0px) + 12px) !important; }
+
   /* ===== Page Header ===== */
   .page-header-wrapper { @apply mb-6 relative; }
   .page-header-icon-box {
