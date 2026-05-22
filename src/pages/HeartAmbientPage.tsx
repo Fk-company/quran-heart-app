@@ -154,6 +154,14 @@ function buildLayer(ctx: AudioContext, id: LayerKind, gain: GainNode): () => voi
     }
     case 'heartbeat': {
       let stopped = false;
+      // Boost via a dedicated post-gain so it stays audible even with low slider
+      const post = ctx.createGain();
+      post.gain.value = 2.2;
+      post.connect(gain);
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 220;
+      lp.connect(post);
       const beat = () => {
         if (stopped) return;
         const now = ctx.currentTime;
@@ -161,21 +169,21 @@ function buildLayer(ctx: AudioContext, id: LayerKind, gain: GainNode): () => voi
           const osc = ctx.createOscillator();
           const g = ctx.createGain();
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(freq, now + t);
-          osc.frequency.exponentialRampToValueAtTime(freq * 0.5, now + t + 0.18);
-          g.gain.setValueAtTime(0, now + t);
-          g.gain.linearRampToValueAtTime(amp, now + t + 0.02);
-          g.gain.exponentialRampToValueAtTime(0.0001, now + t + 0.22);
-          osc.connect(g).connect(gain);
+          osc.frequency.setValueAtTime(freq * 2, now + t);
+          osc.frequency.exponentialRampToValueAtTime(freq * 0.6, now + t + 0.22);
+          g.gain.setValueAtTime(0.0001, now + t);
+          g.gain.exponentialRampToValueAtTime(amp, now + t + 0.015);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + t + 0.28);
+          osc.connect(g).connect(lp);
           osc.start(now + t);
-          osc.stop(now + t + 0.3);
+          osc.stop(now + t + 0.35);
         };
-        thump(0, 70, 0.6);
-        thump(0.22, 60, 0.4);
-        setTimeout(beat, 900); // ~67 bpm calm resting heartbeat
+        thump(0, 80, 0.9);     // lub
+        thump(0.22, 70, 0.55); // dub
+        setTimeout(beat, 880); // ~68 bpm
       };
       beat();
-      return () => { stopped = true; };
+      return () => { stopped = true; try { post.disconnect(); lp.disconnect(); } catch {} };
     }
     case 'cafe': {
       const a = startNoiseSource(ctx, gain, 'bandpass', 900, 0.5);
