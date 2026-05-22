@@ -274,9 +274,7 @@ const MushafPage: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('mushaf_night', String(nightMode));
-  }, [nightMode]);
+  // Night mode is unified with global theme (useTheme)
 
   useEffect(() => {
     ayahPlayer.stopPlayback();
