@@ -435,9 +435,9 @@ const MushafPage: React.FC = () => {
           >
             {bookmarks.length} 🔖
           </button>
-          <button onClick={() => setNightMode(!nightMode)}
-            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${nightMode ? 'bg-amber-500/20 text-amber-400' : 'bg-secondary text-foreground'}`}
-            title="وضع القراءة الليلي">
+          <button onClick={toggleTheme}
+            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${nightMode ? 'bg-amber-500/20 text-amber-300' : 'bg-secondary text-foreground'}`}
+            title="تبديل الوضع الليلي">
             {nightMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
           <button onClick={() => setShowJumpInput(!showJumpInput)}
