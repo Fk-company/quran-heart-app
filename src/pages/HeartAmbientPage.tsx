@@ -258,12 +258,18 @@ const HeartAmbientPage: React.FC = () => {
 
     if (id === 'recitation') {
       if (playing) {
-        const a = recRef.current?.audio ?? new Audio(layer.url!);
-        a.loop = true;
+        let a = recRef.current?.audio;
+        if (!a) {
+          a = new Audio();
+          a.preload = 'auto';
+          a.loop = true;
+          a.src = layer.url!;
+          recRef.current = { audio: a };
+        }
         a.volume = state[id].vol;
-        a.crossOrigin = 'anonymous';
-        a.play().catch(() => {});
-        recRef.current = { audio: a };
+        a.play().catch((err) => {
+          console.warn('recitation play failed', err);
+        });
       } else {
         recRef.current?.audio.pause();
       }
@@ -271,15 +277,15 @@ const HeartAmbientPage: React.FC = () => {
       if (playing) {
         const { ctx, master } = ensureCtx();
         const g = ctx.createGain();
-        g.gain.value = state[id].vol;
+        g.gain.value = Math.max(0.05, state[id].vol);
         g.connect(master);
         const stop = buildLayer(ctx, id, g);
         runtimeRef.current[id] = { gain: g, stop };
       } else {
         const rt = runtimeRef.current[id];
         if (rt) {
-          rt.gain.gain.linearRampToValueAtTime(0, ctxRef.current!.currentTime + 0.05);
-          setTimeout(() => { rt.stop(); rt.gain.disconnect(); }, 80);
+          try { rt.gain.gain.linearRampToValueAtTime(0, ctxRef.current!.currentTime + 0.05); } catch {}
+          setTimeout(() => { rt.stop(); try { rt.gain.disconnect(); } catch {} }, 80);
           delete runtimeRef.current[id];
         }
       }
