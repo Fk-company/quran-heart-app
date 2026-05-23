@@ -103,6 +103,10 @@ const AnimatedRoutes = () => {
         <Route path="/heart-ambient" element={<PageTransition><HeartAmbientPage /></PageTransition>} />
         <Route path="/daily-iman" element={<PageTransition><DailyImanPage /></PageTransition>} />
         <Route path="/surah-summary" element={<PageTransition><SurahSummaryPage /></PageTransition>} />
+        <Route path="/qibla" element={<PageTransition><QiblaPage /></PageTransition>} />
+        <Route path="/zakat" element={<PageTransition><ZakatPage /></PageTransition>} />
+        <Route path="/fasting-tracker" element={<PageTransition><FastingTrackerPage /></PageTransition>} />
+        <Route path="/islamic-quiz" element={<PageTransition><IslamicQuizPage /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
