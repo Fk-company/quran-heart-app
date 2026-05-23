@@ -50,6 +50,10 @@ import GuidedTadabburPage from "./pages/GuidedTadabburPage";
 import HeartAmbientPage from "./pages/HeartAmbientPage";
 import DailyImanPage from "./pages/DailyImanPage";
 import SurahSummaryPage from "./pages/SurahSummaryPage";
+import QiblaPage from "./pages/QiblaPage";
+import ZakatPage from "./pages/ZakatPage";
+import FastingTrackerPage from "./pages/FastingTrackerPage";
+import IslamicQuizPage from "./pages/IslamicQuizPage";
 import NotFound from "./pages/NotFound";
 import { useSettings } from "@/hooks/useSettings";
 
@@ -99,6 +103,10 @@ const AnimatedRoutes = () => {
         <Route path="/heart-ambient" element={<PageTransition><HeartAmbientPage /></PageTransition>} />
         <Route path="/daily-iman" element={<PageTransition><DailyImanPage /></PageTransition>} />
         <Route path="/surah-summary" element={<PageTransition><SurahSummaryPage /></PageTransition>} />
+        <Route path="/qibla" element={<PageTransition><QiblaPage /></PageTransition>} />
+        <Route path="/zakat" element={<PageTransition><ZakatPage /></PageTransition>} />
+        <Route path="/fasting-tracker" element={<PageTransition><FastingTrackerPage /></PageTransition>} />
+        <Route path="/islamic-quiz" element={<PageTransition><IslamicQuizPage /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
