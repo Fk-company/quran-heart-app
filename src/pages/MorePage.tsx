@@ -52,6 +52,15 @@ const moreCategories = [
       { label: 'اختبار الحفظ', icon: Brain, path: '/memorization-test', desc: 'اختبر حفظك للقرآن', color: 'bg-purple-500/10 text-purple-500', gradient: 'gradient-primary' },
       { label: 'المتشابهات', icon: Layers, path: '/mutashabihat', desc: 'تمييز الآيات المتشابهة', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
       { label: 'التحدي الأسبوعي', icon: Trophy, path: '/weekly-challenge', desc: 'تحديات وشارات إنجاز', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-primary' },
+      { label: 'اختبار إسلامي', icon: Brain, path: '/islamic-quiz', desc: 'اختبر معلوماتك الدينية', color: 'bg-purple-500/10 text-purple-500', gradient: 'gradient-gold' },
+    ]
+  },
+  {
+    title: 'أدوات إسلامية',
+    items: [
+      { label: 'اتجاه القبلة', icon: Compass, path: '/qibla', desc: 'بوصلة دقيقة نحو الكعبة', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
+      { label: 'حاسبة الزكاة', icon: Coins, path: '/zakat', desc: 'احسب زكاة مالك بسهولة', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-primary' },
+      { label: 'متتبع الصيام', icon: Moon, path: '/fasting-tracker', desc: 'سجّل صيام النوافل', color: 'bg-primary/10 text-primary', gradient: 'gradient-gold' },
     ]
   },
   {
