@@ -50,6 +50,10 @@ import GuidedTadabburPage from "./pages/GuidedTadabburPage";
 import HeartAmbientPage from "./pages/HeartAmbientPage";
 import DailyImanPage from "./pages/DailyImanPage";
 import SurahSummaryPage from "./pages/SurahSummaryPage";
+import QiblaPage from "./pages/QiblaPage";
+import ZakatPage from "./pages/ZakatPage";
+import FastingTrackerPage from "./pages/FastingTrackerPage";
+import IslamicQuizPage from "./pages/IslamicQuizPage";
 import NotFound from "./pages/NotFound";
 import { useSettings } from "@/hooks/useSettings";
 
