@@ -4,7 +4,7 @@ import {
   Heart, Radio, Users, Quote, Search, Star, BookOpen, BarChart3,
   X, Feather, Book, Grid3X3, List, ChevronLeft, TrendingUp, Baby, Sparkles, Mic,
   Brain, Smile, Lightbulb, Bot, Settings, CalendarDays, Target, Send, Globe,
-  Trophy, Mic2, Map as MapIcon, Layers, Waves, Sunrise, FileText, Compass, Coins, Moon
+  Trophy, Mic2, Map as MapIcon, Layers, Waves, Sunrise, FileText, Compass, Coins, Moon, BookHeart, MapPin
 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { MoreHorizontal } from 'lucide-react';
@@ -61,6 +61,8 @@ const moreCategories = [
       { label: 'اتجاه القبلة', icon: Compass, path: '/qibla', desc: 'بوصلة دقيقة نحو الكعبة', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
       { label: 'حاسبة الزكاة', icon: Coins, path: '/zakat', desc: 'احسب زكاة مالك بسهولة', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-primary' },
       { label: 'متتبع الصيام', icon: Moon, path: '/fasting-tracker', desc: 'سجّل صيام النوافل', color: 'bg-primary/10 text-primary', gradient: 'gradient-gold' },
+      { label: 'المساجد القريبة', icon: MapPin, path: '/nearby-mosques', desc: 'ابحث عن أقرب المساجد', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
+      { label: 'يوميات إيمانية', icon: BookHeart, path: '/faith-journal', desc: 'دوّن لحظاتك الروحية', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
     ]
   },
   {
