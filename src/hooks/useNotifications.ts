@@ -11,8 +11,31 @@ async function getSWReg(): Promise<ServiceWorkerRegistration | null> {
   }
 }
 
+const todayKey = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+};
+
+// Deduplicate: prevent re-scheduling the same tag more than once per day.
+function alreadyScheduled(tag: string): boolean {
+  try {
+    const key = `notif_scheduled:${tag}:${todayKey()}`;
+    if (localStorage.getItem(key)) return true;
+    localStorage.setItem(key, '1');
+    // Cleanup old keys
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('notif_scheduled:') && !k.endsWith(`:${todayKey()}`)) {
+        localStorage.removeItem(k);
+      }
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 // Compute ms from now until a HH:MM wall-clock time in a given IANA timezone.
-// Handles DST and country differences automatically via Intl.
 function msUntilTimeInTz(hhmm: string, tz?: string): number {
   const [h, m] = hhmm.split(':').map(Number);
   if (isNaN(h) || isNaN(m)) return -1;
@@ -41,6 +64,20 @@ function msUntilTimeInTz(hhmm: string, tz?: string): number {
   let diff = (target - nowSec) * 1000;
   if (diff <= 0) diff += 86400000;
   return diff;
+}
+
+// Process-level timer registry: clear previous timers for the same tag.
+const timerRegistry: Map<string, number> = (window as any).__lovableNotifTimers || new Map();
+(window as any).__lovableNotifTimers = timerRegistry;
+
+function setTaggedTimeout(tag: string, ms: number, fn: () => void) {
+  const prev = timerRegistry.get(tag);
+  if (prev) clearTimeout(prev);
+  const id = window.setTimeout(() => {
+    timerRegistry.delete(tag);
+    fn();
+  }, ms);
+  timerRegistry.set(tag, id);
 }
 
 export const useNotifications = () => {
@@ -100,6 +137,9 @@ export const useNotifications = () => {
     const diff = msUntilTimeInTz(timeStr, tz);
     if (diff <= 0 || diff > 86400000) return;
 
+    const tagBase = `prayer-${prayerName}`;
+    if (alreadyScheduled(tagBase)) return; // Dedup: skip if already scheduled today.
+
     const reg: any = await getSWReg();
 
     const trySchedule = async (ts: number, title: string, body: string, tag: string) => {
@@ -121,23 +161,25 @@ export const useNotifications = () => {
     const onTs = Date.now() + diff;
 
     const earlyScheduled = earlyTs > Date.now()
-      ? await trySchedule(earlyTs, 'تذكير بالصلاة', `صلاة ${prayerName} بعد 5 دقائق`, `prayer-${prayerName}-early`)
+      ? await trySchedule(earlyTs, 'تذكير بالصلاة', `صلاة ${prayerName} بعد 5 دقائق`, `${tagBase}-early`)
       : true;
-    const onScheduled = await trySchedule(onTs, 'حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName}`, `prayer-${prayerName}`);
+    const onScheduled = await trySchedule(onTs, 'حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName}`, tagBase);
 
     if (!earlyScheduled && earlyTs > Date.now()) {
-      setTimeout(() => sendNotification('تذكير بالصلاة', `صلاة ${prayerName} بعد 5 دقائق`), earlyTs - Date.now());
+      setTaggedTimeout(`${tagBase}-early`, earlyTs - Date.now(),
+        () => sendNotification('تذكير بالصلاة', `صلاة ${prayerName} بعد 5 دقائق`));
     }
     if (!onScheduled) {
-      setTimeout(() => sendNotification('حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName}`), diff);
+      setTaggedTimeout(tagBase, diff,
+        () => sendNotification('حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName}`));
     }
   }, [sendNotification]);
 
-  // Schedule a one-off reminder at a HH:MM wall-clock time (device timezone by default).
   const scheduleDailyReminder = useCallback(async (
     hhmm: string, title: string, body: string, tag: string, tz?: string,
   ) => {
     if (permissionRef.current !== 'granted') return;
+    if (alreadyScheduled(tag)) return; // Dedup per day per tag.
     const diff = msUntilTimeInTz(hhmm, tz);
     if (diff <= 0) return;
     const ts = Date.now() + diff;
@@ -153,10 +195,16 @@ export const useNotifications = () => {
         return;
       }
     } catch {}
-    setTimeout(() => sendNotification(title, body), diff);
+    setTaggedTimeout(tag, diff, () => sendNotification(title, body));
   }, [sendNotification]);
 
   const sendAdhkarReminder = useCallback(() => {
+    // Throttle: at most one adhkar reminder per 6 hours.
+    try {
+      const last = parseInt(localStorage.getItem('notif_adhkar_last') || '0', 10);
+      if (Date.now() - last < 6 * 60 * 60 * 1000) return;
+      localStorage.setItem('notif_adhkar_last', String(Date.now()));
+    } catch {}
     const adhkarMessages = [
       'لا تنسَ أذكار الصباح',
       'لا تنسَ أذكار المساء',
