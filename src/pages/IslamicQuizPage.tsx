@@ -243,33 +243,52 @@ const IslamicQuizPage: React.FC = () => {
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
   const [wrongAnswers, setWrongAnswers] = useState<Q[]>([]);
+  const [drillMode, setDrillMode] = useState(false);
+  const [missedCount, setMissedCount] = useState(() => Object.keys(getMissed()).length);
+
+  useEffect(() => {
+    if (!started) setMissedCount(Object.keys(getMissed()).length);
+  }, [started, done]);
 
   const questions = useMemo(() => {
+    if (drillMode) {
+      const m = getMissed();
+      const ranked = BANK
+        .filter(q => m[q.q])
+        .sort((a, b) => (m[b.q] || 0) - (m[a.q] || 0));
+      return ranked.slice(0, Math.min(10, ranked.length));
+    }
     let pool = BANK;
     if (difficulty !== 'all') pool = pool.filter(q => q.difficulty === difficulty);
     if (category !== 'all') pool = pool.filter(q => q.category === category);
     return shuffle(pool).slice(0, Math.min(10, pool.length));
-  }, [round, difficulty, category, started]);
+  }, [round, difficulty, category, started, drillMode]);
 
   const current = questions[idx];
 
   const pick = (i: number) => {
     if (selected !== null || !current) return;
     setSelected(i);
-    if (i === current.answer) setScore(s => s + 1);
-    else setWrongAnswers(w => [...w, current]);
+    if (i === current.answer) {
+      setScore(s => s + 1);
+      if (drillMode) decrementMissed(current.q);
+    } else {
+      setWrongAnswers(w => [...w, current]);
+      bumpMissed(current.q);
+    }
     setTimeout(() => {
       if (idx + 1 >= questions.length) setDone(true);
       else { setIdx(idx + 1); setSelected(null); }
     }, 1000);
   };
 
-  const start = () => {
+  const start = (drill = false) => {
+    setDrillMode(drill);
     setRound(r => r + 1); setIdx(0); setSelected(null); setScore(0); setDone(false); setWrongAnswers([]);
     setStarted(true);
   };
 
-  const reset = () => { setStarted(false); setDone(false); };
+  const reset = () => { setStarted(false); setDone(false); setDrillMode(false); };
 
   const difficultyBadge = (d: Difficulty) => {
     const map: Record<Difficulty, string> = {
