@@ -1,6 +1,24 @@
-import React, { useMemo, useState } from 'react';
-import { Brain, CheckCircle2, XCircle, Trophy, RefreshCw, Sparkles, ChevronLeft } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Brain, CheckCircle2, XCircle, Trophy, RefreshCw, Sparkles, ChevronLeft, Target } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
+
+const MISSED_KEY = 'quiz_missed_registry';
+const getMissed = (): Record<string, number> => {
+  try { return JSON.parse(localStorage.getItem(MISSED_KEY) || '{}'); } catch { return {}; }
+};
+const bumpMissed = (qText: string) => {
+  const m = getMissed();
+  m[qText] = (m[qText] || 0) + 1;
+  try { localStorage.setItem(MISSED_KEY, JSON.stringify(m)); } catch {}
+};
+const decrementMissed = (qText: string) => {
+  const m = getMissed();
+  if (m[qText]) {
+    m[qText] = Math.max(0, m[qText] - 1);
+    if (!m[qText]) delete m[qText];
+    try { localStorage.setItem(MISSED_KEY, JSON.stringify(m)); } catch {}
+  }
+};
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 type Category = 'quran' | 'hadith' | 'seerah' | 'fiqh' | 'aqeedah' | 'history' | 'general';
