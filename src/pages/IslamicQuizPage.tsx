@@ -445,9 +445,14 @@ const IslamicQuizPage: React.FC = () => {
                 {score === questions.length ? 'ممتاز! إجابات كاملة' : score >= questions.length * 0.7 ? 'جيد جداً، استمر' : 'حاول مرة أخرى لتحسين نتيجتك'}
               </p>
               <div className="flex gap-2">
-                <button onClick={start} className="flex-1 gradient-primary text-primary-foreground px-6 py-3 rounded-2xl font-bold shadow-emerald inline-flex items-center justify-center gap-2">
+                <button onClick={() => start(drillMode)} className="flex-1 gradient-primary text-primary-foreground px-6 py-3 rounded-2xl font-bold shadow-emerald inline-flex items-center justify-center gap-2">
                   <RefreshCw className="w-4 h-4" /> إعادة
                 </button>
+                {wrongAnswers.length > 0 && !drillMode && (
+                  <button onClick={() => start(true)} className="flex-1 bg-amber-500/15 text-amber-600 dark:text-amber-400 border-2 border-amber-500/40 px-6 py-3 rounded-2xl font-bold inline-flex items-center justify-center gap-2">
+                    <Target className="w-4 h-4" /> تدريب الأخطاء
+                  </button>
+                )}
                 <button onClick={reset} className="flex-1 bg-secondary text-foreground px-6 py-3 rounded-2xl font-bold inline-flex items-center justify-center gap-2">
                   <ChevronLeft className="w-4 h-4" /> تغيير الإعدادات
                 </button>
