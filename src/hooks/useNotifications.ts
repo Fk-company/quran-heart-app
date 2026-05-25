@@ -208,10 +208,11 @@ export const useNotifications = () => {
   }, [sendNotification]);
 
   const sendAdhkarReminder = useCallback(() => {
-    // Throttle: at most one adhkar reminder per 6 hours.
+    const ns = getNotificationSettings();
+    if (!ns.enabled || !ns.adhkarEnabled) return;
     try {
       const last = parseInt(localStorage.getItem('notif_adhkar_last') || '0', 10);
-      if (Date.now() - last < 6 * 60 * 60 * 1000) return;
+      if (Date.now() - last < ns.adhkarHours * 60 * 60 * 1000) return;
       localStorage.setItem('notif_adhkar_last', String(Date.now()));
     } catch {}
     const adhkarMessages = [
