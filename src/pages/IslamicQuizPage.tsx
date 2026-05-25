@@ -359,8 +359,16 @@ const IslamicQuizPage: React.FC = () => {
             <div className="text-xs text-muted-foreground mt-1">من أصل {count} سؤالاً متاحاً</div>
           </div>
 
+          {missedCount > 0 && (
+            <button
+              onClick={() => start(true)}
+              className="w-full mb-3 bg-amber-500/15 text-amber-600 dark:text-amber-400 border-2 border-amber-500/40 py-3 rounded-2xl font-bold inline-flex items-center justify-center gap-2"
+            >
+              <Target className="w-5 h-5" /> تدريب على أخطائك ({missedCount} سؤال)
+            </button>
+          )}
           <button
-            onClick={start}
+            onClick={() => start(false)}
             disabled={count === 0}
             className="w-full gradient-primary text-primary-foreground py-4 rounded-2xl font-bold shadow-emerald inline-flex items-center justify-center gap-2 disabled:opacity-50"
           >
