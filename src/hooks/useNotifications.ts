@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
+import { getNotificationSettings, playAdhan } from './useNotificationSettings';
 
 const ICON = '/app-logo.png';
 
@@ -134,13 +135,17 @@ export const useNotifications = () => {
 
   const schedulePrayerNotification = useCallback(async (prayerName: string, timeStr: string, tz?: string) => {
     if (permissionRef.current !== 'granted') return;
+    const ns = getNotificationSettings();
+    if (!ns.enabled || !ns.prayerEnabled) return;
+
     const diff = msUntilTimeInTz(timeStr, tz);
     if (diff <= 0 || diff > 86400000) return;
 
     const tagBase = `prayer-${prayerName}`;
-    if (alreadyScheduled(tagBase)) return; // Dedup: skip if already scheduled today.
+    if (alreadyScheduled(tagBase)) return;
 
     const reg: any = await getSWReg();
+    const earlyMin = ns.prayerEarlyMinutes;
 
     const trySchedule = async (ts: number, title: string, body: string, tag: string) => {
       try {
@@ -157,22 +162,26 @@ export const useNotifications = () => {
       return false;
     };
 
-    const earlyTs = Date.now() + (diff - 5 * 60 * 1000);
     const onTs = Date.now() + diff;
 
-    const earlyScheduled = earlyTs > Date.now()
-      ? await trySchedule(earlyTs, 'تذكير بالصلاة', `صلاة ${prayerName} بعد 5 دقائق`, `${tagBase}-early`)
-      : true;
-    const onScheduled = await trySchedule(onTs, 'حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName}`, tagBase);
+    if (earlyMin > 0) {
+      const earlyTs = Date.now() + (diff - earlyMin * 60 * 1000);
+      if (earlyTs > Date.now()) {
+        const ok = await trySchedule(earlyTs, 'تذكير بالصلاة', `صلاة ${prayerName} بعد ${earlyMin} دقيقة`, `${tagBase}-early`);
+        if (!ok) {
+          setTaggedTimeout(`${tagBase}-early`, earlyTs - Date.now(),
+            () => sendNotification('تذكير بالصلاة', `صلاة ${prayerName} بعد ${earlyMin} دقيقة`));
+        }
+      }
+    }
 
-    if (!earlyScheduled && earlyTs > Date.now()) {
-      setTaggedTimeout(`${tagBase}-early`, earlyTs - Date.now(),
-        () => sendNotification('تذكير بالصلاة', `صلاة ${prayerName} بعد 5 دقائق`));
-    }
-    if (!onScheduled) {
-      setTaggedTimeout(tagBase, diff,
-        () => sendNotification('حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName}`));
-    }
+    // On-time: play adhan + notify (timer-based to allow audio playback).
+    setTaggedTimeout(tagBase, diff, () => {
+      sendNotification('حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName}`);
+      playAdhan();
+    });
+    // Backup OS notification via trigger (no audio but persists if tab closed).
+    await trySchedule(onTs, 'حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName}`, `${tagBase}-os`);
   }, [sendNotification]);
 
   const scheduleDailyReminder = useCallback(async (
@@ -199,10 +208,11 @@ export const useNotifications = () => {
   }, [sendNotification]);
 
   const sendAdhkarReminder = useCallback(() => {
-    // Throttle: at most one adhkar reminder per 6 hours.
+    const ns = getNotificationSettings();
+    if (!ns.enabled || !ns.adhkarEnabled) return;
     try {
       const last = parseInt(localStorage.getItem('notif_adhkar_last') || '0', 10);
-      if (Date.now() - last < 6 * 60 * 60 * 1000) return;
+      if (Date.now() - last < ns.adhkarHours * 60 * 60 * 1000) return;
       localStorage.setItem('notif_adhkar_last', String(Date.now()));
     } catch {}
     const adhkarMessages = [

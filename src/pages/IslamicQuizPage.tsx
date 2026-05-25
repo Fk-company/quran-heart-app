@@ -1,6 +1,24 @@
-import React, { useMemo, useState } from 'react';
-import { Brain, CheckCircle2, XCircle, Trophy, RefreshCw, Sparkles, ChevronLeft } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Brain, CheckCircle2, XCircle, Trophy, RefreshCw, Sparkles, ChevronLeft, Target } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
+
+const MISSED_KEY = 'quiz_missed_registry';
+const getMissed = (): Record<string, number> => {
+  try { return JSON.parse(localStorage.getItem(MISSED_KEY) || '{}'); } catch { return {}; }
+};
+const bumpMissed = (qText: string) => {
+  const m = getMissed();
+  m[qText] = (m[qText] || 0) + 1;
+  try { localStorage.setItem(MISSED_KEY, JSON.stringify(m)); } catch {}
+};
+const decrementMissed = (qText: string) => {
+  const m = getMissed();
+  if (m[qText]) {
+    m[qText] = Math.max(0, m[qText] - 1);
+    if (!m[qText]) delete m[qText];
+    try { localStorage.setItem(MISSED_KEY, JSON.stringify(m)); } catch {}
+  }
+};
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 type Category = 'quran' | 'hadith' | 'seerah' | 'fiqh' | 'aqeedah' | 'history' | 'general';
@@ -132,6 +150,85 @@ const BANK: Q[] = [
   { q: 'كم نوع من أنواع المياه في الفقه؟', options: ['2', '3', '4', '5'], answer: 1, difficulty: 'hard', category: 'fiqh' },
   { q: 'كم نوعاً من التوحيد عند أهل السنة؟', options: ['2', '3', '4', '5'], answer: 1, difficulty: 'hard', category: 'aqeedah' },
   { q: 'كم عدد أسماء الله الحسنى الواردة في الحديث؟', options: ['99', '100', '114', 'لا حصر لها'], answer: 0, difficulty: 'hard', category: 'aqeedah' },
+
+  // ==================== EXTRA - القرآن ====================
+  { q: 'كم عدد السور المدنية تقريباً؟', options: ['28', '20', '36', '40'], answer: 0, difficulty: 'medium', category: 'quran' },
+  { q: 'ما السورة التي تُعدل ثلث القرآن؟', options: ['الفاتحة', 'الإخلاص', 'يس', 'الكافرون'], answer: 1, difficulty: 'easy', category: 'quran' },
+  { q: 'في أي سورة قصة هاروت وماروت؟', options: ['البقرة', 'النساء', 'المائدة', 'يونس'], answer: 0, difficulty: 'hard', category: 'quran' },
+  { q: 'كم آية في سورة البقرة؟', options: ['200', '250', '286', '300'], answer: 2, difficulty: 'medium', category: 'quran' },
+  { q: 'كم عدد الحروف المقطعة في فواتح السور؟', options: ['10', '14', '20', '28'], answer: 1, difficulty: 'hard', category: 'quran' },
+  { q: 'ما السورة التي ذُكر فيها اسم "محمد" صراحة؟', options: ['القتال (محمد)', 'يس', 'الفتح', 'كل ما سبق'], answer: 3, difficulty: 'hard', category: 'quran' },
+  { q: 'في أي سورة آية الدَّين (أطول آية)؟', options: ['البقرة', 'النساء', 'المائدة', 'النور'], answer: 0, difficulty: 'medium', category: 'quran' },
+  { q: 'ما السورة المعروفة بـ"بني إسرائيل"؟', options: ['الكهف', 'الإسراء', 'مريم', 'طه'], answer: 1, difficulty: 'medium', category: 'quran' },
+  { q: 'كم عدد السجدات في القرآن عند الشافعية؟', options: ['10', '14', '15', '17'], answer: 1, difficulty: 'hard', category: 'quran' },
+  { q: 'ما السورة التي بها سجدتان؟', options: ['الحج', 'السجدة', 'الانشقاق', 'العلق'], answer: 0, difficulty: 'hard', category: 'quran' },
+  { q: 'كم مرة ذُكر اسم مريم عليها السلام في القرآن؟', options: ['10', '20', '34', '50'], answer: 2, difficulty: 'hard', category: 'quran' },
+  { q: 'ما السورة التي تبدأ بـ"تبارك الذي بيده الملك"؟', options: ['الفرقان', 'الملك', 'الذاريات', 'القلم'], answer: 1, difficulty: 'easy', category: 'quran' },
+  { q: 'ما أول آية نزلت في تحريم الخمر بشكل قاطع؟', options: ['البقرة 219', 'النساء 43', 'المائدة 90', 'الأعراف 33'], answer: 2, difficulty: 'hard', category: 'quran' },
+  { q: 'كم عدد آيات سورة الكوثر؟', options: ['3', '4', '5', '6'], answer: 0, difficulty: 'easy', category: 'quran' },
+  { q: 'ما اسم السورة التي تسمى "الفسطاط"؟', options: ['البقرة', 'النور', 'الأنفال', 'الحجرات'], answer: 1, difficulty: 'hard', category: 'quran' },
+
+  // ==================== EXTRA - السيرة والصحابة ====================
+  { q: 'من هو "ذو النورين" من الصحابة؟', options: ['أبو بكر', 'عمر', 'عثمان', 'علي'], answer: 2, difficulty: 'medium', category: 'history' },
+  { q: 'من هو "أسد الله"؟', options: ['علي', 'حمزة', 'خالد', 'سعد'], answer: 1, difficulty: 'medium', category: 'history' },
+  { q: 'من أول من استشهد في الإسلام؟', options: ['سمية بنت خياط', 'بلال', 'ياسر', 'حمزة'], answer: 0, difficulty: 'medium', category: 'history' },
+  { q: 'كم عدد المهاجرين إلى الحبشة في الهجرة الأولى؟', options: ['10', '12', '15', '20'], answer: 1, difficulty: 'hard', category: 'history' },
+  { q: 'في أي غار اختبأ النبي ﷺ وأبو بكر عند الهجرة؟', options: ['حراء', 'ثور', 'الغار الأسود', 'الرحمة'], answer: 1, difficulty: 'easy', category: 'seerah' },
+  { q: 'في أي غار كان النبي ﷺ يتعبد قبل البعثة؟', options: ['حراء', 'ثور', 'الفتح', 'النور'], answer: 0, difficulty: 'easy', category: 'seerah' },
+  { q: 'كم عاماً مكث النبي ﷺ في المدينة؟', options: ['8', '10', '12', '13'], answer: 1, difficulty: 'medium', category: 'seerah' },
+  { q: 'من هو خال النبي ﷺ من الرضاع؟', options: ['عبد الله', 'الحارث', 'حمزة', 'العباس'], answer: 1, difficulty: 'hard', category: 'seerah' },
+  { q: 'في أي معركة استشهد حمزة رضي الله عنه؟', options: ['بدر', 'أحد', 'الخندق', 'حنين'], answer: 1, difficulty: 'medium', category: 'history' },
+  { q: 'من قائد جيش مؤتة بعد استشهاد القادة الثلاثة؟', options: ['خالد بن الوليد', 'عمرو بن العاص', 'أبو عبيدة', 'المثنى'], answer: 0, difficulty: 'medium', category: 'history' },
+  { q: 'كم عدد بيعات العقبة؟', options: ['1', '2', '3', '4'], answer: 1, difficulty: 'medium', category: 'seerah' },
+  { q: 'في أي عام كانت غزوة الخندق؟', options: ['3 هـ', '4 هـ', '5 هـ', '6 هـ'], answer: 2, difficulty: 'medium', category: 'history' },
+  { q: 'من أول من جهر بالقرآن في مكة؟', options: ['أبو بكر', 'عبد الله بن مسعود', 'علي', 'الزبير'], answer: 1, difficulty: 'hard', category: 'seerah' },
+  { q: 'من هو "ترجمان القرآن"؟', options: ['ابن مسعود', 'ابن عباس', 'ابن عمر', 'أبي بن كعب'], answer: 1, difficulty: 'medium', category: 'history' },
+
+  // ==================== EXTRA - الفقه ====================
+  { q: 'كم عدد فروض الوضوء عند الجمهور؟', options: ['4', '5', '6', '7'], answer: 0, difficulty: 'easy', category: 'fiqh' },
+  { q: 'كم عدد سنن الوضوء المؤكدة؟', options: ['5', '7', '10', '12'], answer: 2, difficulty: 'medium', category: 'fiqh' },
+  { q: 'كم عدد نواقض الوضوء؟', options: ['4', '5', '6', '8'], answer: 2, difficulty: 'medium', category: 'fiqh' },
+  { q: 'كم عدد ركعات صلاة العصر؟', options: ['2', '3', '4', '5'], answer: 2, difficulty: 'easy', category: 'fiqh' },
+  { q: 'كم عدد ركعات صلاة العشاء؟', options: ['2', '3', '4', '5'], answer: 2, difficulty: 'easy', category: 'fiqh' },
+  { q: 'ما حكم صلاة الوتر؟', options: ['فرض', 'سنة مؤكدة', 'مستحبة', 'مكروهة'], answer: 1, difficulty: 'medium', category: 'fiqh' },
+  { q: 'كم يوماً يصوم المسلم في رمضان؟', options: ['28', '29', '29 أو 30', '31'], answer: 2, difficulty: 'easy', category: 'fiqh' },
+  { q: 'ما حكم الاعتكاف في العشر الأواخر من رمضان؟', options: ['فرض', 'واجب', 'سنة مؤكدة', 'مباح'], answer: 2, difficulty: 'medium', category: 'fiqh' },
+  { q: 'ما حكم زكاة الفطر؟', options: ['سنة', 'مستحبة', 'واجبة', 'مباحة'], answer: 2, difficulty: 'medium', category: 'fiqh' },
+  { q: 'متى تجب زكاة الفطر؟', options: ['أول رمضان', 'منتصف رمضان', 'غروب آخر يوم من رمضان', 'يوم العيد'], answer: 2, difficulty: 'medium', category: 'fiqh' },
+  { q: 'كم مقدار زكاة الفطر؟', options: ['نصف صاع', 'صاع', 'صاعان', 'رطل'], answer: 1, difficulty: 'medium', category: 'fiqh' },
+  { q: 'ما هو شهر الحج الأكبر؟', options: ['رجب', 'شعبان', 'ذو القعدة', 'ذو الحجة'], answer: 3, difficulty: 'easy', category: 'fiqh' },
+  { q: 'في أي يوم يقف الحاج بعرفة؟', options: ['8 ذو الحجة', '9 ذو الحجة', '10 ذو الحجة', '12 ذو الحجة'], answer: 1, difficulty: 'medium', category: 'fiqh' },
+  { q: 'كم عدد أشواط الطواف؟', options: ['3', '5', '7', '9'], answer: 2, difficulty: 'easy', category: 'fiqh' },
+  { q: 'كم عدد أشواط السعي بين الصفا والمروة؟', options: ['3', '5', '7', '9'], answer: 2, difficulty: 'easy', category: 'fiqh' },
+
+  // ==================== EXTRA - العقيدة والحديث ====================
+  { q: 'من هم أصحاب الكتب الستة؟', options: ['البخاري ومسلم فقط', 'البخاري ومسلم وأبو داود والترمذي والنسائي وابن ماجه', 'الأئمة الأربعة', 'لا أحد'], answer: 1, difficulty: 'medium', category: 'hadith' },
+  { q: 'ما الفرق بين الحديث القدسي والقرآن؟', options: ['لا فرق', 'القدسي معناه من الله ولفظه من النبي ﷺ', 'القدسي يُتلى في الصلاة', 'القدسي محفوظ في اللوح'], answer: 1, difficulty: 'hard', category: 'hadith' },
+  { q: 'ما أول واجب على المكلف؟', options: ['الصلاة', 'الشهادتان', 'معرفة الله', 'الزكاة'], answer: 2, difficulty: 'hard', category: 'aqeedah' },
+  { q: 'كم عدد علامات الساعة الكبرى؟', options: ['5', '8', '10', '12'], answer: 2, difficulty: 'medium', category: 'aqeedah' },
+  { q: 'من أول من يدخل الجنة من الأمم؟', options: ['أمة موسى', 'أمة عيسى', 'أمة محمد ﷺ', 'أمة إبراهيم'], answer: 2, difficulty: 'medium', category: 'aqeedah' },
+  { q: 'ما اسم الملك الموكل بقبض الأرواح؟', options: ['جبريل', 'ميكائيل', 'إسرافيل', 'ملك الموت'], answer: 3, difficulty: 'easy', category: 'aqeedah' },
+  { q: 'ما اسم الملك الموكل بالقطر والنبات؟', options: ['جبريل', 'ميكائيل', 'إسرافيل', 'مالك'], answer: 1, difficulty: 'medium', category: 'aqeedah' },
+  { q: 'من خازن الجنة؟', options: ['رضوان', 'مالك', 'جبريل', 'ميكائيل'], answer: 0, difficulty: 'medium', category: 'aqeedah' },
+  { q: 'كم عدد طبقات الجنة في الحديث؟', options: ['7', '8', '100', 'لا حد'], answer: 2, difficulty: 'hard', category: 'aqeedah' },
+  { q: 'ما أعلى درجات الجنة؟', options: ['عدن', 'الفردوس الأعلى', 'النعيم', 'المأوى'], answer: 1, difficulty: 'medium', category: 'aqeedah' },
+
+  // ==================== EXTRA - عام وقصص الأنبياء ====================
+  { q: 'كم سنة دعا نوح عليه السلام قومه؟', options: ['500', '700', '950', '1000'], answer: 2, difficulty: 'medium', category: 'general' },
+  { q: 'من هو "أبو الأنبياء"؟', options: ['نوح', 'إبراهيم', 'موسى', 'عيسى'], answer: 1, difficulty: 'easy', category: 'general' },
+  { q: 'من هو النبي الذي علّمه الله صنعة الحديد؟', options: ['داود', 'سليمان', 'إدريس', 'موسى'], answer: 0, difficulty: 'medium', category: 'general' },
+  { q: 'كم عدد المرسلين المذكورين بالاسم في القرآن؟', options: ['20', '25', '30', '124'], answer: 1, difficulty: 'medium', category: 'general' },
+  { q: 'من هو النبي الذي رفعه الله إلى السماء؟', options: ['إدريس', 'إلياس', 'عيسى', 'إدريس وعيسى'], answer: 3, difficulty: 'hard', category: 'general' },
+  { q: 'من هو نبي الله الذي ابتُلي في جسده؟', options: ['أيوب', 'يونس', 'يعقوب', 'موسى'], answer: 0, difficulty: 'easy', category: 'general' },
+  { q: 'كم عاماً مكث يوسف في السجن؟', options: ['3', '5', '7', '9'], answer: 2, difficulty: 'hard', category: 'general' },
+  { q: 'من النبي الذي قال "رب اشرح لي صدري"؟', options: ['موسى', 'هارون', 'محمد ﷺ', 'يونس'], answer: 0, difficulty: 'medium', category: 'quran' },
+  { q: 'من النبي الذي علّمه الله منطق الطير؟', options: ['داود', 'سليمان', 'يحيى', 'زكريا'], answer: 1, difficulty: 'easy', category: 'general' },
+  { q: 'في أي سورة قصة لقمان مع ابنه؟', options: ['سبأ', 'لقمان', 'فاطر', 'يس'], answer: 1, difficulty: 'easy', category: 'quran' },
+  { q: 'كم سنة عاش لقمان الحكيم؟', options: ['300', '500', '700', '1000'], answer: 3, difficulty: 'hard', category: 'general' },
+  { q: 'من هو زوج السيدة مريم على بعض الأقوال (المربي)؟', options: ['زكريا', 'يوسف النجار', 'يحيى', 'لم تتزوج'], answer: 1, difficulty: 'hard', category: 'general' },
+  { q: 'من أول نبي في الأرض؟', options: ['آدم', 'نوح', 'إدريس', 'إبراهيم'], answer: 0, difficulty: 'easy', category: 'general' },
+  { q: 'ما اسم أم النبي عيسى عليه السلام؟', options: ['آسيا', 'مريم', 'هاجر', 'سارة'], answer: 1, difficulty: 'easy', category: 'general' },
+  { q: 'كم عدد أهل الكهف على المشهور؟', options: ['5', '7', '8', 'الله أعلم'], answer: 3, difficulty: 'medium', category: 'general' },
 ];
 
 function shuffle<T>(arr: T[]): T[] { return [...arr].sort(() => Math.random() - 0.5); }
@@ -146,33 +243,52 @@ const IslamicQuizPage: React.FC = () => {
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
   const [wrongAnswers, setWrongAnswers] = useState<Q[]>([]);
+  const [drillMode, setDrillMode] = useState(false);
+  const [missedCount, setMissedCount] = useState(() => Object.keys(getMissed()).length);
+
+  useEffect(() => {
+    if (!started) setMissedCount(Object.keys(getMissed()).length);
+  }, [started, done]);
 
   const questions = useMemo(() => {
+    if (drillMode) {
+      const m = getMissed();
+      const ranked = BANK
+        .filter(q => m[q.q])
+        .sort((a, b) => (m[b.q] || 0) - (m[a.q] || 0));
+      return ranked.slice(0, Math.min(10, ranked.length));
+    }
     let pool = BANK;
     if (difficulty !== 'all') pool = pool.filter(q => q.difficulty === difficulty);
     if (category !== 'all') pool = pool.filter(q => q.category === category);
     return shuffle(pool).slice(0, Math.min(10, pool.length));
-  }, [round, difficulty, category, started]);
+  }, [round, difficulty, category, started, drillMode]);
 
   const current = questions[idx];
 
   const pick = (i: number) => {
     if (selected !== null || !current) return;
     setSelected(i);
-    if (i === current.answer) setScore(s => s + 1);
-    else setWrongAnswers(w => [...w, current]);
+    if (i === current.answer) {
+      setScore(s => s + 1);
+      if (drillMode) decrementMissed(current.q);
+    } else {
+      setWrongAnswers(w => [...w, current]);
+      bumpMissed(current.q);
+    }
     setTimeout(() => {
       if (idx + 1 >= questions.length) setDone(true);
       else { setIdx(idx + 1); setSelected(null); }
     }, 1000);
   };
 
-  const start = () => {
+  const start = (drill = false) => {
+    setDrillMode(drill);
     setRound(r => r + 1); setIdx(0); setSelected(null); setScore(0); setDone(false); setWrongAnswers([]);
     setStarted(true);
   };
 
-  const reset = () => { setStarted(false); setDone(false); };
+  const reset = () => { setStarted(false); setDone(false); setDrillMode(false); };
 
   const difficultyBadge = (d: Difficulty) => {
     const map: Record<Difficulty, string> = {
@@ -243,8 +359,16 @@ const IslamicQuizPage: React.FC = () => {
             <div className="text-xs text-muted-foreground mt-1">من أصل {count} سؤالاً متاحاً</div>
           </div>
 
+          {missedCount > 0 && (
+            <button
+              onClick={() => start(true)}
+              className="w-full mb-3 bg-amber-500/15 text-amber-600 dark:text-amber-400 border-2 border-amber-500/40 py-3 rounded-2xl font-bold inline-flex items-center justify-center gap-2"
+            >
+              <Target className="w-5 h-5" /> تدريب على أخطائك ({missedCount} سؤال)
+            </button>
+          )}
           <button
-            onClick={start}
+            onClick={() => start(false)}
             disabled={count === 0}
             className="w-full gradient-primary text-primary-foreground py-4 rounded-2xl font-bold shadow-emerald inline-flex items-center justify-center gap-2 disabled:opacity-50"
           >
@@ -321,9 +445,14 @@ const IslamicQuizPage: React.FC = () => {
                 {score === questions.length ? 'ممتاز! إجابات كاملة' : score >= questions.length * 0.7 ? 'جيد جداً، استمر' : 'حاول مرة أخرى لتحسين نتيجتك'}
               </p>
               <div className="flex gap-2">
-                <button onClick={start} className="flex-1 gradient-primary text-primary-foreground px-6 py-3 rounded-2xl font-bold shadow-emerald inline-flex items-center justify-center gap-2">
+                <button onClick={() => start(drillMode)} className="flex-1 gradient-primary text-primary-foreground px-6 py-3 rounded-2xl font-bold shadow-emerald inline-flex items-center justify-center gap-2">
                   <RefreshCw className="w-4 h-4" /> إعادة
                 </button>
+                {wrongAnswers.length > 0 && !drillMode && (
+                  <button onClick={() => start(true)} className="flex-1 bg-amber-500/15 text-amber-600 dark:text-amber-400 border-2 border-amber-500/40 px-6 py-3 rounded-2xl font-bold inline-flex items-center justify-center gap-2">
+                    <Target className="w-4 h-4" /> تدريب الأخطاء
+                  </button>
+                )}
                 <button onClick={reset} className="flex-1 bg-secondary text-foreground px-6 py-3 rounded-2xl font-bold inline-flex items-center justify-center gap-2">
                   <ChevronLeft className="w-4 h-4" /> تغيير الإعدادات
                 </button>

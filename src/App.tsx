@@ -56,6 +56,7 @@ import FastingTrackerPage from "./pages/FastingTrackerPage";
 import IslamicQuizPage from "./pages/IslamicQuizPage";
 import NearbyMosquesPage from "./pages/NearbyMosquesPage";
 import FaithJournalPage from "./pages/FaithJournalPage";
+import NotificationSettingsPage from "./pages/NotificationSettingsPage";
 import NotFound from "./pages/NotFound";
 import { useSettings } from "@/hooks/useSettings";
 
@@ -111,6 +112,7 @@ const AnimatedRoutes = () => {
         <Route path="/islamic-quiz" element={<PageTransition><IslamicQuizPage /></PageTransition>} />
         <Route path="/nearby-mosques" element={<PageTransition><NearbyMosquesPage /></PageTransition>} />
         <Route path="/faith-journal" element={<PageTransition><FaithJournalPage /></PageTransition>} />
+        <Route path="/notification-settings" element={<PageTransition><NotificationSettingsPage /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
