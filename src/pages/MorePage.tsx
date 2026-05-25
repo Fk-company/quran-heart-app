@@ -79,6 +79,7 @@ const moreCategories = [
   {
     title: 'عن التطبيق',
     items: [
+      { label: 'إعدادات الإشعارات', icon: Bell, path: '/notification-settings', desc: 'الأذان والتذكيرات وأوقاتها', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
       { label: 'تواصل مع المطور', icon: Globe, path: '/developer-social', desc: 'فخري عادل - تليجرام وانستغرام', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
     ]
   }
