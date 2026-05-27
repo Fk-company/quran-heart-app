@@ -4,11 +4,13 @@ export type Difficulty = 'easy' | 'medium' | 'hard';
 export type Category = 'quran' | 'hadith' | 'seerah' | 'fiqh' | 'aqeedah' | 'history' | 'general';
 
 export interface Q {
+  id: string;
   q: string;
   options: string[];
   answer: number;
   difficulty: Difficulty;
   category: Category;
+  source?: 'local' | 'api';
 }
 
 // -------- Seeded RNG (Mulberry32) for shuffles per session --------
@@ -54,9 +56,18 @@ function pickDistractors<T>(pool: T[], correct: T, rand: () => number, count = 3
   return shuffled.slice(0, count);
 }
 
-function buildQ(text: string, correct: string, distractors: string[], difficulty: Difficulty, category: Category, rand: () => number): Q {
+function stableId(input: string): string {
+  let h = 2166136261;
+  for (let i = 0; i < input.length; i++) {
+    h ^= input.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(36);
+}
+
+function buildQ(text: string, correct: string, distractors: string[], difficulty: Difficulty, category: Category, rand: () => number, source: 'local' | 'api' = 'local'): Q {
   const options = shuffleSeeded([correct, ...distractors], rand);
-  return { q: text, options, answer: options.indexOf(correct), difficulty, category };
+  return { id: stableId(`${text}|${correct}|${category}`), q: text, options, answer: options.indexOf(correct), difficulty, category, source };
 }
 
 // -------- Generators --------
@@ -162,21 +173,11 @@ function genProphets(rand: () => number): Q[] {
 
 // -------- Static seed bank kept for variety --------
 const STATIC: Q[] = [
-  { q:'كم عدد أركان الإسلام؟', options:['4','5','6','7'], answer:1, difficulty:'easy', category:'fiqh' },
-  { q:'كم عدد أركان الإيمان؟', options:['5','6','7','4'], answer:1, difficulty:'easy', category:'aqeedah' },
-  { q:'كم عدد الصلوات المفروضة في اليوم؟', options:['3','4','5','6'], answer:2, difficulty:'easy', category:'fiqh' },
-  { q:'كم مقدار زكاة المال؟', options:['1%','2.5%','5%','10%'], answer:1, difficulty:'easy', category:'fiqh' },
-  { q:'في أي شهر فُرض صيام رمضان؟', options:['شعبان','رمضان','محرم','ذو الحجة'], answer:1, difficulty:'easy', category:'fiqh' },
-  { q:'كم عدد أجزاء القرآن؟', options:['20','30','40','60'], answer:1, difficulty:'easy', category:'quran' },
-  { q:'كم عدد سور القرآن؟', options:['110','114','120','116'], answer:1, difficulty:'easy', category:'quran' },
-  { q:'من أول الخلفاء الراشدين؟', options:['عمر','أبو بكر','علي','عثمان'], answer:1, difficulty:'easy', category:'history' },
-  { q:'من هو الصحابي الملقب بـ"سيف الله المسلول"؟', options:['عمر','خالد بن الوليد','سعد','علي'], answer:1, difficulty:'medium', category:'history' },
-  { q:'في أي عام كانت غزوة بدر؟', options:['1 هـ','2 هـ','3 هـ','5 هـ'], answer:1, difficulty:'medium', category:'history' },
-  { q:'كم نوعاً للتوحيد عند أهل السنة؟', options:['2','3','4','5'], answer:1, difficulty:'hard', category:'aqeedah' },
-  { q:'كم عدد أركان الحج؟', options:['3','4','5','6'], answer:1, difficulty:'hard', category:'fiqh' },
-  { q:'كم عدد كتب السنة الستة؟', options:['4','5','6','7'], answer:2, difficulty:'medium', category:'hadith' },
-  { q:'من هو أكثر الصحابة رواية للحديث؟', options:['أبو بكر','أبو هريرة','ابن عباس','عائشة'], answer:1, difficulty:'medium', category:'hadith' },
-  { q:'في أي شهر نزل القرآن الكريم؟', options:['شعبان','رمضان','رجب','ذو الحجة'], answer:1, difficulty:'easy', category:'quran' },
+  buildQ('كم عدد أركان الإسلام؟', '5', ['4','6','7'], 'easy', 'fiqh', () => 0.35),
+  buildQ('كم عدد أركان الإيمان؟', '6', ['5','7','4'], 'easy', 'aqeedah', () => 0.35),
+  buildQ('كم عدد الصلوات المفروضة في اليوم؟', '5', ['3','4','6'], 'easy', 'fiqh', () => 0.35),
+  buildQ('كم مقدار زكاة المال؟', '2.5%', ['1%','5%','10%'], 'easy', 'fiqh', () => 0.35),
+  buildQ('في أي شهر نزل القرآن الكريم؟', 'رمضان', ['شعبان','رجب','ذو الحجة'], 'easy', 'quran', () => 0.35),
 ];
 
 // -------- Public API --------
