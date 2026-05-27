@@ -435,15 +435,17 @@ const QiblaPage: React.FC = () => {
           />
 
           <div className="relative w-72 h-72 my-2 z-10">
+            <div className="absolute -inset-3 rounded-full opacity-70 pointer-events-none"
+              style={{ background: 'conic-gradient(from 0deg, hsl(var(--primary)/.14), transparent 18%, hsl(var(--accent)/.12), transparent 46%, hsl(var(--primary)/.14))' }} />
             {/* Outer ring with cardinals — rotates with heading so N stays true */}
             <div
-              className="absolute inset-0 rounded-full border-[3px] transition-[border-color] duration-300"
+              className="absolute inset-0 rounded-full border-[3px] transition-[border-color] duration-300 overflow-hidden"
               style={{
                 transform: `rotate(${-smoothHeading}deg)`,
                 borderColor: ringColor,
                 boxShadow: aligned ? '0 0 32px hsl(var(--primary)/.45)' : undefined,
                 background:
-                  'radial-gradient(circle at center, hsl(var(--background)) 55%, hsl(var(--secondary)) 100%)',
+                  'radial-gradient(circle at center, hsl(var(--background)) 48%, hsl(var(--secondary)) 72%, hsl(var(--primary)/.10) 100%)',
               }}
             >
               {/* Tick marks */}
@@ -469,8 +471,11 @@ const QiblaPage: React.FC = () => {
               {/* Qibla marker on the rim */}
               {qibla != null && (
                 <div className="absolute top-1/2 left-1/2 origin-bottom"
-                  style={{ height: '50%', width: 6, transform: `translate(-50%, -100%) rotate(${qibla}deg)` }}>
-                  <div className="w-4 h-4 rounded-full gradient-gold -mt-1.5 -ml-1 mx-auto shadow-emerald" />
+                  style={{ height: '50%', width: 28, transform: `translate(-50%, -100%) rotate(${qibla}deg)` }}>
+                  <div className="w-10 h-10 -mt-5 -mr-1.5 mx-auto rounded-2xl gradient-gold flex items-center justify-center shadow-emerald border border-primary/40"
+                    style={{ transform: `rotate(${smoothHeading - qibla}deg)` }}>
+                    <KaabaIcon className="w-7 h-7" />
+                  </div>
                 </div>
               )}
             </div>
@@ -491,8 +496,10 @@ const QiblaPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Center dot */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-foreground/80 z-20" />
+            {/* Center lock */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background border-2 border-primary/50 z-20 flex items-center justify-center shadow-emerald">
+              <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+            </div>
           </div>
 
           {qibla != null ? (
