@@ -1,9 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Brain, CheckCircle2, XCircle, Trophy, RefreshCw, Sparkles, ChevronLeft, Target, Infinity as InfinityIcon } from 'lucide-react';
+import { Brain, CheckCircle2, XCircle, Trophy, RefreshCw, Sparkles, ChevronLeft, Target, Infinity as InfinityIcon, Database } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
-import { buildBank, buildSessionQuiz, type Q, type Difficulty, type Category } from '@/data/quizGenerator';
+import { buildBank, buildSessionQuiz, fetchApiQuizQuestions, generateRoundSeed, TOTAL_VARIANTS_ESTIMATE, type Q, type Difficulty, type Category } from '@/data/quizGenerator';
 
 const MISSED_KEY = 'quiz_missed_registry';
+const ACTIVE_ROUND_KEY = 'quiz_active_round_v2';
+const ROUND_HISTORY_KEY = 'quiz_round_history_v2';
 const getMissed = (): Record<string, number> => {
   try { return JSON.parse(localStorage.getItem(MISSED_KEY) || '{}'); } catch { return {}; }
 };
@@ -19,6 +21,25 @@ const decrementMissed = (qText: string) => {
     if (!m[qText]) delete m[qText];
     try { localStorage.setItem(MISSED_KEY, JSON.stringify(m)); } catch {}
   }
+};
+
+interface StoredRound { seed: number; questions: Q[]; idx: number; score: number; difficulty: Difficulty | 'all'; category: Category | 'all'; count: number; drillMode: boolean; done: boolean; wrongAnswers: Q[]; }
+const readRound = (): StoredRound | null => {
+  try { const raw = localStorage.getItem(ACTIVE_ROUND_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
+};
+const writeRound = (r: StoredRound | null) => {
+  try { r ? localStorage.setItem(ACTIVE_ROUND_KEY, JSON.stringify(r)) : localStorage.removeItem(ACTIVE_ROUND_KEY); } catch {}
+};
+const readHistory = (): string[] => {
+  try { return JSON.parse(localStorage.getItem(ROUND_HISTORY_KEY) || '[]'); } catch { return []; }
+};
+const rememberRoundIds = (ids: string[]) => {
+  const merged = [...ids, ...readHistory()].filter(Boolean);
+  try { localStorage.setItem(ROUND_HISTORY_KEY, JSON.stringify([...new Set(merged)].slice(0, 900))); } catch {}
+};
+const clearHistoryIfNeeded = (needed: number) => {
+  const h = readHistory();
+  if (FULL_BANK.length - h.length < needed) localStorage.removeItem(ROUND_HISTORY_KEY);
 };
 
 const CATEGORY_LABELS: Record<Category | 'all', string> = {
@@ -44,6 +65,10 @@ const IslamicQuizPage: React.FC = () => {
   const [wrongAnswers, setWrongAnswers] = useState<Q[]>([]);
   const [drillMode, setDrillMode] = useState(false);
   const [missedCount, setMissedCount] = useState(() => Object.keys(getMissed()).length);
+  const [roundSeed, setRoundSeed] = useState<number | null>(null);
+  const [loadingApi, setLoadingApi] = useState(false);
+  const [apiEnabled, setApiEnabled] = useState(true);
+  const [resumableRound, setResumableRound] = useState<StoredRound | null>(() => readRound());
 
   useEffect(() => {
     if (!started) setMissedCount(Object.keys(getMissed()).length);
@@ -57,6 +82,11 @@ const IslamicQuizPage: React.FC = () => {
   }, [difficulty, category]);
 
   const current = questions[idx];
+
+  useEffect(() => {
+    if (!started || !questions.length || roundSeed == null) return;
+    writeRound({ seed: roundSeed, questions, idx, score, difficulty, category, count, drillMode, done, wrongAnswers });
+  }, [started, questions, idx, score, difficulty, category, count, drillMode, done, wrongAnswers, roundSeed]);
 
   const pick = (i: number) => {
     if (selected !== null || !current) return;
@@ -74,8 +104,10 @@ const IslamicQuizPage: React.FC = () => {
     }, 900);
   };
 
-  const start = (drill = false) => {
+  const start = async (drill = false) => {
+    setLoadingApi(true);
     let qs: Q[];
+    let seed = generateRoundSeed();
     if (drill) {
       const m = getMissed();
       const ranked = FULL_BANK
@@ -84,15 +116,31 @@ const IslamicQuizPage: React.FC = () => {
         .slice(0, Math.min(count, Object.keys(m).length));
       qs = ranked;
     } else {
-      qs = buildSessionQuiz({ count, difficulty, category });
+      clearHistoryIfNeeded(count);
+      let apiQuestions: Q[] = [];
+      if (apiEnabled) apiQuestions = await fetchApiQuizQuestions(seed, Math.min(count, 18));
+      qs = buildSessionQuiz({ count, difficulty, category, seed, excludeIds: readHistory(), apiQuestions });
+      rememberRoundIds(qs.map(q => q.id));
     }
     setDrillMode(drill);
     setQuestions(qs);
+    setRoundSeed(seed);
     setIdx(0); setSelected(null); setScore(0); setDone(false); setWrongAnswers([]);
     setStarted(true);
+    setResumableRound(null);
+    setLoadingApi(false);
   };
 
-  const reset = () => { setStarted(false); setDone(false); setDrillMode(false); };
+  const resumeRound = () => {
+    const r = readRound();
+    if (!r) return;
+    setDifficulty(r.difficulty); setCategory(r.category); setCount(r.count);
+    setQuestions(r.questions); setIdx(r.idx); setScore(r.score); setDone(r.done);
+    setWrongAnswers(r.wrongAnswers || []); setDrillMode(r.drillMode); setRoundSeed(r.seed);
+    setSelected(null); setStarted(true); setResumableRound(null);
+  };
+
+  const reset = () => { setStarted(false); setDone(false); setDrillMode(false); writeRound(null); setResumableRound(null); };
 
   const difficultyBadge = (d: Difficulty) => {
     const map: Record<Difficulty, string> = {
@@ -116,10 +164,16 @@ const IslamicQuizPage: React.FC = () => {
             </div>
             <div className="flex-1">
               <div className="text-xs text-muted-foreground">حجم البنك الكلي</div>
-              <div className="text-lg font-bold text-foreground">{FULL_BANK.length.toLocaleString('ar-EG')} سؤال</div>
-              <div className="text-[10px] text-muted-foreground">تختلف الأسئلة وترتيب الخيارات في كل اختبار</div>
+              <div className="text-lg font-bold text-foreground">{TOTAL_VARIANTS_ESTIMATE.toLocaleString('ar-EG')}+ تركيبة</div>
+              <div className="text-[10px] text-muted-foreground">مصدر API للآيات + توليد محلي ببذرة ثابتة لكل جولة</div>
             </div>
           </div>
+
+          {resumableRound && (
+            <button onClick={resumeRound} className="w-full mb-4 bg-primary/10 border-2 border-primary/30 text-primary py-3 rounded-2xl font-bold inline-flex items-center justify-center gap-2">
+              <RefreshCw className="w-4 h-4" /> متابعة الجولة المحفوظة بنفس الأسئلة
+            </button>
+          )}
 
           <div className="card-surface p-5 mb-4">
             <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
@@ -135,6 +189,17 @@ const IslamicQuizPage: React.FC = () => {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="card-surface p-4 mb-4 flex items-center gap-3">
+            <Database className="w-5 h-5 text-primary" />
+            <div className="flex-1">
+              <div className="text-sm font-bold text-foreground">مصدر API للآيات</div>
+              <div className="text-[11px] text-muted-foreground">يجلب آيات عشوائية ويحوّلها لأسئلة جديدة، ومع التعذر يعمل البنك المحلي فوراً.</div>
+            </div>
+            <button onClick={() => setApiEnabled(v => !v)} className={`w-12 h-7 rounded-full transition-colors relative shrink-0 ${apiEnabled ? 'bg-primary' : 'bg-muted'}`}>
+              <div className={`w-5 h-5 rounded-full bg-background shadow-sm absolute top-1 transition-all ${apiEnabled ? 'left-1' : 'left-6'}`} />
+            </button>
           </div>
 
           <div className="card-surface p-5 mb-4">
@@ -170,9 +235,9 @@ const IslamicQuizPage: React.FC = () => {
               <Target className="w-5 h-5" /> تدريب على أخطائك ({missedCount})
             </button>
           )}
-          <button onClick={() => start(false)} disabled={availableCount === 0}
+          <button onClick={() => start(false)} disabled={availableCount === 0 || loadingApi}
             className="w-full gradient-primary text-primary-foreground py-4 rounded-2xl font-bold shadow-emerald inline-flex items-center justify-center gap-2 disabled:opacity-50">
-            <Brain className="w-5 h-5" /> ابدأ الاختبار
+            <Brain className="w-5 h-5" /> {loadingApi ? 'جاري تجهيز جولة جديدة...' : 'ابدأ الاختبار'}
           </button>
         </div>
       </div>
@@ -183,6 +248,7 @@ const IslamicQuizPage: React.FC = () => {
     <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={Brain} title="اختبار إسلامي" subtitle={`${CATEGORY_LABELS[category]} · ${DIFFICULTY_LABELS[difficulty]}`} showBack gradient="primary" />
+        {roundSeed != null && <div className="text-[10px] text-muted-foreground mb-3 text-center">بذرة الجولة: {roundSeed} · الأسئلة محفوظة لهذه الجولة</div>}
 
         {!done && current ? (
           <>
@@ -197,6 +263,7 @@ const IslamicQuizPage: React.FC = () => {
             <div className="card-surface p-6 mb-4">
               <div className="flex items-center gap-2 mb-3">
                 {difficultyBadge(current.difficulty)}
+                {current.source === 'api' && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/30">API</span>}
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/30">
                   {CATEGORY_LABELS[current.category]}
                 </span>

@@ -34,6 +34,13 @@ const GRAMS_PER_OUNCE = 31.1034768;
 const GOLD_NISAB_GRAMS = 85;
 const SILVER_NISAB_GRAMS = 595;
 
+const FALLBACK_USD_RATES: Record<string, number> = {
+  USD: 1, SAR: 3.75, AED: 3.67, EGP: 47.5, KWD: 0.31, QAR: 3.64, JOD: 0.71,
+  IQD: 1310, BHD: 0.38, OMR: 0.38, LYD: 4.83, TND: 3.1, YER: 250, SDG: 601,
+  LBP: 89500, SYP: 13000, PKR: 280, INR: 83, IDR: 16000, MYR: 4.7, MAD: 10,
+  DZD: 134, TRY: 32, EUR: 0.92, GBP: 0.79,
+};
+
 interface PriceState {
   goldPerGram: number;   // in selected currency
   silverPerGram: number; // in selected currency
@@ -74,18 +81,18 @@ const ZakatPage: React.FC = () => {
       const silverUsdPerOz = Number(silverData.price);
       if (!goldUsdPerOz || !silverUsdPerOz) throw new Error('invalid');
 
-      // Convert USD to chosen currency via frankfurter.app (no key)
-      let rate = 1;
+      // Convert USD to chosen currency. open.er-api supports regional currencies including IQD.
+      let rate = currency === 'USD' ? 1 : 0;
       if (currency !== 'USD') {
-        const r = await fetch(`https://api.frankfurter.app/latest?from=USD&to=${currency}`);
-        const rd = await r.json();
-        rate = Number(rd?.rates?.[currency]);
+        const r2 = await fetch('https://open.er-api.com/v6/latest/USD');
+        const rd2 = await r2.json();
+        rate = Number(rd2?.rates?.[currency]);
         if (!rate || !isFinite(rate)) {
-          // Fallback: open.er-api.com
-          const r2 = await fetch(`https://open.er-api.com/v6/latest/USD`);
-          const rd2 = await r2.json();
-          rate = Number(rd2?.rates?.[currency]) || 1;
+          const r = await fetch(`https://api.frankfurter.app/latest?from=USD&to=${currency}`);
+          const rd = await r.json();
+          rate = Number(rd?.rates?.[currency]);
         }
+        if (!rate || !isFinite(rate)) rate = FALLBACK_USD_RATES[currency] || 1;
       }
 
       setPrice({
@@ -93,6 +100,7 @@ const ZakatPage: React.FC = () => {
         silverPerGram: (silverUsdPerOz / GRAMS_PER_OUNCE) * rate,
         loadedAt: Date.now(),
         source: 'api',
+        error: undefined,
       });
     } catch (e) {
       setPrice(p => ({ ...p, error: 'تعذّر جلب الأسعار، يمكنك تعديلها يدوياً.', source: 'manual' }));
@@ -114,7 +122,7 @@ const ZakatPage: React.FC = () => {
   const eligible = totalNet >= effectiveNisab && totalNet > 0;
   const zakat = eligible ? totalNet * 0.025 : 0;
 
-  const fmt = (n: number) => n.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+  const fmt = (n: number) => n.toLocaleString('en-US', { maximumFractionDigits: currency === 'IQD' ? 0 : 2, minimumFractionDigits: currency === 'IQD' ? 0 : 2 });
 
   return (
     <div className="page-container page-with-topbar" dir="rtl">

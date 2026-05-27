@@ -75,6 +75,7 @@ self.addEventListener('fetch', (event) => {
 // ---------- Background notifications ----------
 
 const DEFAULT_ICON = '/app-logo.png';
+const scheduledTimers = new Map();
 
 function showNotif(title, body, tag, data) {
   return self.registration.showNotification(title, {
@@ -110,12 +111,27 @@ async function scheduleTriggered(title, body, timestamp, tag) {
   }
 }
 
+function scheduleFallback(title, body, timestamp, tag, data) {
+  const delay = Math.max(0, timestamp - Date.now());
+  if (scheduledTimers.has(tag)) clearTimeout(scheduledTimers.get(tag));
+  if (delay > 2147483647) return false;
+  const id = setTimeout(() => {
+    scheduledTimers.delete(tag);
+    showNotif(title, body, tag, data);
+  }, delay);
+  scheduledTimers.set(tag, id);
+  return true;
+}
+
 self.addEventListener('message', (event) => {
   const msg = event.data || {};
   if (msg.type === 'SHOW_NOTIFICATION') {
     event.waitUntil(showNotif(msg.title, msg.body, msg.tag, msg.data));
   } else if (msg.type === 'SCHEDULE_NOTIFICATION') {
-    event.waitUntil(scheduleTriggered(msg.title, msg.body, msg.timestamp, msg.tag));
+    event.waitUntil((async () => {
+      const ok = await scheduleTriggered(msg.title, msg.body, msg.timestamp, msg.tag);
+      if (!ok) scheduleFallback(msg.title, msg.body, msg.timestamp, msg.tag, msg.data);
+    })());
   }
 });
 

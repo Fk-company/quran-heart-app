@@ -33,6 +33,57 @@ interface Loc { lat: number; lng: number; name?: string; gpsAccuracy?: number; }
 
 type CompassQuality = 'unknown' | 'poor' | 'fair' | 'good';
 
+interface CalibrationRecord {
+  savedAt: number;
+  quality: CompassQuality;
+  samples: number;
+  compassAccuracy: number | null;
+  hasAbsolute: boolean;
+  gpsAccuracy?: number;
+  reason: string;
+  recommendations: string[];
+  device: string;
+}
+
+const CALIBRATION_KEY = 'qibla_calibration_result';
+
+function readCalibration(): CalibrationRecord | null {
+  try { const raw = localStorage.getItem(CALIBRATION_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
+}
+
+function qualityLabel(q: CompassQuality) {
+  return q === 'good' ? 'ممتازة' : q === 'fair' ? 'متوسطة' : q === 'poor' ? 'ضعيفة' : 'غير معروفة';
+}
+
+function buildCalibrationInsight(args: { loc: Loc | null; compassActive: boolean; hasAbsolute: boolean; compassAccuracy: number | null; samples: number }) {
+  const recommendations: string[] = [];
+  let quality: CompassQuality = 'good';
+  if (!args.loc) { quality = 'poor'; recommendations.push('حدّد موقعك عبر GPS أو المدينة قبل الاعتماد على الاتجاه.'); }
+  if (args.loc?.gpsAccuracy && args.loc.gpsAccuracy > 100) { quality = 'fair'; recommendations.push('دقة الموقع منخفضة؛ قف في مكان مفتوح ثم حدّث GPS.'); }
+  if (!args.compassActive || args.samples < 18) { quality = 'poor'; recommendations.push('ابدأ المعايرة وحرّك الهاتف على شكل رقم 8 حتى تثبت القراءة.'); }
+  if (!args.hasAbsolute) { quality = quality === 'good' ? 'fair' : quality; recommendations.push('الجهاز يستخدم مستشعراً نسبياً؛ أبعده عن المعادن والحقائب المغناطيسية.'); }
+  if (args.compassAccuracy != null && args.compassAccuracy >= 25) { quality = 'poor'; recommendations.push('هامش البوصلة كبير؛ أعد المعايرة بعيداً عن الأجهزة الكهربائية.'); }
+  else if (args.compassAccuracy != null && args.compassAccuracy >= 15 && quality === 'good') { quality = 'fair'; recommendations.push('الدقة مقبولة، لكن إعادة المعايرة قد تجعلها أفضل.'); }
+
+  const reason = !args.compassActive ? 'البوصلة لم تبدأ بعد'
+    : !args.hasAbsolute ? 'نوع المستشعر في هذا الجهاز لا يعطي شمالاً حقيقياً دائماً'
+      : args.compassAccuracy != null && args.compassAccuracy >= 25 ? 'هامش خطأ البوصلة مرتفع'
+        : args.loc?.gpsAccuracy && args.loc.gpsAccuracy > 100 ? 'موقعك الحالي غير دقيق بما يكفي'
+          : 'المعايرة الأخيرة مستقرة ويمكن البدء';
+
+  return { quality, reason, recommendations: recommendations.slice(0, 3) };
+}
+
+const KaabaIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
+    <path d="M14 23 32 13l18 10v30H14V23Z" fill="hsl(var(--foreground))" />
+    <path d="M14 23h36v9H14z" fill="hsl(var(--primary))" />
+    <path d="M19 27h8M31 27h14" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" />
+    <path d="M20 36h24v12H20z" fill="hsl(var(--background))" opacity=".16" />
+    <path d="M14 23 32 13l18 10" fill="none" stroke="hsl(var(--border))" strokeWidth="2" strokeLinejoin="round" />
+  </svg>
+);
+
 const QiblaPage: React.FC = () => {
   const [loc, setLoc] = useState<Loc | null>(() => {
     try { const raw = localStorage.getItem('qibla_loc'); return raw ? JSON.parse(raw) : null; } catch { return null; }
@@ -52,6 +103,7 @@ const QiblaPage: React.FC = () => {
   const [manualLng, setManualLng] = useState('');
   const [showCalibration, setShowCalibration] = useState(false);
   const [calibSamples, setCalibSamples] = useState(0);
+  const [lastCalibration, setLastCalibration] = useState<CalibrationRecord | null>(() => readCalibration());
   const lastVibrateAlignedRef = useRef(false);
 
   const orientationListenerRef = useRef<((e: any) => void) | null>(null);
@@ -177,7 +229,7 @@ const QiblaPage: React.FC = () => {
     if (!showCalibration) return;
     const ok = calibSamples > 25 && (compassAccuracy == null || compassAccuracy < 25);
     if (ok) {
-      const t = setTimeout(() => setShowCalibration(false), 600);
+      const t = setTimeout(() => finishCalibration(), 600);
       return () => clearTimeout(t);
     }
   }, [calibSamples, compassAccuracy, showCalibration]);
@@ -234,6 +286,28 @@ const QiblaPage: React.FC = () => {
     return items;
   }, [loc, compassActive, hasAbsolute, compassAccuracy]);
 
+  const calibrationInsight = useMemo(() => buildCalibrationInsight({
+    loc, compassActive, hasAbsolute, compassAccuracy, samples: calibSamples,
+  }), [loc, compassActive, hasAbsolute, compassAccuracy, calibSamples]);
+
+  const finishCalibration = () => {
+    const insight = buildCalibrationInsight({ loc, compassActive, hasAbsolute, compassAccuracy, samples: calibSamples });
+    const record: CalibrationRecord = {
+      savedAt: Date.now(),
+      quality: insight.quality,
+      samples: calibSamples,
+      compassAccuracy,
+      hasAbsolute,
+      gpsAccuracy: loc?.gpsAccuracy,
+      reason: insight.reason,
+      recommendations: insight.recommendations.length ? insight.recommendations : ['استخدم الهاتف أفقياً وتحقق من خلو المكان من المعادن.'],
+      device: navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad') ? 'iOS' : navigator.userAgent.includes('Android') ? 'Android' : 'متصفح سطح المكتب',
+    };
+    try { localStorage.setItem(CALIBRATION_KEY, JSON.stringify(record)); } catch {}
+    setLastCalibration(record);
+    setShowCalibration(false);
+  };
+
   const handleManualSubmit = () => {
     const la = parseFloat(manualLat);
     const ln = parseFloat(manualLng);
@@ -245,6 +319,7 @@ const QiblaPage: React.FC = () => {
   };
 
   const ringColor = aligned ? 'hsl(var(--primary))' : close ? 'hsl(var(--accent))' : 'hsl(var(--border))';
+  const qualityPercent = lastCalibration?.quality === 'good' ? 92 : lastCalibration?.quality === 'fair' ? 68 : lastCalibration?.quality === 'poor' ? 38 : 18;
 
   return (
     <div className="page-container page-with-topbar" dir="rtl">
@@ -317,8 +392,36 @@ const QiblaPage: React.FC = () => {
           </div>
         )}
 
+        {lastCalibration && (
+          <div className="card-surface p-4 mb-4 border-primary/25">
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <div>
+                <div className="text-[11px] text-muted-foreground">توصيات قبل الاستخدام من آخر معايرة</div>
+                <div className="text-sm font-extrabold text-foreground">الدقة {qualityLabel(lastCalibration.quality)} · {lastCalibration.reason}</div>
+              </div>
+              <div className="w-12 h-12 rounded-2xl gradient-gold flex items-center justify-center shrink-0">
+                <KaabaIcon className="w-7 h-7" />
+              </div>
+            </div>
+            <div className="h-2 rounded-full bg-secondary overflow-hidden mb-3">
+              <div className="h-full gradient-primary transition-all" style={{ width: `${qualityPercent}%` }} />
+            </div>
+            <div className="space-y-1.5">
+              {lastCalibration.recommendations.map((r, i) => (
+                <div key={i} className="text-xs text-muted-foreground flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" />
+                  <span>{r}</span>
+                </div>
+              ))}
+            </div>
+            <div className="text-[10px] text-muted-foreground mt-3">
+              آخر حفظ: {new Date(lastCalibration.savedAt).toLocaleString('ar')} · {lastCalibration.device}
+            </div>
+          </div>
+        )}
+
         {/* ============ Compass Card ============ */}
-        <div className="card-surface p-6 flex flex-col items-center text-center relative overflow-hidden">
+        <div className="card-surface p-6 flex flex-col items-center text-center relative overflow-hidden border-primary/20">
           {/* glow background */}
           <div
             className="absolute inset-0 opacity-40 transition-opacity duration-500 pointer-events-none"
@@ -332,15 +435,17 @@ const QiblaPage: React.FC = () => {
           />
 
           <div className="relative w-72 h-72 my-2 z-10">
+            <div className="absolute -inset-3 rounded-full opacity-70 pointer-events-none"
+              style={{ background: 'conic-gradient(from 0deg, hsl(var(--primary)/.14), transparent 18%, hsl(var(--accent)/.12), transparent 46%, hsl(var(--primary)/.14))' }} />
             {/* Outer ring with cardinals — rotates with heading so N stays true */}
             <div
-              className="absolute inset-0 rounded-full border-[3px] transition-[border-color] duration-300"
+              className="absolute inset-0 rounded-full border-[3px] transition-[border-color] duration-300 overflow-hidden"
               style={{
                 transform: `rotate(${-smoothHeading}deg)`,
                 borderColor: ringColor,
                 boxShadow: aligned ? '0 0 32px hsl(var(--primary)/.45)' : undefined,
                 background:
-                  'radial-gradient(circle at center, hsl(var(--background)) 55%, hsl(var(--secondary)) 100%)',
+                  'radial-gradient(circle at center, hsl(var(--background)) 48%, hsl(var(--secondary)) 72%, hsl(var(--primary)/.10) 100%)',
               }}
             >
               {/* Tick marks */}
@@ -366,8 +471,11 @@ const QiblaPage: React.FC = () => {
               {/* Qibla marker on the rim */}
               {qibla != null && (
                 <div className="absolute top-1/2 left-1/2 origin-bottom"
-                  style={{ height: '50%', width: 6, transform: `translate(-50%, -100%) rotate(${qibla}deg)` }}>
-                  <div className="w-4 h-4 rounded-full gradient-gold -mt-1.5 -ml-1 mx-auto shadow-emerald" />
+                  style={{ height: '50%', width: 28, transform: `translate(-50%, -100%) rotate(${qibla}deg)` }}>
+                  <div className="w-10 h-10 -mt-5 -mr-1.5 mx-auto rounded-2xl gradient-gold flex items-center justify-center shadow-emerald border border-primary/40"
+                    style={{ transform: `rotate(${smoothHeading - qibla}deg)` }}>
+                    <KaabaIcon className="w-7 h-7" />
+                  </div>
                 </div>
               )}
             </div>
@@ -388,8 +496,10 @@ const QiblaPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Center dot */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-foreground/80 z-20" />
+            {/* Center lock */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background border-2 border-primary/50 z-20 flex items-center justify-center shadow-emerald">
+              <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+            </div>
           </div>
 
           {qibla != null ? (
@@ -459,7 +569,7 @@ const QiblaPage: React.FC = () => {
           </div>
           <p>• ضع الجهاز بشكل أفقي وابتعد عن المعادن والأجهزة الكهربائية.</p>
           <p>• إذا كانت البوصلة غير دقيقة، حرّك الجهاز بشكل رقم 8 لمعايرتها.</p>
-          <p>• النقطة الذهبية على الإطار تشير إلى اتجاه القبلة الحقيقي.</p>
+          <p>• أيقونة الكعبة على الإطار تشير إلى اتجاه القبلة الحقيقي.</p>
           <p>• عندما يصبح السهم أخضر ويهتزّ الجهاز فأنت متجه إلى القبلة.</p>
         </div>
       </div>
@@ -468,7 +578,7 @@ const QiblaPage: React.FC = () => {
       {showCalibration && (
         <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-md flex items-center justify-center p-6" dir="rtl">
           <div className="card-surface p-6 max-w-sm w-full text-center relative">
-            <button onClick={() => setShowCalibration(false)} className="absolute top-3 left-3 w-8 h-8 rounded-full bg-secondary inline-flex items-center justify-center text-muted-foreground hover:text-foreground">
+            <button onClick={finishCalibration} className="absolute top-3 left-3 w-8 h-8 rounded-full bg-secondary inline-flex items-center justify-center text-muted-foreground hover:text-foreground">
               <X className="w-4 h-4" />
             </button>
             <div className="w-16 h-16 mx-auto rounded-full gradient-gold flex items-center justify-center shadow-emerald mb-4">
@@ -514,10 +624,12 @@ const QiblaPage: React.FC = () => {
               <p>• الاستشعار: {hasAbsolute ? 'مطلق (دقيق)' : 'نسبي (قد ينحرف)'}</p>
               <p>• قراءات مستلمة: {calibSamples}</p>
               {compassAccuracy != null && <p>• هامش الخطأ: ±{Math.round(compassAccuracy)}°</p>}
+              <p>• التقييم الحالي: {qualityLabel(calibrationInsight.quality)}</p>
+              <p>• سبب عدم اليقين: {calibrationInsight.reason}</p>
             </div>
 
-            <button onClick={() => setShowCalibration(false)} className="mt-4 w-full gradient-primary text-primary-foreground py-2.5 rounded-2xl font-bold text-sm">
-              تم
+            <button onClick={finishCalibration} className="mt-4 w-full gradient-primary text-primary-foreground py-2.5 rounded-2xl font-bold text-sm">
+              حفظ المعايرة والبدء
             </button>
           </div>
         </div>

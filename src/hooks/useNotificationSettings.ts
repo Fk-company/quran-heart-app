@@ -55,7 +55,10 @@ export function useNotificationSettings() {
   const [settings, setSettings] = useState<NotificationSettings>(getNotificationSettings);
 
   useEffect(() => {
-    try { localStorage.setItem(KEY, JSON.stringify(settings)); } catch {}
+    try {
+      localStorage.setItem(KEY, JSON.stringify(settings));
+      localStorage.setItem('notifications_enabled', settings.enabled ? 'true' : 'false');
+    } catch {}
   }, [settings]);
 
   const update = useCallback(<K extends keyof NotificationSettings>(key: K, value: NotificationSettings[K]) => {
