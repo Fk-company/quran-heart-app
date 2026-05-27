@@ -12,6 +12,14 @@ async function getSWReg(): Promise<ServiceWorkerRegistration | null> {
   }
 }
 
+async function ensureServiceWorker(): Promise<ServiceWorkerRegistration | null> {
+  if (!('serviceWorker' in navigator)) return null;
+  try {
+    const reg = await navigator.serviceWorker.getRegistration();
+    return reg || await navigator.serviceWorker.register('/sw.js');
+  } catch { return getSWReg(); }
+}
+
 const todayKey = () => {
   const d = new Date();
   return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
@@ -81,6 +89,24 @@ function setTaggedTimeout(tag: string, ms: number, fn: () => void) {
   timerRegistry.set(tag, id);
 }
 
+async function scheduleInServiceWorker(title: string, body: string, timestamp: number, tag: string, data?: any) {
+  const reg = await ensureServiceWorker();
+  if (!reg) return false;
+  const sw = reg.active || reg.waiting || reg.installing;
+  if (!sw) return false;
+  sw.postMessage({ type: 'SCHEDULE_NOTIFICATION', title, body, timestamp, tag, data });
+  return true;
+}
+
+async function showViaServiceWorker(title: string, body: string, tag: string, data?: any) {
+  const reg = await ensureServiceWorker();
+  if (!reg) return false;
+  try {
+    await reg.showNotification(title, { body, icon: ICON, badge: ICON, dir: 'rtl', lang: 'ar', tag, renotify: true, data: data || { url: '/' } });
+    return true;
+  } catch { return false; }
+}
+
 export const useNotifications = () => {
   const permissionRef = useRef<NotificationPermission>('default');
 
@@ -97,7 +123,7 @@ export const useNotifications = () => {
 
     if (result === 'granted') {
       try {
-        const reg: any = await getSWReg();
+        const reg: any = await ensureServiceWorker();
         if (reg && 'periodicSync' in reg) {
           const status = await (navigator as any).permissions?.query({
             name: 'periodic-background-sync' as any,
@@ -115,7 +141,7 @@ export const useNotifications = () => {
 
   const sendNotification = useCallback(async (title: string, body: string, icon?: string) => {
     if (permissionRef.current !== 'granted') return;
-    const reg = await getSWReg();
+    const reg = await ensureServiceWorker();
     const options: NotificationOptions = {
       body,
       icon: icon || ICON,
@@ -169,6 +195,7 @@ export const useNotifications = () => {
       if (earlyTs > Date.now()) {
         const ok = await trySchedule(earlyTs, 'تذكير بالصلاة', `صلاة ${prayerName} بعد ${earlyMin} دقيقة`, `${tagBase}-early`);
         if (!ok) {
+          await scheduleInServiceWorker('تذكير بالصلاة', `صلاة ${prayerName} بعد ${earlyMin} دقيقة`, earlyTs, `${tagBase}-early`, { url: '/' });
           setTaggedTimeout(`${tagBase}-early`, earlyTs - Date.now(),
             () => sendNotification('تذكير بالصلاة', `صلاة ${prayerName} بعد ${earlyMin} دقيقة`));
         }
@@ -181,7 +208,8 @@ export const useNotifications = () => {
       playAdhan();
     });
     // Backup OS notification via trigger (no audio but persists if tab closed).
-    await trySchedule(onTs, 'حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName}`, `${tagBase}-os`);
+    const backed = await trySchedule(onTs, 'حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName}`, `${tagBase}-os`);
+    if (!backed) await scheduleInServiceWorker('حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName} — افتح التطبيق لتشغيل الأذان`, onTs, `${tagBase}-os`, { url: '/' });
   }, [sendNotification]);
 
   const scheduleDailyReminder = useCallback(async (
@@ -192,7 +220,7 @@ export const useNotifications = () => {
     const diff = msUntilTimeInTz(hhmm, tz);
     if (diff <= 0) return;
     const ts = Date.now() + diff;
-    const reg: any = await getSWReg();
+    const reg: any = await ensureServiceWorker();
     try {
       // @ts-ignore experimental
       if (typeof TimestampTrigger !== 'undefined' && reg) {
@@ -204,6 +232,7 @@ export const useNotifications = () => {
         return;
       }
     } catch {}
+    await scheduleInServiceWorker(title, body, ts, tag, { url: '/' });
     setTaggedTimeout(tag, diff, () => sendNotification(title, body));
   }, [sendNotification]);
 
