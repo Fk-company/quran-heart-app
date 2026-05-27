@@ -569,7 +569,7 @@ const QiblaPage: React.FC = () => {
           </div>
           <p>• ضع الجهاز بشكل أفقي وابتعد عن المعادن والأجهزة الكهربائية.</p>
           <p>• إذا كانت البوصلة غير دقيقة، حرّك الجهاز بشكل رقم 8 لمعايرتها.</p>
-          <p>• النقطة الذهبية على الإطار تشير إلى اتجاه القبلة الحقيقي.</p>
+          <p>• أيقونة الكعبة على الإطار تشير إلى اتجاه القبلة الحقيقي.</p>
           <p>• عندما يصبح السهم أخضر ويهتزّ الجهاز فأنت متجه إلى القبلة.</p>
         </div>
       </div>
@@ -578,7 +578,7 @@ const QiblaPage: React.FC = () => {
       {showCalibration && (
         <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-md flex items-center justify-center p-6" dir="rtl">
           <div className="card-surface p-6 max-w-sm w-full text-center relative">
-            <button onClick={() => setShowCalibration(false)} className="absolute top-3 left-3 w-8 h-8 rounded-full bg-secondary inline-flex items-center justify-center text-muted-foreground hover:text-foreground">
+            <button onClick={finishCalibration} className="absolute top-3 left-3 w-8 h-8 rounded-full bg-secondary inline-flex items-center justify-center text-muted-foreground hover:text-foreground">
               <X className="w-4 h-4" />
             </button>
             <div className="w-16 h-16 mx-auto rounded-full gradient-gold flex items-center justify-center shadow-emerald mb-4">
@@ -624,10 +624,12 @@ const QiblaPage: React.FC = () => {
               <p>• الاستشعار: {hasAbsolute ? 'مطلق (دقيق)' : 'نسبي (قد ينحرف)'}</p>
               <p>• قراءات مستلمة: {calibSamples}</p>
               {compassAccuracy != null && <p>• هامش الخطأ: ±{Math.round(compassAccuracy)}°</p>}
+              <p>• التقييم الحالي: {qualityLabel(calibrationInsight.quality)}</p>
+              <p>• سبب عدم اليقين: {calibrationInsight.reason}</p>
             </div>
 
-            <button onClick={() => setShowCalibration(false)} className="mt-4 w-full gradient-primary text-primary-foreground py-2.5 rounded-2xl font-bold text-sm">
-              تم
+            <button onClick={finishCalibration} className="mt-4 w-full gradient-primary text-primary-foreground py-2.5 rounded-2xl font-bold text-sm">
+              حفظ المعايرة والبدء
             </button>
           </div>
         </div>
