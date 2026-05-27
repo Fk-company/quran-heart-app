@@ -169,7 +169,7 @@ export const useNotifications = () => {
     if (diff <= 0 || diff > 86400000) return;
 
     const tagBase = `prayer-${prayerName}`;
-    if (alreadyScheduled(tagBase)) return;
+    alreadyScheduled(tagBase);
 
     const reg: any = await getSWReg();
     const earlyMin = ns.prayerEarlyMinutes;
@@ -217,7 +217,7 @@ export const useNotifications = () => {
     hhmm: string, title: string, body: string, tag: string, tz?: string,
   ) => {
     if (permissionRef.current !== 'granted') return;
-    if (alreadyScheduled(tag)) return; // Dedup per day per tag.
+    alreadyScheduled(tag); // cleanup marker only; tagged timers replace older schedules.
     const diff = msUntilTimeInTz(hhmm, tz);
     if (diff <= 0) return;
     const ts = Date.now() + diff;
