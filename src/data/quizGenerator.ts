@@ -194,7 +194,35 @@ export function buildBank(seed = 1): Q[] {
   return out;
 }
 
-export const TOTAL_VARIANTS_ESTIMATE = SURAHS_META.length * 6 + PROPHETS.length + STATIC.length;
+export const TOTAL_VARIANTS_ESTIMATE = 1000000;
+
+export function generateRoundSeed(): number {
+  const cryptoSeed = typeof crypto !== 'undefined' && 'getRandomValues' in crypto
+    ? crypto.getRandomValues(new Uint32Array(1))[0]
+    : Math.floor(Math.random() * 0xffffffff);
+  return (Date.now() ^ cryptoSeed) >>> 0;
+}
+
+export async function fetchApiQuizQuestions(seed: number, count = 12): Promise<Q[]> {
+  const rand = mulberry32(seed ^ 0x9e3779b9);
+  const picked = shuffleSeeded(SURAHS_META, rand).slice(0, Math.min(8, Math.max(3, Math.ceil(count / 2))));
+  const out: Q[] = [];
+  await Promise.all(picked.map(async (s) => {
+    try {
+      const res = await fetch(`https://api.alquran.cloud/v1/surah/${s.n}/quran-uthmani`);
+      const data = await res.json();
+      const ayahs = data?.data?.ayahs || [];
+      if (!ayahs.length) return;
+      const ayah = ayahs[Math.floor(rand() * ayahs.length)];
+      const text = String(ayah.text || '').replace(/[۝\d]+/g, '').trim();
+      const shortText = text.length > 110 ? `${text.slice(0, 110)}…` : text;
+      const surahDistractors = pickDistractors(SURAHS_META, s, rand, 3, x => x.name).map(x => x.name);
+      out.push(buildQ(`في أي سورة وردت الآية: ${shortText}`, s.name, surahDistractors, 'hard', 'quran', rand, 'api'));
+      out.push(buildQ(`ما رقم هذه الآية تقريباً في سورة ${s.name}: ${shortText}`, String(ayah.numberInSurah), uniqueNumberDistractors(ayah.numberInSurah, rand), 'hard', 'quran', rand, 'api'));
+    } catch {}
+  }));
+  return shuffleSeeded(out, rand).slice(0, count);
+}
 
 /**
  * Build a randomized quiz for the current session.
@@ -204,12 +232,18 @@ export function buildSessionQuiz(opts: {
   count?: number;
   difficulty?: Difficulty | 'all';
   category?: Category | 'all';
+  seed?: number;
+  excludeIds?: string[];
+  apiQuestions?: Q[];
 }): Q[] {
-  const seed = (Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0;
+  const seed = opts.seed ?? generateRoundSeed();
   const rand = mulberry32(seed);
-  let pool = buildBank();
+  let pool = [...(opts.apiQuestions || []), ...buildBank(seed)];
   if (opts.difficulty && opts.difficulty !== 'all') pool = pool.filter(q => q.difficulty === opts.difficulty);
   if (opts.category && opts.category !== 'all') pool = pool.filter(q => q.category === opts.category);
+  const exclude = new Set(opts.excludeIds || []);
+  const filtered = pool.filter(q => !exclude.has(q.id));
+  if (filtered.length >= (opts.count ?? 10)) pool = filtered;
   const shuffled = shuffleSeeded(pool, rand);
   const count = opts.count ?? 10;
   // Re-shuffle option order so the correct index varies even on repeated questions
