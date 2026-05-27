@@ -229,7 +229,7 @@ const QiblaPage: React.FC = () => {
     if (!showCalibration) return;
     const ok = calibSamples > 25 && (compassAccuracy == null || compassAccuracy < 25);
     if (ok) {
-      const t = setTimeout(() => setShowCalibration(false), 600);
+      const t = setTimeout(() => finishCalibration(), 600);
       return () => clearTimeout(t);
     }
   }, [calibSamples, compassAccuracy, showCalibration]);
@@ -286,6 +286,28 @@ const QiblaPage: React.FC = () => {
     return items;
   }, [loc, compassActive, hasAbsolute, compassAccuracy]);
 
+  const calibrationInsight = useMemo(() => buildCalibrationInsight({
+    loc, compassActive, hasAbsolute, compassAccuracy, samples: calibSamples,
+  }), [loc, compassActive, hasAbsolute, compassAccuracy, calibSamples]);
+
+  const finishCalibration = () => {
+    const insight = buildCalibrationInsight({ loc, compassActive, hasAbsolute, compassAccuracy, samples: calibSamples });
+    const record: CalibrationRecord = {
+      savedAt: Date.now(),
+      quality: insight.quality,
+      samples: calibSamples,
+      compassAccuracy,
+      hasAbsolute,
+      gpsAccuracy: loc?.gpsAccuracy,
+      reason: insight.reason,
+      recommendations: insight.recommendations.length ? insight.recommendations : ['استخدم الهاتف أفقياً وتحقق من خلو المكان من المعادن.'],
+      device: navigator.userAgent.includes('iPhone') || navigator.userAgent.includes('iPad') ? 'iOS' : navigator.userAgent.includes('Android') ? 'Android' : 'متصفح سطح المكتب',
+    };
+    try { localStorage.setItem(CALIBRATION_KEY, JSON.stringify(record)); } catch {}
+    setLastCalibration(record);
+    setShowCalibration(false);
+  };
+
   const handleManualSubmit = () => {
     const la = parseFloat(manualLat);
     const ln = parseFloat(manualLng);
@@ -297,6 +319,7 @@ const QiblaPage: React.FC = () => {
   };
 
   const ringColor = aligned ? 'hsl(var(--primary))' : close ? 'hsl(var(--accent))' : 'hsl(var(--border))';
+  const qualityPercent = lastCalibration?.quality === 'good' ? 92 : lastCalibration?.quality === 'fair' ? 68 : lastCalibration?.quality === 'poor' ? 38 : 18;
 
   return (
     <div className="page-container page-with-topbar" dir="rtl">
