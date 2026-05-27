@@ -33,6 +33,57 @@ interface Loc { lat: number; lng: number; name?: string; gpsAccuracy?: number; }
 
 type CompassQuality = 'unknown' | 'poor' | 'fair' | 'good';
 
+interface CalibrationRecord {
+  savedAt: number;
+  quality: CompassQuality;
+  samples: number;
+  compassAccuracy: number | null;
+  hasAbsolute: boolean;
+  gpsAccuracy?: number;
+  reason: string;
+  recommendations: string[];
+  device: string;
+}
+
+const CALIBRATION_KEY = 'qibla_calibration_result';
+
+function readCalibration(): CalibrationRecord | null {
+  try { const raw = localStorage.getItem(CALIBRATION_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
+}
+
+function qualityLabel(q: CompassQuality) {
+  return q === 'good' ? 'ممتازة' : q === 'fair' ? 'متوسطة' : q === 'poor' ? 'ضعيفة' : 'غير معروفة';
+}
+
+function buildCalibrationInsight(args: { loc: Loc | null; compassActive: boolean; hasAbsolute: boolean; compassAccuracy: number | null; samples: number }) {
+  const recommendations: string[] = [];
+  let quality: CompassQuality = 'good';
+  if (!args.loc) { quality = 'poor'; recommendations.push('حدّد موقعك عبر GPS أو المدينة قبل الاعتماد على الاتجاه.'); }
+  if (args.loc?.gpsAccuracy && args.loc.gpsAccuracy > 100) { quality = 'fair'; recommendations.push('دقة الموقع منخفضة؛ قف في مكان مفتوح ثم حدّث GPS.'); }
+  if (!args.compassActive || args.samples < 18) { quality = 'poor'; recommendations.push('ابدأ المعايرة وحرّك الهاتف على شكل رقم 8 حتى تثبت القراءة.'); }
+  if (!args.hasAbsolute) { quality = quality === 'good' ? 'fair' : quality; recommendations.push('الجهاز يستخدم مستشعراً نسبياً؛ أبعده عن المعادن والحقائب المغناطيسية.'); }
+  if (args.compassAccuracy != null && args.compassAccuracy >= 25) { quality = 'poor'; recommendations.push('هامش البوصلة كبير؛ أعد المعايرة بعيداً عن الأجهزة الكهربائية.'); }
+  else if (args.compassAccuracy != null && args.compassAccuracy >= 15 && quality === 'good') { quality = 'fair'; recommendations.push('الدقة مقبولة، لكن إعادة المعايرة قد تجعلها أفضل.'); }
+
+  const reason = !args.compassActive ? 'البوصلة لم تبدأ بعد'
+    : !args.hasAbsolute ? 'نوع المستشعر في هذا الجهاز لا يعطي شمالاً حقيقياً دائماً'
+      : args.compassAccuracy != null && args.compassAccuracy >= 25 ? 'هامش خطأ البوصلة مرتفع'
+        : args.loc?.gpsAccuracy && args.loc.gpsAccuracy > 100 ? 'موقعك الحالي غير دقيق بما يكفي'
+          : 'المعايرة الأخيرة مستقرة ويمكن البدء';
+
+  return { quality, reason, recommendations: recommendations.slice(0, 3) };
+}
+
+const KaabaIcon: React.FC<{ className?: string }> = ({ className }) => (
+  <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
+    <path d="M14 23 32 13l18 10v30H14V23Z" fill="hsl(var(--foreground))" />
+    <path d="M14 23h36v9H14z" fill="hsl(var(--primary))" />
+    <path d="M19 27h8M31 27h14" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" />
+    <path d="M20 36h24v12H20z" fill="hsl(var(--background))" opacity=".16" />
+    <path d="M14 23 32 13l18 10" fill="none" stroke="hsl(var(--border))" strokeWidth="2" strokeLinejoin="round" />
+  </svg>
+);
+
 const QiblaPage: React.FC = () => {
   const [loc, setLoc] = useState<Loc | null>(() => {
     try { const raw = localStorage.getItem('qibla_loc'); return raw ? JSON.parse(raw) : null; } catch { return null; }
@@ -52,6 +103,7 @@ const QiblaPage: React.FC = () => {
   const [manualLng, setManualLng] = useState('');
   const [showCalibration, setShowCalibration] = useState(false);
   const [calibSamples, setCalibSamples] = useState(0);
+  const [lastCalibration, setLastCalibration] = useState<CalibrationRecord | null>(() => readCalibration());
   const lastVibrateAlignedRef = useRef(false);
 
   const orientationListenerRef = useRef<((e: any) => void) | null>(null);
