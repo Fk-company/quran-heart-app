@@ -392,8 +392,36 @@ const QiblaPage: React.FC = () => {
           </div>
         )}
 
+        {lastCalibration && (
+          <div className="card-surface p-4 mb-4 border-primary/25">
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <div>
+                <div className="text-[11px] text-muted-foreground">توصيات قبل الاستخدام من آخر معايرة</div>
+                <div className="text-sm font-extrabold text-foreground">الدقة {qualityLabel(lastCalibration.quality)} · {lastCalibration.reason}</div>
+              </div>
+              <div className="w-12 h-12 rounded-2xl gradient-gold flex items-center justify-center shrink-0">
+                <KaabaIcon className="w-7 h-7" />
+              </div>
+            </div>
+            <div className="h-2 rounded-full bg-secondary overflow-hidden mb-3">
+              <div className="h-full gradient-primary transition-all" style={{ width: `${qualityPercent}%` }} />
+            </div>
+            <div className="space-y-1.5">
+              {lastCalibration.recommendations.map((r, i) => (
+                <div key={i} className="text-xs text-muted-foreground flex items-start gap-2">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" />
+                  <span>{r}</span>
+                </div>
+              ))}
+            </div>
+            <div className="text-[10px] text-muted-foreground mt-3">
+              آخر حفظ: {new Date(lastCalibration.savedAt).toLocaleString('ar')} · {lastCalibration.device}
+            </div>
+          </div>
+        )}
+
         {/* ============ Compass Card ============ */}
-        <div className="card-surface p-6 flex flex-col items-center text-center relative overflow-hidden">
+        <div className="card-surface p-6 flex flex-col items-center text-center relative overflow-hidden border-primary/20">
           {/* glow background */}
           <div
             className="absolute inset-0 opacity-40 transition-opacity duration-500 pointer-events-none"
