@@ -102,7 +102,8 @@ async function showViaServiceWorker(title: string, body: string, tag: string, da
   const reg = await ensureServiceWorker();
   if (!reg) return false;
   try {
-    await reg.showNotification(title, { body, icon: ICON, badge: ICON, dir: 'rtl', lang: 'ar', tag, renotify: true, data: data || { url: '/' } });
+    const options: any = { body, icon: ICON, badge: ICON, dir: 'rtl', lang: 'ar', tag, renotify: true, data: data || { url: '/' } };
+    await reg.showNotification(title, options);
     return true;
   } catch { return false; }
 }
