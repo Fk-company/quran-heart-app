@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import SEO from '@/components/SEO';
 import { Map, MapPin } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { fetchSurahs, type Surah } from '@/lib/api';
@@ -22,7 +23,9 @@ const RevelationMapPage: React.FC = () => {
   const medinanCount = surahs.length - meccanCount;
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="خريطة نزول السور — قلب القرآن" description="تعرف على أماكن نزول السور المكية والمدنية." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={Map} title="خريطة نزول السور" subtitle="مكية ومدنية" showBack />
 
@@ -79,6 +82,7 @@ const RevelationMapPage: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

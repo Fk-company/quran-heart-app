@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import SEO from '@/components/SEO';
 import { fetchSurahs, fetchSurahAyahs, type Surah, type Ayah } from '@/lib/api';
 import PageHeader from '@/components/PageHeader';
 import { Brain, RefreshCw, Eye, EyeOff, ChevronLeft, ChevronRight, Check, X, Loader2, Trophy, RotateCcw } from 'lucide-react';
@@ -105,6 +106,8 @@ const MemorizationTestPage: React.FC = () => {
 
   if (!selectedSurah) {
     return (
+      <>
+      <SEO title="اختبار حفظ القرآن — قلب القرآن" description="اختبر حفظك للقرآن الكريم بأساليب تفاعلية متنوعة." />
       <div className="page-container page-with-topbar" dir="rtl">
         <div className="px-4 pt-6 max-w-lg mx-auto">
           <PageHeader icon={Brain} title="اختبار الحفظ" subtitle="اختر السورة للبدء" />
@@ -137,6 +140,7 @@ const MemorizationTestPage: React.FC = () => {
           )}
         </div>
       </div>
+    </>
     );
   }
 

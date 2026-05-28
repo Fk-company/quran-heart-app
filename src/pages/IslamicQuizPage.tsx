@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import SEO from '@/components/SEO';
 import { Brain, CheckCircle2, XCircle, Trophy, RefreshCw, Sparkles, ChevronLeft, Target, Infinity as InfinityIcon, Database } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { buildBank, buildSessionQuiz, fetchApiQuizQuestions, generateRoundSeed, TOTAL_VARIANTS_ESTIMATE, type Q, type Difficulty, type Category } from '@/data/quizGenerator';
@@ -154,6 +155,8 @@ const IslamicQuizPage: React.FC = () => {
   // ============ Setup Screen ============
   if (!started) {
     return (
+      <>
+      <SEO title="اختبار إسلامي — اختبر معلوماتك الدينية" description="اختبارات إسلامية متنوعة في القرآن والسيرة والفقه بمستويات صعوبة مختلفة." />
       <div className="page-container page-with-topbar" dir="rtl">
         <div className="px-4 pt-6 max-w-lg mx-auto">
           <PageHeader icon={Brain} title="اختبار إسلامي" subtitle="آلاف الأسئلة المتجددة في كل جولة" showBack gradient="primary" />
@@ -241,6 +244,7 @@ const IslamicQuizPage: React.FC = () => {
           </button>
         </div>
       </div>
+    </>
     );
   }
 

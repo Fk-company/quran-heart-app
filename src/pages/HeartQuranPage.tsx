@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SEO from '@/components/SEO';
 import PageHeader from '@/components/PageHeader';
 import { Heart, BookOpen, Play, ChevronLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -55,7 +56,9 @@ const HeartQuranPage: React.FC = () => {
   const section = selectedSection !== null ? heartSections[selectedSection] : null;
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="قلب القرآن — سورة يس وآيات القلب" description="سورة يس وآيات تثبيت القلب والسكينة." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={Heart} title="قلب القرآن" subtitle="آيات تطمئن القلب وتشفي الصدر" gradient="gold" />
 
@@ -111,6 +114,7 @@ const HeartQuranPage: React.FC = () => {
         ) : null}
       </div>
     </div>
+    </>
   );
 };
 

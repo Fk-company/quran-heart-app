@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SEO from '@/components/SEO';
 import { fetchSurahs, type Surah } from '@/lib/api';
 import { BarChart3, BookOpen, Hash, FileText, Type } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
@@ -42,7 +43,9 @@ const QuranStatsPage: React.FC = () => {
   ];
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="إحصائيات القرآن الكريم — أرقام وحقائق" description="أرقام وحقائق إحصائية عن القرآن الكريم: السور، الآيات، الكلمات، الأجزاء." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={BarChart3}
@@ -107,6 +110,7 @@ const QuranStatsPage: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

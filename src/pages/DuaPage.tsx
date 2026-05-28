@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SEO from '@/components/SEO';
 import { useFavorites } from '@/hooks/useFavorites';
 import { Search, Heart, BookOpen, Share2 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
@@ -68,7 +69,9 @@ const DuaPage: React.FC = () => {
   };
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="الأدعية الإسلامية لكل مناسبة — قلب القرآن" description="مجموعة شاملة من الأدعية: أدعية الصباح، السفر، الطعام، الاستغفار، الشفاء، وأدعية قرآنية." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={BookOpen}
@@ -113,6 +116,7 @@ const DuaPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

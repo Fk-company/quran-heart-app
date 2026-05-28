@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import SEO from '@/components/SEO';
 import { fetchReciters, fetchSurahs, type Reciter, type Surah } from '@/lib/api';
 import { useAudioPlayer, type AudioTrack } from '@/contexts/AudioContext';
 import { useFavorites } from '@/hooks/useFavorites';
@@ -124,6 +125,8 @@ const RecitersPage: React.FC = () => {
     const surahNums = getSurahNums(reciter);
     return (
       <>
+      <SEO title="أشهر قراء القرآن الكريم — قلب القرآن" description="استمع لتلاوات أشهر قراء العالم الإسلامي مع إمكانية البث المباشر والاستماع للسور." />
+      <>
         <div className="sheet-overlay" onClick={onClose} />
         <div className="sheet-content" dir="rtl">
           <div className="sheet-handle" />
@@ -169,6 +172,7 @@ const RecitersPage: React.FC = () => {
           </div>
         </div>
       </>
+    </>
     );
   };
 

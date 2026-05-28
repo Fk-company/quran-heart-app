@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import SEO from '@/components/SEO';
 import { useNavigate } from 'react-router-dom';
 import { Target, Calendar, BookOpen, Check, ChevronLeft, RotateCcw, TrendingUp, Award } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
@@ -87,6 +88,8 @@ const KhatmPlanPage: React.FC = () => {
   // ============ NO PLAN — Setup screen ============
   if (!plan) {
     return (
+      <>
+      <SEO title="خطة ختم القرآن — 30 / 60 / 90 يوم" description="خطط لختمتك القادمة باختيار المدة المناسبة لك." />
       <div className="page-container page-with-topbar" dir="rtl">
         <div className="px-4 pt-6 max-w-lg mx-auto">
           <PageHeader icon={Target} title="خطة الختمة" subtitle="نظّم قراءتك للقرآن الكريم" gradient="primary" showBack />
@@ -153,6 +156,7 @@ const KhatmPlanPage: React.FC = () => {
           </div>
         </div>
       </div>
+    </>
     );
   }
 

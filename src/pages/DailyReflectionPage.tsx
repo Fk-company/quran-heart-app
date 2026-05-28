@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import SEO from '@/components/SEO';
 import PageHeader from '@/components/PageHeader';
 import { Lightbulb, BookOpen, Heart, RefreshCw, Share2, Copy, Check } from 'lucide-react';
 
@@ -45,7 +46,9 @@ const DailyReflectionPage: React.FC = () => {
   };
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="تأملات يومية — آية وتدبر وعمل" description="آية يومية مع تدبر وعمل لتعزيز علاقتك بالقرآن." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={Lightbulb} title="تأملات يومية" subtitle="آية وتدبر وعمل" gradient="gold"
           actions={
@@ -107,6 +110,7 @@ const DailyReflectionPage: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

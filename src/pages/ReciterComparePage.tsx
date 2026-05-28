@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SEO from '@/components/SEO';
 import { Mic2, Play, Pause, Loader2 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { useAudioPlayer } from '@/contexts/AudioContext';
@@ -45,7 +46,9 @@ const ReciterComparePage: React.FC = () => {
   };
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="مقارنة القراء — قلب القرآن" description="قارن بين تلاوات القراء المختلفين لنفس الآية." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={Mic2} title="مقارنة القراءات" subtitle="استمع لنفس الآية بأصوات مختلفة" showBack />
 
@@ -90,6 +93,7 @@ const ReciterComparePage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

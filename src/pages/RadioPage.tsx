@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import SEO from '@/components/SEO';
 import { fetchRadioStations, type RadioStation } from '@/lib/api';
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { Play, Pause, Radio, Signal, Search, Grid3X3, List, ArrowDownAZ, Filter, ChevronDown, History, Heart, X } from 'lucide-react';
@@ -77,7 +78,9 @@ const RadioPage: React.FC = () => {
   };
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="راديو القرآن الكريم — بث مباشر" description="استمع للبث المباشر لإذاعات القرآن الكريم من مختلف الدول الإسلامية." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={Radio}
@@ -250,6 +253,7 @@ const RadioPage: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

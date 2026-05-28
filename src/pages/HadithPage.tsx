@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SEO from '@/components/SEO';
 import { hadiths, hadithCategories } from '@/data/hadiths';
 import { useFavorites } from '@/hooks/useFavorites';
 import { Search, Heart, ChevronDown, ChevronUp, Quote, Grid3X3, List, Share2, X } from 'lucide-react';
@@ -34,7 +35,9 @@ const HadithPage: React.FC = () => {
   };
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="الأحاديث النبوية الشريفة — قلب القرآن" description="أحاديث نبوية مختارة من الصحاح مع البحث والتصنيف حسب الموضوع." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={Quote}
@@ -177,6 +180,7 @@ const HadithPage: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

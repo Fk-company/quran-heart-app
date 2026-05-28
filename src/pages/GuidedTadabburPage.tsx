@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import SEO from '@/components/SEO';
 import { Lightbulb, Play, Pause, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 
@@ -82,7 +83,9 @@ const GuidedTadabburPage: React.FC = () => {
   const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="جلسة تدبر موجهة — قلب القرآن" description="جلسة تدبر قرآنية موجهة من 5 إلى 10 دقائق." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={Lightbulb} title="جلسة تدبر موجهة" subtitle={`جلسة ${idx + 1} من ${SESSIONS.length} • ${Math.round(total / 60)} دقائق`} showBack />
 
@@ -121,6 +124,7 @@ const GuidedTadabburPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

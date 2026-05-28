@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import SEO from '@/components/SEO';
 import { Layers, Search, Loader2, BookOpen, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { searchQuran } from '@/lib/api';
@@ -97,7 +98,9 @@ const MutashabihatPage: React.FC = () => {
   };
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="المتشابهات في القرآن — قلب القرآن" description="تعرف على الآيات المتشابهة في القرآن الكريم وتمييزها." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={Layers} title="المتشابهات اللفظية" subtitle="ابحث عن آية لتجد كل مواضعها المتشابهة" showBack />
 
@@ -197,6 +200,7 @@ const MutashabihatPage: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

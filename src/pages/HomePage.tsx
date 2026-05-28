@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import SEO from '@/components/SEO';
 import { useNavigate } from 'react-router-dom';
 import {
   Book, Mic, Radio, Clock, Moon, Sun, Sunrise, Sunset,
@@ -334,7 +335,9 @@ const HomePage: React.FC = () => {
   const favCount = (favorites?.surahs?.length || 0) + (favorites?.items?.length || 0);
 
   return (
-    <div className="page-container" dir="rtl">
+    <>
+      <SEO title="قلب القرآن — مواقيت الصلاة والقرآن والأذكار" description="الصفحة الرئيسية: مواقيت الصلاة، آخر قراءة، أذكار، وصول سريع لسور القرآن والقراء والراديو." />
+      <div className="page-container" dir="rtl">
       <div className="px-4 pt-6 pb-4 max-w-lg mx-auto">
 
         {/* Premium Header */}
@@ -716,6 +719,7 @@ const HomePage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

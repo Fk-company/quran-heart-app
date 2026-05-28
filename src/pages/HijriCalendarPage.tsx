@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import SEO from '@/components/SEO';
 import { CalendarDays, ChevronLeft, ChevronRight, Loader2, Star, Moon } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 
@@ -118,7 +119,9 @@ const HijriCalendarPage: React.FC = () => {
   }, [days]);
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="التقويم الهجري والمناسبات الإسلامية" description="التقويم الهجري الإسلامي مع المناسبات والأشهر الحرم وتحويل التواريخ." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={CalendarDays}
@@ -215,6 +218,7 @@ const HijriCalendarPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SEO from '@/components/SEO';
 import PageHeader from '@/components/PageHeader';
 import { Heart, Frown, AlertTriangle, Smile, HelpCircle, Shield, BookOpen, RefreshCw, ChevronLeft } from 'lucide-react';
 
@@ -67,7 +68,9 @@ const EmotionQuranPage: React.FC = () => {
   };
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="كيف يشعر قلبك؟ — آيات حسب حالتك" description="آيات قرآنية مختارة حسب حالتك النفسية والشعورية." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={Heart} title="كيف يشعر قلبك؟" subtitle="آيات تواسي قلبك" gradient="gold" />
 
@@ -126,6 +129,7 @@ const EmotionQuranPage: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

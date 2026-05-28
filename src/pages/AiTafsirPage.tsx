@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SEO from '@/components/SEO';
 import PageHeader from '@/components/PageHeader';
 import { Bot, Send, Loader2, BookOpen, AlertCircle } from 'lucide-react';
 
@@ -78,7 +79,9 @@ const AiTafsirPage: React.FC = () => {
   };
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="المساعد القرآني — اسأل عن التفسير" description="مساعد ذكي للإجابة عن معاني القرآن وتفسير الآيات." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto flex flex-col" style={{ height: 'calc(100vh - 10rem)' }}>
         <PageHeader icon={Bot} title="المساعد القرآني" subtitle="اسأل عن تفسير أو معنى كلمة" />
 
@@ -144,6 +147,7 @@ const AiTafsirPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

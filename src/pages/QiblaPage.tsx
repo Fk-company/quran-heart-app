@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import SEO from '@/components/SEO';
 import {
   Compass, Navigation, MapPin, Search, AlertCircle, Crosshair, Ruler,
   Smartphone, RotateCw, Wifi, Sparkles, CheckCircle2, X,
@@ -82,6 +83,7 @@ const KaabaIcon: React.FC<{ className?: string }> = ({ className }) => (
     <path d="M20 36h24v12H20z" fill="hsl(var(--background))" opacity=".16" />
     <path d="M14 23 32 13l18 10" fill="none" stroke="hsl(var(--border))" strokeWidth="2" strokeLinejoin="round" />
   </svg>
+    </>
 );
 
 const QiblaPage: React.FC = () => {
@@ -322,7 +324,9 @@ const QiblaPage: React.FC = () => {
   const qualityPercent = lastCalibration?.quality === 'good' ? 92 : lastCalibration?.quality === 'fair' ? 68 : lastCalibration?.quality === 'poor' ? 38 : 18;
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="اتجاه القبلة — بوصلة دقيقة نحو الكعبة" description="حدد اتجاه القبلة بدقة عبر بوصلة احترافية مع معايرة الجهاز وحساب الانحراف عن مكة المكرمة." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto pb-8">
         <PageHeader icon={Compass} title="اتجاه القبلة" subtitle="بوصلة احترافية نحو الكعبة المشرفة" showBack gradient="gold" />
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import SEO from '@/components/SEO';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, BookOpen, ArrowRight, Moon, Sun, Mic, Play, Pause, X, SkipBack, SkipForward, Square, Volume2, Bookmark, BookmarkCheck, Repeat, Minus, Plus, Type, AlignJustify, Sparkles, Settings2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAudioPlayer } from '@/contexts/AudioContext';
@@ -45,7 +46,9 @@ const AyahByAyahControls: React.FC<{
   const barFill = nightMode ? 'bg-amber-400' : 'bg-primary';
 
   return (
-    <div className={`card-surface mb-3 ${bg} border animate-fade-in`}>
+    <>
+      <SEO title="المصحف صفحة بصفحة — قلب القرآن" description="اقرأ المصحف الشريف صفحة بصفحة (604 صفحات) مع تلاوة آية بآية وتفسير لكل آية." />
+      <div className={`card-surface mb-3 ${bg} border animate-fade-in`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
@@ -151,6 +154,7 @@ const AyahByAyahControls: React.FC<{
         ))}
       </div>
     </div>
+    </>
   );
 };
 

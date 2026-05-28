@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SEO from '@/components/SEO';
 import { Coins, RefreshCw, Info, Wallet, TrendingUp } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 
@@ -125,7 +126,9 @@ const ZakatPage: React.FC = () => {
   const fmt = (n: number) => n.toLocaleString('en-US', { maximumFractionDigits: currency === 'IQD' ? 0 : 2, minimumFractionDigits: currency === 'IQD' ? 0 : 2 });
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="حاسبة الزكاة — قلب القرآن" description="احسب زكاة المال والذهب والفضة بسهولة ودقة مع دعم العملات العربية والعالمية." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={Coins} title="حاسبة الزكاة" subtitle="بسيطة ودقيقة — أسعار حيّة" showBack gradient="gold" />
 
@@ -233,6 +236,7 @@ const ZakatPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

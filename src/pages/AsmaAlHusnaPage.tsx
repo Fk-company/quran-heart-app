@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SEO from '@/components/SEO';
 import { Search, ChevronDown, ChevronUp, Grid3X3, List, Star } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 
@@ -123,7 +124,9 @@ const AsmaAlHusnaPage: React.FC = () => {
     : asmaAlHusna;
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="أسماء الله الحسنى — التسعة والتسعون اسماً" description="استعرض أسماء الله الحسنى الـ99 مع المعاني والشرح والفضل." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={Star}
@@ -185,6 +188,7 @@ const AsmaAlHusnaPage: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

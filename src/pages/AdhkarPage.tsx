@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react';
+import SEO from '@/components/SEO';
 import { adhkarCategories, adhkarData } from '@/data/adhkar';
 import { recordTasbih } from '@/lib/tasbihHistory';
 import { ArrowRight, RotateCcw, Sunrise, Sunset, Moon, Circle, Heart, Trophy, Zap, Target, ChevronLeft, Search, X } from 'lucide-react';
@@ -85,6 +86,8 @@ const AdhkarPage: React.FC = () => {
   // Tasbih mode
   if (tasbihMode) {
     return (
+      <>
+      <SEO title="الأذكار والتسبيح — أذكار الصباح والمساء" description="مجموعة أذكار الصباح والمساء وأذكار الصلاة مع عداد التسبيح وإحصائيات يومية." />
       <div className="page-container page-with-topbar" dir="rtl">
         <div className="px-4 pt-4 max-w-lg mx-auto">
           <div className="flex items-center gap-3 mb-6">
@@ -189,6 +192,7 @@ const AdhkarPage: React.FC = () => {
           </div>
         </div>
       </div>
+    </>
     );
   }
 
