@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import SEO from '@/components/SEO';
 import { useReadingTracker } from '@/hooks/useReadingTracker';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useAppStats, formatListenTime } from '@/hooks/useAppStats';
@@ -72,7 +73,9 @@ const ReadingStatsPage: React.FC = () => {
   ];
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="تقدم القراءة اليومية — قلب القرآن" description="تتبع ختمتك وسجل قراءتك اليومية للقرآن." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto pb-28">
         <PageHeader
           icon={TrendingUp}
@@ -324,6 +327,7 @@ const ReadingStatsPage: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

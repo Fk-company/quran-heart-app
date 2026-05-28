@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import SEO from '@/components/SEO';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, BookOpen, Heart, Feather, Check, ChevronLeft, RotateCcw, Flame, Sunrise, Moon } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
@@ -92,7 +93,9 @@ const DailyWirdPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="وردي اليومي — قلب القرآن" description="تتبع وردك اليومي من القرآن والأذكار بسلاسة." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={Sparkles}
@@ -180,6 +183,7 @@ const DailyWirdPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SEO from '@/components/SEO';
 import { prophets, type Prophet } from '@/data/prophets';
 import { ArrowRight, BookOpen, MapPin, Lightbulb, ChevronDown, ChevronUp, Users, Grid3X3, List } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
@@ -10,6 +11,8 @@ const ProphetsPage: React.FC = () => {
 
   if (selected) {
     return (
+      <>
+      <SEO title="قصص الأنبياء والمرسلين — قلب القرآن" description="اقرأ قصص الأنبياء والمرسلين عليهم السلام كما وردت في القرآن والسنة." />
       <div className="page-container page-with-topbar" dir="rtl">
         <div className="px-4 pt-4 max-w-lg mx-auto">
           <div className="flex items-center gap-3 mb-5">
@@ -80,6 +83,7 @@ const ProphetsPage: React.FC = () => {
           </div>
         </div>
       </div>
+    </>
     );
   }
 

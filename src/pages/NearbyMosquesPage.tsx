@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import SEO from '@/components/SEO';
 import { MapPin, RefreshCw, Navigation, AlertCircle } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 
@@ -90,7 +91,9 @@ const NearbyMosquesPage: React.FC = () => {
   };
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="المساجد القريبة منك — قلب القرآن" description="ابحث عن أقرب المساجد إلى موقعك مع المسافة والاتجاهات." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={MapPin} title="المساجد القريبة" subtitle="ابحث عن أقرب المساجد إليك" showBack gradient="primary" />
 
@@ -162,6 +165,7 @@ const NearbyMosquesPage: React.FC = () => {
         <p className="text-[10px] text-muted-foreground text-center mt-4">البيانات من OpenStreetMap بمساهمة المجتمع</p>
       </div>
     </div>
+    </>
   );
 };
 

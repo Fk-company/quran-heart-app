@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SEO from '@/components/SEO';
 import { BookHeart, Plus, Trash2, Calendar, Heart, Brain, Sparkles } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 
@@ -69,7 +70,9 @@ const FaithJournalPage: React.FC = () => {
   })();
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="يوميات إيمانية — قلب القرآن" description="دوّن لحظاتك الروحية وتأملاتك الإيمانية اليومية." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={BookHeart} title="يوميات إيمانية" subtitle="دوّن لحظاتك الروحية" showBack gradient="gold" />
 
@@ -213,6 +216,7 @@ const FaithJournalPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

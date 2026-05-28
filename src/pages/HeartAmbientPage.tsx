@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import SEO from '@/components/SEO';
 import { Waves, Play, Pause, Volume2, Moon, CloudRain, Wind, TreePine, Flame, Heart, Bird, Coffee } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 
@@ -337,7 +338,9 @@ const HeartAmbientPage: React.FC = () => {
   };
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="خلفية قلبية للتركيز — قلب القرآن" description="أصوات هادئة وتلاوة خافتة للتركيز والاسترخاء." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={Waves} title="خلفية قلبية" subtitle="مزج أصوات الطبيعة والتلاوة لراحة القلب" showBack />
 
@@ -420,6 +423,7 @@ const HeartAmbientPage: React.FC = () => {
         </p>
       </div>
     </div>
+    </>
   );
 };
 

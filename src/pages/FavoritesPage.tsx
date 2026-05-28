@@ -1,4 +1,5 @@
 import React from 'react';
+import SEO from '@/components/SEO';
 import { useFavorites } from '@/hooks/useFavorites';
 import { Heart, Download, Trash2, BookOpen, Quote, Feather } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
@@ -11,7 +12,9 @@ const FavoritesPage: React.FC = () => {
   const items = favorites.items;
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="المفضلة — الآيات والأدعية المحفوظة" description="استعرض جميع الآيات والأدعية التي حفظتها في المفضلة." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={Heart}
@@ -59,6 +62,7 @@ const FavoritesPage: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

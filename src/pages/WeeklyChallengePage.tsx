@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import SEO from '@/components/SEO';
 import { Trophy, Flame, Check, Lock, Award, Target, Calendar, Zap } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { useReadingTracker } from '@/hooks/useReadingTracker';
@@ -130,7 +131,9 @@ const WeeklyChallengePage: React.FC = () => {
   };
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="التحدي الأسبوعي — قلب القرآن" description="تحديات أسبوعية للقراءة والحفظ والذكر مع شارات إنجاز." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={Trophy} title="التحدي الأسبوعي" subtitle="أنجز التحديات واكسب الشارات" showBack />
 
@@ -205,6 +208,7 @@ const WeeklyChallengePage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

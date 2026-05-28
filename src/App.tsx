@@ -65,57 +65,59 @@ const queryClient = new QueryClient();
 const AnimatedRoutes = () => {
   const location = useLocation();
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<PageTransition><HomePage /></PageTransition>} />
-        <Route path="/quran" element={<PageTransition><QuranPage /></PageTransition>} />
-        <Route path="/quran/:id" element={<PageTransition><SurahDetailPage /></PageTransition>} />
-        <Route path="/mushaf" element={<PageTransition><MushafPage /></PageTransition>} />
-        <Route path="/reciters" element={<PageTransition><RecitersPage /></PageTransition>} />
-        <Route path="/adhkar" element={<PageTransition><AdhkarPage /></PageTransition>} />
-        <Route path="/radio" element={<PageTransition><RadioPage /></PageTransition>} />
-        <Route path="/search" element={<PageTransition><SearchPage /></PageTransition>} />
-        <Route path="/more" element={<PageTransition><MorePage /></PageTransition>} />
-        <Route path="/prophets" element={<PageTransition><ProphetsPage /></PageTransition>} />
-        <Route path="/hadith" element={<PageTransition><HadithPage /></PageTransition>} />
-        <Route path="/asma-al-husna" element={<PageTransition><AsmaAlHusnaPage /></PageTransition>} />
-        <Route path="/sakinah" element={<PageTransition><SakinahPage /></PageTransition>} />
-        <Route path="/quran-stats" element={<PageTransition><QuranStatsPage /></PageTransition>} />
-        <Route path="/dua" element={<PageTransition><DuaPage /></PageTransition>} />
-        <Route path="/tafsir" element={<PageTransition><TafsirPage /></PageTransition>} />
-        <Route path="/kids-stories" element={<PageTransition><KidsStoriesPage /></PageTransition>} />
-        <Route path="/favorites" element={<PageTransition><FavoritesPage /></PageTransition>} />
-        <Route path="/reading-stats" element={<PageTransition><ReadingStatsPage /></PageTransition>} />
-        <Route path="/settings" element={<PageTransition><SettingsPage /></PageTransition>} />
-        <Route path="/memorization-test" element={<PageTransition><MemorizationTestPage /></PageTransition>} />
-        <Route path="/emotion-quran" element={<PageTransition><EmotionQuranPage /></PageTransition>} />
-        <Route path="/heart-quran" element={<PageTransition><HeartQuranPage /></PageTransition>} />
-        <Route path="/daily-reflection" element={<PageTransition><DailyReflectionPage /></PageTransition>} />
-        <Route path="/ai-tafsir" element={<PageTransition><AiTafsirPage /></PageTransition>} />
-        <Route path="/hijri-calendar" element={<PageTransition><HijriCalendarPage /></PageTransition>} />
-        <Route path="/khatm-plan" element={<PageTransition><KhatmPlanPage /></PageTransition>} />
-        <Route path="/daily-wird" element={<PageTransition><DailyWirdPage /></PageTransition>} />
-        <Route path="/tasbih-stats" element={<PageTransition><TasbihStatsPage /></PageTransition>} />
-        <Route path="/developer-social" element={<PageTransition><DeveloperSocialPage /></PageTransition>} />
-        <Route path="/smart-wird" element={<PageTransition><SmartWirdPage /></PageTransition>} />
-        <Route path="/weekly-challenge" element={<PageTransition><WeeklyChallengePage /></PageTransition>} />
-        <Route path="/reciter-compare" element={<PageTransition><ReciterComparePage /></PageTransition>} />
-        <Route path="/revelation-map" element={<PageTransition><RevelationMapPage /></PageTransition>} />
-        <Route path="/mutashabihat" element={<PageTransition><MutashabihatPage /></PageTransition>} />
-        <Route path="/guided-tadabbur" element={<PageTransition><GuidedTadabburPage /></PageTransition>} />
-        <Route path="/heart-ambient" element={<PageTransition><HeartAmbientPage /></PageTransition>} />
-        <Route path="/daily-iman" element={<PageTransition><DailyImanPage /></PageTransition>} />
-        <Route path="/surah-summary" element={<PageTransition><SurahSummaryPage /></PageTransition>} />
-        <Route path="/qibla" element={<PageTransition><QiblaPage /></PageTransition>} />
-        <Route path="/zakat" element={<PageTransition><ZakatPage /></PageTransition>} />
-        <Route path="/fasting-tracker" element={<PageTransition><FastingTrackerPage /></PageTransition>} />
-        <Route path="/islamic-quiz" element={<PageTransition><IslamicQuizPage /></PageTransition>} />
-        <Route path="/nearby-mosques" element={<PageTransition><NearbyMosquesPage /></PageTransition>} />
-        <Route path="/faith-journal" element={<PageTransition><FaithJournalPage /></PageTransition>} />
-        <Route path="/notification-settings" element={<PageTransition><NotificationSettingsPage /></PageTransition>} />
-        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
-      </Routes>
-    </AnimatePresence>
+    <main>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<PageTransition><HomePage /></PageTransition>} />
+          <Route path="/quran" element={<PageTransition><QuranPage /></PageTransition>} />
+          <Route path="/quran/:id" element={<PageTransition><SurahDetailPage /></PageTransition>} />
+          <Route path="/mushaf" element={<PageTransition><MushafPage /></PageTransition>} />
+          <Route path="/reciters" element={<PageTransition><RecitersPage /></PageTransition>} />
+          <Route path="/adhkar" element={<PageTransition><AdhkarPage /></PageTransition>} />
+          <Route path="/radio" element={<PageTransition><RadioPage /></PageTransition>} />
+          <Route path="/search" element={<PageTransition><SearchPage /></PageTransition>} />
+          <Route path="/more" element={<PageTransition><MorePage /></PageTransition>} />
+          <Route path="/prophets" element={<PageTransition><ProphetsPage /></PageTransition>} />
+          <Route path="/hadith" element={<PageTransition><HadithPage /></PageTransition>} />
+          <Route path="/asma-al-husna" element={<PageTransition><AsmaAlHusnaPage /></PageTransition>} />
+          <Route path="/sakinah" element={<PageTransition><SakinahPage /></PageTransition>} />
+          <Route path="/quran-stats" element={<PageTransition><QuranStatsPage /></PageTransition>} />
+          <Route path="/dua" element={<PageTransition><DuaPage /></PageTransition>} />
+          <Route path="/tafsir" element={<PageTransition><TafsirPage /></PageTransition>} />
+          <Route path="/kids-stories" element={<PageTransition><KidsStoriesPage /></PageTransition>} />
+          <Route path="/favorites" element={<PageTransition><FavoritesPage /></PageTransition>} />
+          <Route path="/reading-stats" element={<PageTransition><ReadingStatsPage /></PageTransition>} />
+          <Route path="/settings" element={<PageTransition><SettingsPage /></PageTransition>} />
+          <Route path="/memorization-test" element={<PageTransition><MemorizationTestPage /></PageTransition>} />
+          <Route path="/emotion-quran" element={<PageTransition><EmotionQuranPage /></PageTransition>} />
+          <Route path="/heart-quran" element={<PageTransition><HeartQuranPage /></PageTransition>} />
+          <Route path="/daily-reflection" element={<PageTransition><DailyReflectionPage /></PageTransition>} />
+          <Route path="/ai-tafsir" element={<PageTransition><AiTafsirPage /></PageTransition>} />
+          <Route path="/hijri-calendar" element={<PageTransition><HijriCalendarPage /></PageTransition>} />
+          <Route path="/khatm-plan" element={<PageTransition><KhatmPlanPage /></PageTransition>} />
+          <Route path="/daily-wird" element={<PageTransition><DailyWirdPage /></PageTransition>} />
+          <Route path="/tasbih-stats" element={<PageTransition><TasbihStatsPage /></PageTransition>} />
+          <Route path="/developer-social" element={<PageTransition><DeveloperSocialPage /></PageTransition>} />
+          <Route path="/smart-wird" element={<PageTransition><SmartWirdPage /></PageTransition>} />
+          <Route path="/weekly-challenge" element={<PageTransition><WeeklyChallengePage /></PageTransition>} />
+          <Route path="/reciter-compare" element={<PageTransition><ReciterComparePage /></PageTransition>} />
+          <Route path="/revelation-map" element={<PageTransition><RevelationMapPage /></PageTransition>} />
+          <Route path="/mutashabihat" element={<PageTransition><MutashabihatPage /></PageTransition>} />
+          <Route path="/guided-tadabbur" element={<PageTransition><GuidedTadabburPage /></PageTransition>} />
+          <Route path="/heart-ambient" element={<PageTransition><HeartAmbientPage /></PageTransition>} />
+          <Route path="/daily-iman" element={<PageTransition><DailyImanPage /></PageTransition>} />
+          <Route path="/surah-summary" element={<PageTransition><SurahSummaryPage /></PageTransition>} />
+          <Route path="/qibla" element={<PageTransition><QiblaPage /></PageTransition>} />
+          <Route path="/zakat" element={<PageTransition><ZakatPage /></PageTransition>} />
+          <Route path="/fasting-tracker" element={<PageTransition><FastingTrackerPage /></PageTransition>} />
+          <Route path="/islamic-quiz" element={<PageTransition><IslamicQuizPage /></PageTransition>} />
+          <Route path="/nearby-mosques" element={<PageTransition><NearbyMosquesPage /></PageTransition>} />
+          <Route path="/faith-journal" element={<PageTransition><FaithJournalPage /></PageTransition>} />
+          <Route path="/notification-settings" element={<PageTransition><NotificationSettingsPage /></PageTransition>} />
+          <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+        </Routes>
+      </AnimatePresence>
+    </main>
   );
 };
 

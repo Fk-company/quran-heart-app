@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SEO from '@/components/SEO';
 import { useNavigate } from 'react-router-dom';
 import {
   Heart, Radio, Users, Quote, Search, Star, BookOpen, BarChart3,
@@ -99,6 +100,8 @@ export const MoreSheet: React.FC<MoreSheetProps> = ({ open, onClose }) => {
 
   return (
     <>
+      <SEO title="جميع الأقسام والميزات — قلب القرآن" description="استكشف كل ميزات التطبيق: القرآن، الأذكار، الأدعية، القبلة، الزكاة، القصص، والاختبارات." />
+      <>
       <div className="sheet-overlay" onClick={onClose} />
       <div className="sheet-content" dir="rtl">
         <div className="sheet-handle" />
@@ -130,6 +133,7 @@ export const MoreSheet: React.FC<MoreSheetProps> = ({ open, onClose }) => {
           ))}
         </div>
       </div>
+    </>
     </>
   );
 };

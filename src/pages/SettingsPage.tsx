@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SEO from '@/components/SEO';
 import { createPortal } from 'react-dom';
 import {
   Settings, Type, Palette, Mic, RotateCcw, Repeat, Volume2,
@@ -85,7 +86,9 @@ const SettingsPage: React.FC = () => {
   }, [searchQuery, matchedSections]);
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="الإعدادات — قلب القرآن" description="تخصيص إعدادات التطبيق: الثيم، الخط، الإشعارات، والصوت." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={Settings}
@@ -493,6 +496,7 @@ const SettingsPage: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

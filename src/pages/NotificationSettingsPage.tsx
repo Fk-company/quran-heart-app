@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SEO from '@/components/SEO';
 import { Bell, BellOff, Volume2, VolumeX, Clock, Moon, Mic, Repeat, Play, Square, CheckCircle2 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { useNotificationSettings, MUEZZINS, playAdhan, stopAdhan } from '@/hooks/useNotificationSettings';
@@ -36,7 +37,9 @@ const NotificationSettingsPage: React.FC = () => {
   };
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="إعدادات الإشعارات والأذان — قلب القرآن" description="تحكم بإشعارات الأذان والتذكيرات واختر صوت المؤذن وأوقات الهدوء." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={Bell} title="إعدادات الإشعارات" subtitle="تحكم كامل بالتذكيرات والأذان" showBack gradient="primary" />
 
@@ -234,6 +237,7 @@ const NotificationSettingsPage: React.FC = () => {
         </button>
       </div>
     </div>
+    </>
   );
 };
 

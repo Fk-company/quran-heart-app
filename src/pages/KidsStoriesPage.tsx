@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SEO from '@/components/SEO';
 import { ArrowRight, BookOpen, Grid3X3, List, Heart, Star, ChevronDown, ChevronUp } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 
@@ -141,6 +142,8 @@ const KidsStoriesPage: React.FC = () => {
 
   if (selected) {
     return (
+      <>
+      <SEO title="قصص إسلامية للأطفال — قلب القرآن" description="مجموعة قصص إسلامية ممتعة وتربوية للأطفال مع الدروس المستفادة." />
       <div className="page-container page-with-topbar" dir="rtl">
         <div className="px-4 pt-4 max-w-lg mx-auto">
           <div className="flex items-center gap-3 mb-5">
@@ -188,6 +191,7 @@ const KidsStoriesPage: React.FC = () => {
           </div>
         </div>
       </div>
+    </>
     );
   }
 

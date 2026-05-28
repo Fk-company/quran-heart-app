@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SEO from '@/components/SEO';
 import { CheckCircle2, Circle, Moon, Flame, TrendingUp } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 
@@ -52,7 +53,9 @@ const FastingTrackerPage: React.FC = () => {
   });
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="متتبع الصيام — صيام النوافل" description="سجّل أيام صيام النوافل وتتبع تقدمك في عبادة الصيام." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={Moon} title="متتبع الصيام" subtitle="سجّل صيام النوافل واحفظ أجرك" showBack gradient="primary" />
 
@@ -136,6 +139,7 @@ const FastingTrackerPage: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import SEO from '@/components/SEO';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Flame, Trophy, TrendingUp, Heart, BarChart3 } from 'lucide-react';
 import {
@@ -27,6 +28,7 @@ const TasbihStatsPage: React.FC = () => {
   const last7Total = useMemo(
     () => last14.slice(-7).reduce((a, b) => a + b.total, 0),
     [last14],
+    </>
   );
   const streak = useMemo(() => getStreak(), [tick]);
   const top = useMemo(() => getTopPhrases(30), [tick]);
@@ -36,7 +38,9 @@ const TasbihStatsPage: React.FC = () => {
   const todayTotal = last14[last14.length - 1]?.total || 0;
 
   return (
-    <div className="page-container page-with-topbar pb-32" dir="rtl">
+    <>
+      <SEO title="إحصاء التسبيح اليومي — قلب القرآن" description="تتبع ذكرك وتسبيحك اليومي بالأرقام." />
+      <div className="page-container page-with-topbar pb-32" dir="rtl">
       <div className="px-4 pt-4 max-w-lg mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SEO from '@/components/SEO';
 import { Sunrise, Bell, BellRing, RefreshCw, Loader2 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -93,7 +94,9 @@ const DailyImanPage: React.FC = () => {
   }, [prefs, ayah, permission, sendNotification]);
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="رسالة الصباح الإيمانية — قلب القرآن" description="آية وتفسير ورسالة إيمانية لبداية يومك." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={Sunrise} title="رسائل إيمانية يومية" subtitle="آية وتفسير قصير كل صباح" showBack />
 
@@ -141,6 +144,7 @@ const DailyImanPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

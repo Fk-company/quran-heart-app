@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import SEO from '@/components/SEO';
 import { useNavigate } from 'react-router-dom';
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { Play, Pause, Heart, BookOpen } from 'lucide-react';
@@ -49,7 +50,9 @@ const SakinahPage: React.FC = () => {
   };
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="آيات السكينة والطمأنينة — قلب القرآن" description="مجموعة آيات للراحة والسكينة وطمأنينة القلب." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={Heart}
@@ -92,6 +95,7 @@ const SakinahPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import SEO from '@/components/SEO';
 import { useNavigate } from 'react-router-dom';
 import { Share2, ArrowLeft, ExternalLink, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -72,7 +73,9 @@ const DeveloperSocialPage: React.FC = () => {
   };
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="تواصل مع المطور فخري عادل" description="تواصل مع مطور التطبيق فخري عادل عبر تليجرام وانستغرام." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
@@ -200,6 +203,7 @@ const DeveloperSocialPage: React.FC = () => {
         </motion.div>
       </div>
     </div>
+    </>
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SEO from '@/components/SEO';
 import { FileText, Loader2, BookOpen, MapPin, ListOrdered } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '@/components/PageHeader';
@@ -50,7 +51,9 @@ const SurahSummaryPage: React.FC = () => {
   const data = summary ?? fallback;
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="ملخص السور القرآنية — قلب القرآن" description="ملخصات موجزة لمواضيع وأهداف سور القرآن." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={FileText} title="تلخيص السور" subtitle="محاور كل سورة بإيجاز" showBack />
 
@@ -117,6 +120,7 @@ const SurahSummaryPage: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

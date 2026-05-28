@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import SEO from '@/components/SEO';
 import { useNavigate } from 'react-router-dom';
 import { searchQuran, fetchSurahs, type Surah } from '@/lib/api';
 import { Search as SearchIcon, Book, Clock, X, Filter, ChevronDown, BookOpen, Sparkles, Layers } from 'lucide-react';
@@ -177,7 +178,9 @@ const SearchPage: React.FC = () => {
   };
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="البحث في القرآن الكريم — قلب القرآن" description="ابحث في آيات القرآن الكريم بسهولة مع نتائج فورية ودقيقة." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={SearchIcon}
@@ -359,6 +362,7 @@ const SearchPage: React.FC = () => {
         ) : null}
       </div>
     </div>
+    </>
   );
 };
 

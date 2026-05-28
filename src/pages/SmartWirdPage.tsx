@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import SEO from '@/components/SEO';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, Clock, Gauge, BookOpen, ArrowLeft } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
@@ -43,7 +44,9 @@ const SmartWirdPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="page-container page-with-topbar" dir="rtl">
+    <>
+      <SEO title="الورد الذكي — قلب القرآن" description="اقتراح يومي للورد القرآني حسب وقتك وروتينك." />
+      <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader icon={Sparkles} title="الورد القرآني الذكي" subtitle="اقتراح يومي حسب وقتك وسرعتك" showBack />
 
@@ -92,6 +95,7 @@ const SmartWirdPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

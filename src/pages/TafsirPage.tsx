@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SEO from '@/components/SEO';
 import { useNavigate } from 'react-router-dom';
 import { fetchSurahs, type Surah } from '@/lib/api';
 import { Search, BookOpen, ArrowRight } from 'lucide-react';
@@ -49,6 +50,8 @@ const TafsirPage: React.FC = () => {
   if (selectedSurah) {
     const surah = surahs.find(s => s.number === selectedSurah);
     return (
+      <>
+      <SEO title="تفسير القرآن الكريم — قلب القرآن" description="تفاسير القرآن الكريم من أكثر من مصدر مع البحث حسب السورة والآية." />
       <div className="page-container page-with-topbar" dir="rtl">
         <div className="px-4 pt-4 max-w-lg mx-auto">
           <div className="flex items-center gap-3 mb-4">
@@ -90,6 +93,7 @@ const TafsirPage: React.FC = () => {
           )}
         </div>
       </div>
+    </>
     );
   }
 
