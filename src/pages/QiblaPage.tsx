@@ -77,13 +77,12 @@ function buildCalibrationInsight(args: { loc: Loc | null; compassActive: boolean
 
 const KaabaIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
-    <path d="M14 23 32 13l18 10v30H14V23Z" fill="hsl(var(--foreground))" />
-    <path d="M14 23h36v9H14z" fill="hsl(var(--primary))" />
-    <path d="M19 27h8M31 27h14" stroke="hsl(var(--primary-foreground))" strokeWidth="2" strokeLinecap="round" />
-    <path d="M20 36h24v12H20z" fill="hsl(var(--background))" opacity=".16" />
-    <path d="M14 23 32 13l18 10" fill="none" stroke="hsl(var(--border))" strokeWidth="2" strokeLinejoin="round" />
+    <rect x="12" y="20" width="40" height="34" rx="2" fill="hsl(var(--foreground))" />
+    <path d="M12 20 32 10l20 10" fill="hsl(var(--foreground))" stroke="hsl(var(--border))" strokeWidth="1.5" strokeLinejoin="round" />
+    <rect x="12" y="28" width="40" height="7" fill="hsl(var(--primary))" />
+    <path d="M16 31.5h7M27 31.5h10M41 31.5h7" stroke="hsl(var(--primary-foreground))" strokeWidth="1.5" strokeLinecap="round" />
+    <rect x="27" y="40" width="10" height="14" fill="hsl(var(--background))" opacity=".22" rx="1" />
   </svg>
-    </>
 );
 
 const QiblaPage: React.FC = () => {
