@@ -638,6 +638,7 @@ const QiblaPage: React.FC = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

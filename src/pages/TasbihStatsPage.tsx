@@ -166,6 +166,7 @@ const TasbihStatsPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
