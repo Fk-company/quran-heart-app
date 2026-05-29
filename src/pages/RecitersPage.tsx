@@ -125,12 +125,10 @@ const RecitersPage: React.FC = () => {
     const surahNums = getSurahNums(reciter);
     return (
       <>
-      <SEO title="أشهر قراء القرآن الكريم — قلب القرآن" description="استمع لتلاوات أشهر قراء العالم الإسلامي مع إمكانية البث المباشر والاستماع للسور." />
-      <>
         <div className="sheet-overlay" onClick={onClose} />
-        <div className="sheet-content" dir="rtl">
+        <div className="sheet-content" dir="rtl" style={{ paddingBottom: currentTrack ? '8rem' : '1.5rem' }}>
           <div className="sheet-handle" />
-          <div className="px-5 pb-6 pt-2 max-h-[75vh] overflow-y-auto">
+          <div className="px-5 pb-6 pt-2 max-h-[70vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <img src={getReciterImage(reciter)} alt={reciter.name} className="w-12 h-12 rounded-2xl" />
@@ -172,9 +170,9 @@ const RecitersPage: React.FC = () => {
           </div>
         </div>
       </>
-    </>
     );
   };
+
 
   return (
     <div className="page-container page-with-topbar" dir="rtl">
