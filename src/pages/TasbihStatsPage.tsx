@@ -28,7 +28,6 @@ const TasbihStatsPage: React.FC = () => {
   const last7Total = useMemo(
     () => last14.slice(-7).reduce((a, b) => a + b.total, 0),
     [last14],
-    </>
   );
   const streak = useMemo(() => getStreak(), [tick]);
   const top = useMemo(() => getTopPhrases(30), [tick]);
@@ -167,6 +166,7 @@ const TasbihStatsPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
