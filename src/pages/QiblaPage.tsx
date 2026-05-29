@@ -438,8 +438,10 @@ const QiblaPage: React.FC = () => {
           />
 
           <div className="relative w-72 h-72 my-2 z-10">
+          <div className="relative w-72 h-72 my-2 z-10">
             <div className="absolute -inset-3 rounded-full opacity-70 pointer-events-none"
               style={{ background: 'conic-gradient(from 0deg, hsl(var(--primary)/.14), transparent 18%, hsl(var(--accent)/.12), transparent 46%, hsl(var(--primary)/.14))' }} />
+
             {/* Outer ring with cardinals — rotates with heading so N stays true */}
             <div
               className="absolute inset-0 rounded-full border-[3px] transition-[border-color] duration-300 overflow-hidden"
@@ -471,37 +473,77 @@ const QiblaPage: React.FC = () => {
               <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">E</span>
               <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">W</span>
 
-              {/* Qibla marker on the rim */}
+              {/* Qibla marker on the rim — perfectly centered radial spoke */}
               {qibla != null && (
-                <div className="absolute top-1/2 left-1/2 origin-bottom"
-                  style={{ height: '50%', width: 28, transform: `translate(-50%, -100%) rotate(${qibla}deg)` }}>
-                  <div className="w-10 h-10 -mt-5 -mr-1.5 mx-auto rounded-2xl gradient-gold flex items-center justify-center shadow-emerald border border-primary/40"
-                    style={{ transform: `rotate(${smoothHeading - qibla}deg)` }}>
-                    <KaabaIcon className="w-7 h-7" />
+                <div
+                  className="absolute top-1/2 left-1/2 pointer-events-none"
+                  style={{
+                    width: 0,
+                    height: '50%',
+                    transformOrigin: '0 100%',
+                    transform: `translate(0, -100%) rotate(${qibla}deg)`,
+                  }}
+                >
+                  {/* Radial guide line */}
+                  <div
+                    className="absolute left-1/2 bottom-0 -translate-x-1/2"
+                    style={{
+                      width: 2,
+                      height: '78%',
+                      background: aligned
+                        ? 'linear-gradient(to top, transparent, hsl(var(--primary)))'
+                        : 'linear-gradient(to top, transparent, hsl(var(--accent)/.7))',
+                    }}
+                  />
+                  {/* Kaaba badge — sits on the rim, kept upright relative to viewer */}
+                  <div
+                    className="absolute -translate-x-1/2"
+                    style={{ left: 0, top: -2 }}
+                  >
+                    <div
+                      className="w-11 h-11 rounded-2xl gradient-gold flex items-center justify-center shadow-emerald border-2 border-primary/50"
+                      style={{ transform: `rotate(${smoothHeading - qibla}deg)` }}
+                    >
+                      <KaabaIcon className="w-7 h-7" />
+                    </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Inner face */}
-            <div className="absolute inset-8 rounded-full flex items-center justify-center"
+            {/* Inner face — fixed arrow that points to Qibla */}
+            <div className="absolute inset-8 rounded-full flex items-center justify-center pointer-events-none"
               style={{
                 background: 'radial-gradient(circle at 30% 30%, hsl(var(--secondary)), hsl(var(--background)))',
                 boxShadow: 'inset 0 0 24px hsl(var(--foreground)/.08)',
               }}>
-              <div className="transition-transform duration-150 ease-out" style={{ transform: `rotate(${arrowRotation}deg)` }}>
-                <Navigation
-                  className={`w-24 h-24 drop-shadow-lg transition-colors ${
-                    aligned ? 'text-primary fill-primary' : close ? 'text-accent fill-accent' : 'text-muted-foreground fill-muted-foreground/40'
-                  }`}
-                  strokeWidth={1.5}
-                />
+              <div
+                className="transition-transform duration-150 ease-out"
+                style={{ transform: `rotate(${arrowRotation}deg)`, transformOrigin: '50% 50%' }}
+              >
+                {/* Custom arrow — tip is centered on the top edge so it lines up with the Kaaba badge */}
+                <svg width="120" height="120" viewBox="0 0 120 120" aria-hidden="true" className="drop-shadow-lg">
+                  <defs>
+                    <linearGradient id="qiblaArrow" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={aligned ? 'hsl(var(--primary))' : close ? 'hsl(var(--accent))' : 'hsl(var(--muted-foreground))'} />
+                      <stop offset="100%" stopColor={aligned ? 'hsl(var(--primary)/.4)' : close ? 'hsl(var(--accent)/.4)' : 'hsl(var(--muted-foreground)/.25)'} />
+                    </linearGradient>
+                  </defs>
+                  {/* Arrow tip at (60, 6) — exactly on top edge */}
+                  <path d="M60 6 L78 38 L66 38 L66 92 L54 92 L54 38 L42 38 Z"
+                    fill="url(#qiblaArrow)"
+                    stroke={aligned ? 'hsl(var(--primary))' : close ? 'hsl(var(--accent))' : 'hsl(var(--border))'}
+                    strokeWidth="1.5"
+                    strokeLinejoin="round"
+                  />
+                  <circle cx="60" cy="92" r="6" fill="hsl(var(--background))" stroke={aligned ? 'hsl(var(--primary))' : 'hsl(var(--border))'} strokeWidth="1.5" />
+                </svg>
               </div>
             </div>
 
             {/* Center lock */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background border-2 border-primary/50 z-20 flex items-center justify-center shadow-emerald">
-              <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-background border-2 border-primary/50 z-20 flex items-center justify-center shadow-emerald">
+              <div className="w-2 h-2 rounded-full bg-primary" />
             </div>
           </div>
 
