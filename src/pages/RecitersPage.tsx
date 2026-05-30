@@ -276,8 +276,24 @@ const RecitersPage: React.FC = () => {
 
         {viewMode === 'grid' && expandedReciter !== null && (() => {
           const reciter = filtered.find(r => r.id === expandedReciter);
-          return reciter ? <SurahPicker reciter={reciter} onClose={() => setExpandedReciter(null)} /> : null;
+          if (!reciter) return null;
+          const surahNums = getSurahNums(reciter);
+          return (
+            <SurahPicker
+              reciter={reciter}
+              surahs={surahs}
+              surahNums={surahNums}
+              reciterImage={getReciterImage(reciter)}
+              currentTrackId={currentTrack?.id}
+              isPlaying={isPlaying}
+              hasActiveTrack={!!currentTrack}
+              onPlay={(num) => handlePlay(reciter, num)}
+              onPlayAll={() => handlePlayAll(reciter)}
+              onClose={() => setExpandedReciter(null)}
+            />
+          );
         })()}
+
 
         {loading ? (
           <SkeletonGrid count={8} variant={viewMode === 'grid' ? 'tile' : 'list'} />
