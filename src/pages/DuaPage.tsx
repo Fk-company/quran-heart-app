@@ -6,21 +6,32 @@ import {
   ChevronDown, Clock, Sparkles, Bookmark, Copy, Check,
 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
-import { longDuas, duaCategories, type LongDua } from '@/data/longDuas';
+import { duaCategories, type LongDua } from '@/data/longDuas';
+import { allDuas } from '@/data/generatedDuas';
+const longDuas = allDuas;
 
 const FONT_KEY = 'dua-font-size';
 
 const DuaPage: React.FC = () => {
   const [selectedCat, setSelectedCat] = useState<LongDua['category'] | 'all'>('all');
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [reader, setReader] = useState<LongDua | null>(null);
+  const [visibleCount, setVisibleCount] = useState(40);
   const [fontSize, setFontSize] = useState<number>(() => {
     const v = Number(localStorage.getItem(FONT_KEY));
     return v >= 14 && v <= 36 ? v : 22;
   });
   const [copied, setCopied] = useState<string | null>(null);
   const { addItem, removeItem, isItemFav } = useFavorites();
+
+  // Debounce search input for snappy mobile UX.
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search.trim()), 220);
+    return () => clearTimeout(t);
+  }, [search]);
+  useEffect(() => { setVisibleCount(40); }, [debouncedSearch, selectedCat]);
 
   useEffect(() => { localStorage.setItem(FONT_KEY, String(fontSize)); }, [fontSize]);
   useEffect(() => {
@@ -32,13 +43,15 @@ const DuaPage: React.FC = () => {
   }, [reader]);
 
   const filtered = useMemo(() => {
-    const q = search.trim();
+    const q = debouncedSearch;
     return longDuas.filter(d => {
       if (selectedCat !== 'all' && d.category !== selectedCat) return false;
       if (q && !d.title.includes(q) && !d.text.includes(q) && !d.reference.includes(q)) return false;
       return true;
     });
-  }, [search, selectedCat]);
+  }, [debouncedSearch, selectedCat]);
+
+  const visible = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount]);
 
   const totalMinutes = useMemo(() => longDuas.reduce((s, d) => s + d.estimatedMinutes, 0), []);
 
