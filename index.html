@@ -49,6 +49,20 @@
   </head>
 
   <body>
+    <script>
+      // SPA fallback restore — paired with public/404.html
+      (function () {
+        try {
+          var u = new URL(window.location.href);
+          var spa = u.searchParams.get('spa');
+          if (spa) {
+            u.searchParams.delete('spa');
+            var clean = (u.pathname.replace(/\/$/, '') || '') + (u.search || '');
+            window.history.replaceState(null, '', spa);
+          }
+        } catch (e) {}
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

@@ -907,22 +907,21 @@
   .shadow-gold { box-shadow: var(--shadow-gold); }
 }
 
-/* ===== Ticker ===== */
+/* ===== Ticker — seamless 2-copy marquee (no hover pause to avoid perceived gap) ===== */
 .ticker-container {
   overflow: hidden;
-  mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 8%, black 92%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, black 6%, black 94%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 6%, black 94%, transparent 100%);
 }
 .ticker-track {
   display: flex;
-  animation: ticker-scroll 120s linear infinite;
   width: max-content;
+  animation: ticker-scroll 90s linear infinite;
   will-change: transform;
 }
-.ticker-track:hover { animation-play-state: paused; }
 @keyframes ticker-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-33.333%); }
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
 /* ===== Animations ===== */
