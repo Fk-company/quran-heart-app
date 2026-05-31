@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>قلب القرآن</title>
+    <script>
+      // SPA fallback for static hosts (GitHub Pages, etc.)
+      // Redirect any deep link to index.html with the path encoded in the query,
+      // then index.html restores the real URL via history.replaceState.
+      (function () {
+        var l = window.location;
+        var path = l.pathname + l.search + l.hash;
+        l.replace(l.origin + '/?spa=' + encodeURIComponent(path));
+      })();
+    </script>
+    <meta name="robots" content="noindex" />
+  </head>
+  <body></body>
+</html>
