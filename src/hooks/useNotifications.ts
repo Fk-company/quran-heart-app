@@ -165,18 +165,18 @@ export const useNotifications = () => {
     const ns = getNotificationSettings();
     if (!ns.enabled || !ns.prayerEnabled) return;
 
-    const diff = msUntilTimeInTz(timeStr, tz);
-    if (diff <= 0 || diff > 86400000) return;
+    const baseDiff = msUntilTimeInTz(timeStr, tz);
+    if (baseDiff <= 0) return;
 
     const tagBase = `prayer-${prayerName}`;
     alreadyScheduled(tagBase);
 
-    const reg: any = await getSWReg();
+    const reg: any = await ensureServiceWorker();
     const earlyMin = ns.prayerEarlyMinutes;
 
     const trySchedule = async (ts: number, title: string, body: string, tag: string) => {
       try {
-        // @ts-ignore experimental
+        // @ts-ignore experimental — fires even with browser closed (Chrome/Edge)
         if (typeof TimestampTrigger !== 'undefined' && reg) {
           await reg.showNotification(title, {
             body, icon: ICON, badge: ICON, dir: 'rtl', lang: 'ar', tag,
@@ -189,28 +189,39 @@ export const useNotifications = () => {
       return false;
     };
 
-    const onTs = Date.now() + diff;
+    // Pre-schedule for the next 7 days so reminders keep firing even when the tab is closed.
+    const DAY = 86400000;
+    for (let d = 0; d < 7; d++) {
+      const dayOffset = d * DAY;
+      const diff = baseDiff + dayOffset;
+      const onTs = Date.now() + diff;
+      const dayTag = d === 0 ? tagBase : `${tagBase}-d${d}`;
 
-    if (earlyMin > 0) {
-      const earlyTs = Date.now() + (diff - earlyMin * 60 * 1000);
-      if (earlyTs > Date.now()) {
-        const ok = await trySchedule(earlyTs, 'تذكير بالصلاة', `صلاة ${prayerName} بعد ${earlyMin} دقيقة`, `${tagBase}-early`);
-        if (!ok) {
-          await scheduleInServiceWorker('تذكير بالصلاة', `صلاة ${prayerName} بعد ${earlyMin} دقيقة`, earlyTs, `${tagBase}-early`, { url: '/' });
-          setTaggedTimeout(`${tagBase}-early`, earlyTs - Date.now(),
-            () => sendNotification('تذكير بالصلاة', `صلاة ${prayerName} بعد ${earlyMin} دقيقة`));
+      if (earlyMin > 0) {
+        const earlyTs = onTs - earlyMin * 60 * 1000;
+        if (earlyTs > Date.now()) {
+          const ok = await trySchedule(earlyTs, 'تذكير بالصلاة', `صلاة ${prayerName} بعد ${earlyMin} دقيقة`, `${dayTag}-early`);
+          if (!ok && d === 0) {
+            await scheduleInServiceWorker('تذكير بالصلاة', `صلاة ${prayerName} بعد ${earlyMin} دقيقة`, earlyTs, `${dayTag}-early`, { url: '/' });
+            setTaggedTimeout(`${dayTag}-early`, earlyTs - Date.now(),
+              () => sendNotification('تذكير بالصلاة', `صلاة ${prayerName} بعد ${earlyMin} دقيقة`));
+          }
         }
       }
-    }
 
-    // On-time: play adhan + notify (timer-based to allow audio playback).
-    setTaggedTimeout(tagBase, diff, () => {
-      sendNotification('حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName}`);
-      playAdhan();
-    });
-    // Backup OS notification via trigger (no audio but persists if tab closed).
-    const backed = await trySchedule(onTs, 'حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName}`, `${tagBase}-os`);
-    if (!backed) await scheduleInServiceWorker('حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName} — افتح التطبيق لتشغيل الأذان`, onTs, `${tagBase}-os`, { url: '/' });
+      const backed = await trySchedule(onTs, 'حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName}`, `${dayTag}-os`);
+      if (!backed && d === 0) {
+        // First-day fallback: in-tab timer (plays adhan) + SW timer backup.
+        setTaggedTimeout(tagBase, diff, () => {
+          sendNotification('حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName}`);
+          playAdhan();
+        });
+        await scheduleInServiceWorker('حان وقت الصلاة', `حان الآن وقت صلاة ${prayerName} — افتح التطبيق لتشغيل الأذان`, onTs, `${tagBase}-os`, { url: '/' });
+      } else if (d === 0) {
+        // Even when OS trigger is used, also play adhan in-tab if user is here.
+        setTaggedTimeout(`${tagBase}-adhan`, diff, () => playAdhan());
+      }
+    }
   }, [sendNotification]);
 
   const scheduleDailyReminder = useCallback(async (
