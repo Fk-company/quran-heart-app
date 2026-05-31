@@ -88,7 +88,7 @@ const DuaPage: React.FC = () => {
           <PageHeader
             icon={BookOpen}
             title="الأدعية المطوّلة"
-            subtitle={`${longDuas.length} دعاءً طويلاً · ${totalMinutes} دقيقة قراءة`}
+            subtitle={`${longDuas.length.toLocaleString('ar-EG')} دعاء · بحث فوري وتصفية ذكية`}
             gradient="gold"
           />
 
@@ -150,8 +150,13 @@ const DuaPage: React.FC = () => {
               لا توجد أدعية مطابقة. جرّب كلمة أخرى.
             </div>
           ) : (
+            <>
+            <div className="flex items-center justify-between mb-2 px-1 text-[11px] text-muted-foreground">
+              <span>عرض {visible.length.toLocaleString('ar-EG')} من {filtered.length.toLocaleString('ar-EG')}</span>
+              {search && search !== debouncedSearch && <span className="opacity-60">…يبحث</span>}
+            </div>
             <div className="space-y-3">
-              {filtered.map(dua => {
+              {visible.map(dua => {
                 const fid = `longdua-${dua.id}`;
                 const fav = isItemFav(fid);
                 const isOpen = expanded === dua.id;
@@ -222,6 +227,15 @@ const DuaPage: React.FC = () => {
                 );
               })}
             </div>
+            {visibleCount < filtered.length && (
+              <button
+                onClick={() => setVisibleCount(c => c + 40)}
+                className="mt-4 w-full py-3 rounded-2xl bg-secondary text-foreground text-sm font-bold hover:bg-muted transition-colors"
+              >
+                عرض المزيد ({(filtered.length - visibleCount).toLocaleString('ar-EG')} متبقٍ)
+              </button>
+            )}
+            </>
           )}
         </div>
       </div>
