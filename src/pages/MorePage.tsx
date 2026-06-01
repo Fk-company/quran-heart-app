@@ -33,6 +33,7 @@ const moreCategories = [
       { label: 'جلسة تدبر', icon: Lightbulb, path: '/guided-tadabbur', desc: 'تدبر موجه 5-10 دقائق', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-primary' },
       { label: 'خلفية قلبية', icon: Waves, path: '/heart-ambient', desc: 'أصوات وتلاوة للتركيز', color: 'bg-sky-500/10 text-sky-500', gradient: 'gradient-gold' },
       { label: 'رسالة الصباح', icon: Sunrise, path: '/daily-iman', desc: 'آية وتفسير كل يوم', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-primary' },
+      { label: 'خاطرة اليوم', icon: Sparkles, path: '/daily-khatirah', desc: 'مختارات يومية متجددة', color: 'bg-primary/10 text-primary', gradient: 'gradient-gold' },
     ]
   },
   {
