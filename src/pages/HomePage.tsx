@@ -15,6 +15,7 @@ import { useNotifications } from '@/hooks/useNotifications';
 import { useReadingTracker } from '@/hooks/useReadingTracker';
 import { useFavorites } from '@/hooks/useFavorites';
 import { getCached, setCached } from '@/lib/dataCache';
+import WisdomCarousel from '@/components/WisdomCarousel';
 
 const prayerIcons: Record<string, React.ElementType> = {
   Fajr: Sunrise, Sunrise: Sun, Dhuhr: CloudSun, Asr: Sun, Maghrib: Sunset, Isha: Moon,
@@ -608,16 +609,8 @@ const HomePage: React.FC = () => {
           </button>
         )}
 
-        {/* Ticker */}
-        <div className="mb-5 overflow-hidden rounded-2xl bg-primary/5 border border-primary/10">
-          <div className="ticker-container py-2.5 px-4">
-            <div className="ticker-track" aria-hidden="true">
-              {[...tickerItems, ...tickerItems].map((item, i) => (
-                <span key={i} className="font-amiri text-sm text-primary whitespace-nowrap mx-8">{item}</span>
-              ))}
-            </div>
-          </div>
-        </div>
+        {/* Wisdom Carousel — auto-rotating cards (dhikr / ayah / hadith / names / dua) */}
+        <WisdomCarousel />
 
         {/* Primary Actions — Big icons */}
         <div className="grid grid-cols-4 gap-2 mb-5">
