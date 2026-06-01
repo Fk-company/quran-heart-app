@@ -1,70 +1,31 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Sparkles, BookOpen, Quote, Star, Hand, Pause, Play } from 'lucide-react';
+import { Sparkles, BookOpen, Quote, Star, Hand, Pause, Play, Feather, ChevronLeft, ChevronRight } from 'lucide-react';
+import { pickDailySet, WisdomCategory, WisdomItem } from '@/data/wisdomPool';
 
-type Category = 'dhikr' | 'ayah' | 'hadith' | 'name' | 'dua';
-
-interface Item {
-  cat: Category;
-  text: string;
-  meta?: string;
-}
-
-const CAT_META: Record<Category, { label: string; icon: React.ElementType; gradient: string; chip: string }> = {
+const CAT_META: Record<WisdomCategory, { label: string; icon: React.ElementType; gradient: string; chip: string }> = {
   dhikr:  { label: 'ذكر',  icon: Sparkles, gradient: 'from-primary/15 via-primary/5 to-transparent',     chip: 'bg-primary/15 text-primary' },
   ayah:   { label: 'آية',  icon: BookOpen, gradient: 'from-accent/15 via-accent/5 to-transparent',       chip: 'bg-accent/15 text-accent' },
   hadith: { label: 'حديث', icon: Quote,    gradient: 'from-emerald-500/15 via-emerald-500/5 to-transparent', chip: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' },
   name:   { label: 'من أسماء الله', icon: Star, gradient: 'from-amber-500/15 via-amber-500/5 to-transparent', chip: 'bg-amber-500/15 text-amber-600 dark:text-amber-400' },
   dua:    { label: 'دعاء', icon: Hand,     gradient: 'from-violet-500/15 via-violet-500/5 to-transparent',   chip: 'bg-violet-500/15 text-violet-600 dark:text-violet-400' },
+  wisdom: { label: 'حكمة', icon: Feather,  gradient: 'from-rose-500/15 via-rose-500/5 to-transparent',       chip: 'bg-rose-500/15 text-rose-600 dark:text-rose-400' },
 };
 
-const ITEMS: Item[] = [
-  // Dhikr
-  { cat: 'dhikr', text: 'سُبْحَانَ اللهِ وَبِحَمْدِهِ سُبْحَانَ اللهِ الْعَظِيمِ', meta: 'تُثقّل الميزان' },
-  { cat: 'dhikr', text: 'لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ', meta: 'أفضل الذكر' },
-  { cat: 'dhikr', text: 'أَسْتَغْفِرُ اللهَ الْعَظِيمَ وَأَتُوبُ إِلَيْهِ', meta: 'سيد الاستغفار' },
-  { cat: 'dhikr', text: 'لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللهِ', meta: 'كنز من كنوز الجنة' },
-  { cat: 'dhikr', text: 'اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّد', meta: 'الصلاة على النبي ﷺ' },
-  // Ayat
-  { cat: 'ayah', text: 'إِنَّ مَعَ الْعُسْرِ يُسْرًا', meta: 'الشرح · 6' },
-  { cat: 'ayah', text: 'وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ', meta: 'الطلاق · 3' },
-  { cat: 'ayah', text: 'أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ', meta: 'الرعد · 28' },
-  { cat: 'ayah', text: 'وَقُل رَّبِّ زِدْنِي عِلْمًا', meta: 'طه · 114' },
-  { cat: 'ayah', text: 'فَاذْكُرُونِي أَذْكُرْكُمْ', meta: 'البقرة · 152' },
-  { cat: 'ayah', text: 'حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ', meta: 'آل عمران · 173' },
-  // Hadith
-  { cat: 'hadith', text: '«كلمتان خفيفتان على اللسان، ثقيلتان في الميزان، حبيبتان إلى الرحمن: سبحان الله وبحمده، سبحان الله العظيم»', meta: 'متفق عليه' },
-  { cat: 'hadith', text: '«من قال لا إله إلا الله وحده لا شريك له... في يوم مئة مرة كانت له عدل عشر رقاب»', meta: 'متفق عليه' },
-  { cat: 'hadith', text: '«إنما الأعمال بالنيات، وإنما لكل امرئ ما نوى»', meta: 'متفق عليه' },
-  // Names
-  { cat: 'name', text: 'يَا رَحْمٰنُ يَا رَحِيمُ', meta: 'الرحمن الرحيم' },
-  { cat: 'name', text: 'يَا حَيُّ يَا قَيُّومُ', meta: 'الحي القيوم' },
-  { cat: 'name', text: 'يَا لَطِيفُ يَا خَبِيرُ', meta: 'اللطيف الخبير' },
-  { cat: 'name', text: 'يَا وَدُودُ يَا غَفُورُ', meta: 'الودود الغفور' },
-  // Dua
-  { cat: 'dua', text: 'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْهُدَى وَالتُّقَى وَالْعَفَافَ وَالْغِنَى', meta: 'دعاء جامع' },
-  { cat: 'dua', text: 'رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ', meta: 'دعاء قرآني' },
-  { cat: 'dua', text: 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْهَمِّ وَالْحَزَنِ', meta: 'تفريج الكرب' },
-];
-
-function shuffle<T>(arr: T[], seed: number): T[] {
-  const out = [...arr]; let s = seed || 1;
-  for (let i = out.length - 1; i > 0; i--) {
-    s = (s * 9301 + 49297) % 233280;
-    const j = Math.floor((s / 233280) * (i + 1));
-    [out[i], out[j]] = [out[j], out[i]];
-  }
-  return out;
-}
-
-const ROTATE_MS = 5200;
+const ROTATE_MS = 6000;
 
 const WisdomCarousel: React.FC = () => {
-  const seed = useMemo(() => Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000) || 1, []);
-  const items = useMemo(() => shuffle(ITEMS, seed), [seed]);
+  const items: WisdomItem[] = useMemo(() => pickDailySet(24), []);
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
   const timerRef = useRef<number | null>(null);
   const touchStartX = useRef<number | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+
+  // Respect reduced motion
+  const prefersReducedMotion = useMemo(
+    () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
+    []
+  );
 
   useEffect(() => {
     if (paused) return;
@@ -82,7 +43,7 @@ const WisdomCarousel: React.FC = () => {
 
   return (
     <div
-      className="wisdom-carousel mb-5 relative overflow-hidden rounded-2xl border border-border/60 bg-card/80 backdrop-blur-sm"
+      className="wisdom-carousel mb-5 relative overflow-hidden rounded-2xl border border-border/60 bg-card/80 backdrop-blur-sm select-none"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; setPaused(true); }}
@@ -91,45 +52,89 @@ const WisdomCarousel: React.FC = () => {
         if (sx == null) return;
         const dx = e.changedTouches[0].clientX - sx;
         if (Math.abs(dx) > 40) go(idx + (dx > 0 ? -1 : 1));
-        setTimeout(() => setPaused(false), 600);
+        // Resume after a short delay
+        window.setTimeout(() => setPaused(false), 800);
       }}
     >
-      {/* Animated gradient backdrop per category */}
-      <div key={`bg-${idx}`} className={`absolute inset-0 bg-gradient-to-l ${meta.gradient} animate-wc-fade pointer-events-none`} />
+      {/* Smooth crossfading gradient backdrops per item */}
+      <div className="absolute inset-0 pointer-events-none">
+        {items.map((it, i) => (
+          <div
+            key={i}
+            className={`absolute inset-0 bg-gradient-to-l ${CAT_META[it.cat].gradient} transition-opacity duration-[900ms] ease-out`}
+            style={{ opacity: i === idx ? 1 : 0 }}
+          />
+        ))}
+      </div>
       <div className="absolute inset-0 islamic-pattern-arabesque opacity-[0.07] pointer-events-none" />
 
-      <div className="relative px-4 pt-3 pb-2.5">
+      <div className="relative px-4 pt-3 pb-3">
         {/* Header row */}
         <div className="flex items-center justify-between mb-2">
-          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold ${meta.chip}`}>
+          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold transition-colors duration-500 ${meta.chip}`}>
             <Icon className="w-3 h-3" />
             <span>{meta.label}</span>
           </div>
-          <button
-            onClick={() => setPaused(p => !p)}
-            className="w-6 h-6 rounded-full bg-secondary/60 hover:bg-secondary text-muted-foreground inline-flex items-center justify-center"
-            aria-label={paused ? 'تشغيل' : 'إيقاف'}
-          >
-            {paused ? <Play className="w-3 h-3" /> : <Pause className="w-3 h-3" />}
-          </button>
-        </div>
-
-        {/* Item content with key-based animation */}
-        <div className="relative min-h-[56px] flex items-center justify-center" dir="rtl">
-          <div key={idx} className="wc-item w-full text-center">
-            <p className="font-amiri text-foreground leading-[1.9] text-[15px] sm:text-base px-1">
-              {cur.text}
-            </p>
-            {cur.meta && (
-              <p className="text-[10px] text-muted-foreground mt-1 font-medium">{cur.meta}</p>
-            )}
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => go(idx - 1)}
+              className="w-6 h-6 rounded-full bg-secondary/60 hover:bg-secondary text-muted-foreground inline-flex items-center justify-center"
+              aria-label="السابق"
+            >
+              <ChevronRight className="w-3 h-3" />
+            </button>
+            <button
+              onClick={() => setPaused(p => !p)}
+              className="w-6 h-6 rounded-full bg-secondary/60 hover:bg-secondary text-muted-foreground inline-flex items-center justify-center"
+              aria-label={paused ? 'تشغيل' : 'إيقاف'}
+            >
+              {paused ? <Play className="w-3 h-3" /> : <Pause className="w-3 h-3" />}
+            </button>
+            <button
+              onClick={() => go(idx + 1)}
+              className="w-6 h-6 rounded-full bg-secondary/60 hover:bg-secondary text-muted-foreground inline-flex items-center justify-center"
+              aria-label="التالي"
+            >
+              <ChevronLeft className="w-3 h-3" />
+            </button>
           </div>
         </div>
 
-        {/* Progress + dots */}
+        {/* Smooth slide track — translate by index, no remount, no flicker */}
+        <div className="relative overflow-hidden" dir="rtl" style={{ minHeight: 72 }}>
+          <div
+            ref={trackRef}
+            className="flex"
+            style={{
+              // In RTL: index 0 is rightmost. Translate to the LEFT (negative) per index.
+              transform: `translate3d(${-idx * 100}%, 0, 0)`,
+              transition: prefersReducedMotion
+                ? 'none'
+                : 'transform 650ms cubic-bezier(0.22, 1, 0.36, 1)',
+              willChange: 'transform',
+            }}
+          >
+            {items.map((it, i) => (
+              <div
+                key={i}
+                className="shrink-0 w-full px-1 flex flex-col items-center justify-center text-center"
+                style={{ backfaceVisibility: 'hidden' }}
+              >
+                <p className="font-amiri text-foreground leading-[1.9] text-[15px] sm:text-base">
+                  {it.text}
+                </p>
+                {it.meta && (
+                  <p className="text-[10px] text-muted-foreground mt-1 font-medium">{it.meta}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Dots */}
         <div className="flex items-center justify-center gap-1.5 mt-2">
-          {items.slice(0, Math.min(items.length, 7)).map((_, i) => {
-            const active = i === idx % 7;
+          {items.slice(0, Math.min(items.length, 8)).map((_, i) => {
+            const active = i === idx % 8;
             return (
               <span
                 key={i}
@@ -140,9 +145,13 @@ const WisdomCarousel: React.FC = () => {
         </div>
 
         {/* Bottom progress bar (per-item) */}
-        {!paused && (
+        {!paused && !prefersReducedMotion && (
           <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-transparent overflow-hidden">
-            <div key={`pb-${idx}`} className="wc-progress h-full bg-gradient-to-l from-primary via-accent to-primary" />
+            <div
+              key={`pb-${idx}`}
+              className="h-full bg-gradient-to-l from-primary via-accent to-primary"
+              style={{ animation: `wc-progress ${ROTATE_MS}ms linear forwards` }}
+            />
           </div>
         )}
       </div>
