@@ -57,6 +57,7 @@ import IslamicQuizPage from "./pages/IslamicQuizPage";
 import NearbyMosquesPage from "./pages/NearbyMosquesPage";
 import FaithJournalPage from "./pages/FaithJournalPage";
 import NotificationSettingsPage from "./pages/NotificationSettingsPage";
+import DailyKhatirahPage from "./pages/DailyKhatirahPage";
 import NotFound from "./pages/NotFound";
 import { useSettings } from "@/hooks/useSettings";
 
@@ -114,6 +115,7 @@ const AnimatedRoutes = () => {
           <Route path="/nearby-mosques" element={<PageTransition><NearbyMosquesPage /></PageTransition>} />
           <Route path="/faith-journal" element={<PageTransition><FaithJournalPage /></PageTransition>} />
           <Route path="/notification-settings" element={<PageTransition><NotificationSettingsPage /></PageTransition>} />
+          <Route path="/daily-khatirah" element={<PageTransition><DailyKhatirahPage /></PageTransition>} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         </Routes>
       </AnimatePresence>
