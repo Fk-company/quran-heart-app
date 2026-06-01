@@ -907,22 +907,24 @@
   .shadow-gold { box-shadow: var(--shadow-gold); }
 }
 
-/* ===== Ticker — seamless 2-copy marquee (no hover pause to avoid perceived gap) ===== */
-.ticker-container {
-  overflow: hidden;
-  mask-image: linear-gradient(90deg, transparent 0%, black 6%, black 94%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, black 6%, black 94%, transparent 100%);
+/* ===== Wisdom Carousel ===== */
+@keyframes wc-item-in {
+  0%   { opacity: 0; transform: translateY(10px) scale(0.98); filter: blur(4px); }
+  100% { opacity: 1; transform: translateY(0) scale(1);       filter: blur(0); }
 }
-.ticker-track {
-  display: flex;
-  width: max-content;
-  animation: ticker-scroll 90s linear infinite;
-  will-change: transform;
+.wc-item { animation: wc-item-in 0.55s cubic-bezier(.2,.7,.2,1) both; }
+
+@keyframes wc-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
-@keyframes ticker-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+.animate-wc-fade { animation: wc-fade 0.7s ease-out both; }
+
+@keyframes wc-progress {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
 }
+.wc-progress { width: 100%; transform-origin: right; animation: wc-progress 5.2s linear forwards; }
 
 /* ===== Animations ===== */
 @keyframes sheet-up {
