@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Moon, Sun, Settings, Search } from 'lucide-react';
+import { Moon, Sun, Settings, Search, ChevronRight } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 import appLogo from '@/assets/app-logo.png';
 
@@ -8,39 +8,97 @@ const TopBar: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 6);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   if (location.pathname === '/') return null;
 
+  const canGoBack = window.history.length > 1;
+
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-40 safe-top"
+      className="fixed top-0 left-0 right-0 z-40 safe-top transition-all duration-300"
       style={{
-        background: 'hsl(var(--glass-strong))',
-        backdropFilter: 'blur(24px) saturate(200%)',
-        WebkitBackdropFilter: 'blur(24px) saturate(200%)',
+        background: scrolled
+          ? 'linear-gradient(180deg, hsl(var(--background) / 0.92), hsl(var(--background) / 0.78))'
+          : 'linear-gradient(180deg, hsl(var(--background) / 0.7), hsl(var(--background) / 0.45))',
+        backdropFilter: 'blur(28px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(28px) saturate(180%)',
+        boxShadow: scrolled ? '0 8px 24px -16px hsl(var(--foreground) / 0.18)' : 'none',
       }}
     >
-      <div className="flex items-center justify-between h-14 px-4 max-w-lg mx-auto" dir="rtl">
-        <button onClick={() => navigate('/')} className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center overflow-hidden bg-card border border-border/40">
-            <img src={appLogo} alt="قلب القرآن" width={36} height={36} loading="lazy" className="w-full h-full object-contain" />
+      {/* Subtle aurora glow */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-60"
+        style={{
+          background:
+            'radial-gradient(120% 80% at 50% -20%, hsl(var(--primary)/0.18), transparent 60%), radial-gradient(80% 60% at 100% 0%, hsl(var(--accent)/0.14), transparent 60%)',
+        }}
+      />
+
+      <div className="relative flex items-center justify-between h-14 px-3 max-w-lg mx-auto" dir="rtl">
+        {/* Brand */}
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2.5 group rounded-2xl px-1.5 py-1 -mx-1.5 active:scale-95 transition-transform"
+          aria-label="الرئيسية"
+        >
+          <div className="relative">
+            <div
+              className="absolute -inset-1 rounded-2xl opacity-50 blur-md group-hover:opacity-80 transition-opacity"
+              style={{ background: 'linear-gradient(135deg, hsl(var(--primary)/0.6), hsl(var(--accent)/0.5))' }}
+            />
+            <div className="relative w-9 h-9 rounded-2xl flex items-center justify-center overflow-hidden bg-card/90 border border-border/60 shadow-sm">
+              <img
+                src={appLogo}
+                alt="قلب القرآن"
+                width={36}
+                height={36}
+                loading="lazy"
+                className="w-full h-full object-contain"
+              />
+            </div>
           </div>
           <div className="text-right leading-tight">
-            <div className="text-sm font-bold text-foreground tracking-tight font-kufi">قلب القرآن</div>
-            <div className="text-[9px] text-muted-foreground font-medium">Quran Heart</div>
+            <div className="text-[13px] font-extrabold text-foreground tracking-tight font-kufi">
+              قلب القرآن
+            </div>
+            <div
+              className="text-[9px] font-semibold tracking-[0.18em] uppercase bg-clip-text text-transparent"
+              style={{ backgroundImage: 'linear-gradient(90deg, hsl(var(--primary)), hsl(var(--accent)))' }}
+            >
+              Quran · Heart
+            </div>
           </div>
         </button>
+
+        {/* Actions */}
         <div className="flex items-center gap-1.5">
+          {canGoBack && (
+            <button
+              onClick={() => navigate(-1)}
+              className="hidden sm:inline-flex w-9 h-9 rounded-xl bg-secondary/60 items-center justify-center transition-all hover:bg-secondary border border-border/40 active:scale-95"
+              aria-label="رجوع"
+            >
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </button>
+          )}
           <button
             onClick={() => navigate('/search')}
-            className="w-9 h-9 rounded-xl bg-secondary/70 flex items-center justify-center transition-all hover:bg-muted border border-border/40"
+            className="w-9 h-9 rounded-xl bg-secondary/60 flex items-center justify-center transition-all hover:bg-secondary border border-border/40 active:scale-95"
             aria-label="بحث"
           >
             <Search className="w-4 h-4 text-foreground" />
           </button>
           <button
             onClick={toggleTheme}
-            className="w-9 h-9 rounded-xl bg-secondary/70 flex items-center justify-center transition-all hover:bg-muted border border-border/40"
+            className="w-9 h-9 rounded-xl bg-secondary/60 flex items-center justify-center transition-all hover:bg-secondary border border-border/40 active:scale-95"
             aria-label="تبديل المظهر"
           >
             {theme === 'dark' ? (
@@ -51,14 +109,22 @@ const TopBar: React.FC = () => {
           </button>
           <button
             onClick={() => navigate('/settings')}
-            className="w-9 h-9 rounded-xl bg-secondary/70 flex items-center justify-center transition-all hover:bg-muted border border-border/40"
+            className="w-9 h-9 rounded-xl bg-secondary/60 flex items-center justify-center transition-all hover:bg-secondary border border-border/40 active:scale-95"
             aria-label="الإعدادات"
           >
             <Settings className="w-4 h-4 text-muted-foreground" />
           </button>
         </div>
       </div>
-      <div className="h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--accent)/0.35) 50%, transparent)' }} />
+
+      {/* Premium gradient divider */}
+      <div
+        className="h-[1.5px]"
+        style={{
+          background:
+            'linear-gradient(90deg, transparent 0%, hsl(var(--primary)/0.35) 30%, hsl(var(--accent)/0.55) 50%, hsl(var(--primary)/0.35) 70%, transparent 100%)',
+        }}
+      />
     </div>
   );
 };

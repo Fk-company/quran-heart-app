@@ -100,31 +100,35 @@ const WisdomCarousel: React.FC = () => {
           </div>
         </div>
 
-        {/* Smooth slide track — translate by index, no remount, no flicker */}
-        <div className="relative overflow-hidden" dir="rtl" style={{ minHeight: 72 }}>
+        {/* Smooth slide track — translate by index, no remount, no flicker.
+            IMPORTANT: keep LTR on the track so translateX(-idx*100%) advances forward.
+            With dir="rtl" the flex children physically extend leftward and the same
+            translate moves the track into empty space, showing a blank slide. */}
+        <div className="relative overflow-hidden" style={{ minHeight: 84 }}>
           <div
             ref={trackRef}
             className="flex"
+            dir="ltr"
             style={{
-              // In RTL: index 0 is rightmost. Translate to the LEFT (negative) per index.
               transform: `translate3d(${-idx * 100}%, 0, 0)`,
               transition: prefersReducedMotion
                 ? 'none'
-                : 'transform 650ms cubic-bezier(0.22, 1, 0.36, 1)',
+                : 'transform 700ms cubic-bezier(0.22, 1, 0.36, 1)',
               willChange: 'transform',
             }}
           >
             {items.map((it, i) => (
               <div
                 key={i}
-                className="shrink-0 w-full px-1 flex flex-col items-center justify-center text-center"
+                dir="rtl"
+                className="shrink-0 w-full px-3 flex flex-col items-center justify-center text-center"
                 style={{ backfaceVisibility: 'hidden' }}
               >
-                <p className="font-amiri text-foreground leading-[1.9] text-[15px] sm:text-base">
+                <p className="font-amiri text-foreground leading-[1.95] text-[15px] sm:text-base max-w-[44ch] break-words">
                   {it.text}
                 </p>
                 {it.meta && (
-                  <p className="text-[10px] text-muted-foreground mt-1 font-medium">{it.meta}</p>
+                  <p className="text-[10px] text-muted-foreground mt-1.5 font-medium tracking-wide">{it.meta}</p>
                 )}
               </div>
             ))}
