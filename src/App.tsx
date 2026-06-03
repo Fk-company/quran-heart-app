@@ -117,6 +117,7 @@ const AnimatedRoutes = () => {
           <Route path="/faith-journal" element={<PageTransition><FaithJournalPage /></PageTransition>} />
           <Route path="/notification-settings" element={<PageTransition><NotificationSettingsPage /></PageTransition>} />
           <Route path="/daily-khatirah" element={<PageTransition><DailyKhatirahPage /></PageTransition>} />
+          <Route path="/dashboard" element={<PageTransition><PersonalDashboardPage /></PageTransition>} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         </Routes>
       </AnimatePresence>
