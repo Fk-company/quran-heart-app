@@ -120,14 +120,15 @@ const WisdomCarousel: React.FC = () => {
             {items.map((it, i) => (
               <div
                 key={i}
-                className="shrink-0 w-full px-1 flex flex-col items-center justify-center text-center"
+                dir="rtl"
+                className="shrink-0 w-full px-3 flex flex-col items-center justify-center text-center"
                 style={{ backfaceVisibility: 'hidden' }}
               >
-                <p className="font-amiri text-foreground leading-[1.9] text-[15px] sm:text-base">
+                <p className="font-amiri text-foreground leading-[1.95] text-[15px] sm:text-base max-w-[44ch] break-words">
                   {it.text}
                 </p>
                 {it.meta && (
-                  <p className="text-[10px] text-muted-foreground mt-1 font-medium">{it.meta}</p>
+                  <p className="text-[10px] text-muted-foreground mt-1.5 font-medium tracking-wide">{it.meta}</p>
                 )}
               </div>
             ))}
