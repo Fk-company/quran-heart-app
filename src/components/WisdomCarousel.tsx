@@ -100,17 +100,20 @@ const WisdomCarousel: React.FC = () => {
           </div>
         </div>
 
-        {/* Smooth slide track — translate by index, no remount, no flicker */}
-        <div className="relative overflow-hidden" dir="rtl" style={{ minHeight: 72 }}>
+        {/* Smooth slide track — translate by index, no remount, no flicker.
+            IMPORTANT: keep LTR on the track so translateX(-idx*100%) advances forward.
+            With dir="rtl" the flex children physically extend leftward and the same
+            translate moves the track into empty space, showing a blank slide. */}
+        <div className="relative overflow-hidden" style={{ minHeight: 84 }}>
           <div
             ref={trackRef}
             className="flex"
+            dir="ltr"
             style={{
-              // In RTL: index 0 is rightmost. Translate to the LEFT (negative) per index.
               transform: `translate3d(${-idx * 100}%, 0, 0)`,
               transition: prefersReducedMotion
                 ? 'none'
-                : 'transform 650ms cubic-bezier(0.22, 1, 0.36, 1)',
+                : 'transform 700ms cubic-bezier(0.22, 1, 0.36, 1)',
               willChange: 'transform',
             }}
           >
