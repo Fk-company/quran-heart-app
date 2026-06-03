@@ -70,6 +70,7 @@ const moreCategories = [
   {
     title: 'الإحصائيات والمفضلة',
     items: [
+      { label: 'لوحتي الشخصية', icon: TrendingUp, path: '/dashboard', desc: 'ملخص رحلتك مع اقتراحات ذكية', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
       { label: 'المفضلة', icon: Heart, path: '/favorites', desc: 'الآيات والأدعية المحفوظة', color: 'bg-destructive/10 text-destructive', gradient: 'gradient-primary' },
       { label: 'تقدم القراءة', icon: TrendingUp, path: '/reading-stats', desc: 'تتبع ختمتك اليومية', color: 'bg-primary/10 text-primary', gradient: 'gradient-gold' },
       { label: 'إحصائيات القرآن', icon: BarChart3, path: '/quran-stats', desc: 'أرقام وحقائق عن القرآن', color: 'bg-accent/10 text-accent', gradient: 'gradient-primary' },
