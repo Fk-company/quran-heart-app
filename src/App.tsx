@@ -58,6 +58,7 @@ import NearbyMosquesPage from "./pages/NearbyMosquesPage";
 import FaithJournalPage from "./pages/FaithJournalPage";
 import NotificationSettingsPage from "./pages/NotificationSettingsPage";
 import DailyKhatirahPage from "./pages/DailyKhatirahPage";
+import PersonalDashboardPage from "./pages/PersonalDashboardPage";
 import NotFound from "./pages/NotFound";
 import { useSettings } from "@/hooks/useSettings";
 
