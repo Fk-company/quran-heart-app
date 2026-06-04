@@ -80,9 +80,17 @@ const moreCategories = [
     ]
   },
   {
+    title: 'العلوم القرآنية',
+    items: [
+      { label: 'التجويد والتلاوة', icon: Mic2, path: '/tajweed', desc: 'أحكام التلاوة مع أمثلة', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
+    ]
+  },
+  {
     title: 'عن التطبيق',
     items: [
       { label: 'إعدادات الإشعارات', icon: Bell, path: '/notification-settings', desc: 'الأذان والتذكيرات وأوقاتها', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
+      { label: 'سياسة الخصوصية', icon: FileText, path: '/privacy', desc: 'كيف نتعامل مع بياناتك', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
+      { label: 'سياسة الاستخدام', icon: FileText, path: '/terms', desc: 'الشروط والأحكام', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
       { label: 'تواصل مع المطور', icon: Globe, path: '/developer-social', desc: 'فخري عادل - تليجرام وانستغرام', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
     ]
   }

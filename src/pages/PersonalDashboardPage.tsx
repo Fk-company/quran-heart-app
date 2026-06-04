@@ -67,6 +67,11 @@ const PersonalDashboardPage: React.FC = () => {
         showBack
       />
 
+      {/* Prayer times */}
+      <div className="px-4 mt-3">
+        <PrayerTimesWidget />
+      </div>
+
       {/* Headline stats */}
       <div className="grid grid-cols-2 gap-3 px-4 mt-3">
         {headline.map((s, i) => {
