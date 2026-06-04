@@ -166,6 +166,96 @@ const PrayerTimesWidget: React.FC = () => {
           </button>
         </div>
       )}
+
+      {openReminders && (
+        <div className="mt-3 pt-3 border-t border-border/40 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-xs font-extrabold text-foreground">تنبيهات قبل الأذان</div>
+              <div className="text-[11px] text-muted-foreground">
+                {reminders.permission === 'granted' ? 'الإشعارات مفعّلة' : reminders.permission === 'denied' ? 'الإشعارات محظورة من المتصفح' : 'بحاجة لإذن الإشعارات'}
+              </div>
+            </div>
+            <label className="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={reminders.settings.enabled}
+                onChange={async (e) => {
+                  if (e.target.checked && reminders.permission !== 'granted') {
+                    const p = await reminders.requestPermission();
+                    if (p !== 'granted') return;
+                  }
+                  reminders.setSettings({ ...reminders.settings, enabled: e.target.checked });
+                }}
+              />
+              <div className="w-10 h-6 bg-secondary rounded-full peer peer-checked:bg-primary relative after:content-[''] after:absolute after:top-0.5 after:right-0.5 after:bg-background after:w-5 after:h-5 after:rounded-full after:transition-all peer-checked:after:-translate-x-4" />
+            </label>
+          </div>
+
+          <div>
+            <label className="text-[11px] font-bold text-muted-foreground block mb-1">
+              تنبيه قبل الأذان: {reminders.settings.minutesBefore} دقيقة
+            </label>
+            <input
+              type="range"
+              min={0}
+              max={45}
+              step={5}
+              value={reminders.settings.minutesBefore}
+              onChange={(e) =>
+                reminders.setSettings({ ...reminders.settings, minutesBefore: Number(e.target.value) })
+              }
+              className="w-full accent-primary"
+            />
+            <div className="flex justify-between text-[10px] text-muted-foreground">
+              <span>0</span><span>15</span><span>30</span><span>45</span>
+            </div>
+          </div>
+
+          <label className="flex items-center justify-between text-xs">
+            <span className="font-bold text-foreground">تنبيه عند دخول الوقت أيضاً</span>
+            <input
+              type="checkbox"
+              checked={reminders.settings.alsoAtTime}
+              onChange={(e) => reminders.setSettings({ ...reminders.settings, alsoAtTime: e.target.checked })}
+              className="w-4 h-4 accent-primary"
+            />
+          </label>
+
+          <div>
+            <div className="text-[11px] font-bold text-muted-foreground mb-1.5">الصلوات المفعّلة</div>
+            <div className="grid grid-cols-5 gap-1.5">
+              {reminderKeys.map((k) => {
+                const on = reminders.settings.perPrayer[k] !== false;
+                return (
+                  <button
+                    key={k}
+                    onClick={() =>
+                      reminders.setSettings({
+                        ...reminders.settings,
+                        perPrayer: { ...reminders.settings.perPrayer, [k]: !on },
+                      })
+                    }
+                    className={`text-[11px] font-bold py-1.5 rounded-lg border transition ${
+                      on ? 'bg-primary/15 text-primary border-primary/30' : 'bg-secondary/40 text-muted-foreground border-border/40'
+                    }`}
+                  >
+                    {PRAYER_NAMES_AR[k]}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <button
+            onClick={reminders.testNotification}
+            className="w-full text-xs font-bold py-2 rounded-lg bg-secondary text-foreground active:scale-95"
+          >
+            إرسال تنبيه تجريبي
+          </button>
+        </div>
+      )}
     </div>
   );
 };
