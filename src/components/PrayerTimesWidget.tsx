@@ -66,6 +66,14 @@ const PrayerTimesWidget: React.FC = () => {
             <RefreshCw className="w-4 h-4 text-foreground" />
           </button>
           <button
+            onClick={() => setOpenReminders((v) => !v)}
+            className={`w-8 h-8 rounded-lg flex items-center justify-center active:scale-95 ${reminders.settings.enabled ? 'bg-primary/20 text-primary' : 'bg-secondary/60 text-foreground'}`}
+            aria-label="التنبيهات"
+            title="إشعارات قبل الأذان"
+          >
+            {reminders.settings.enabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
+          </button>
+          <button
             onClick={() => setOpenSettings((v) => !v)}
             className="w-8 h-8 rounded-lg bg-secondary/60 flex items-center justify-center active:scale-95"
             aria-label="إعدادات"
