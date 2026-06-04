@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { MapPin, RefreshCw, Settings2, Clock, Sun, Sunrise, Sunset, Moon, CloudSun } from 'lucide-react';
+import { MapPin, RefreshCw, Settings2, Clock, Sun, Sunrise, Sunset, Moon, CloudSun, Bell, BellOff } from 'lucide-react';
 import { usePrayerTimes, CALC_METHODS, PRAYER_NAMES_AR, PrayerTimings } from '@/hooks/usePrayerTimes';
+import { usePrayerReminders } from '@/hooks/usePrayerReminders';
 
 const ICONS: Record<keyof PrayerTimings, React.ElementType> = {
   Fajr: Sunrise,
@@ -28,8 +29,11 @@ const fmtUntil = (m: number) => {
 const PrayerTimesWidget: React.FC = () => {
   const { settings, setSettings, data, loading, error, refresh, nextPrayer } = usePrayerTimes();
   const [openSettings, setOpenSettings] = useState(false);
+  const [openReminders, setOpenReminders] = useState(false);
+  const reminders = usePrayerReminders(data?.timings || null);
 
   const order: (keyof PrayerTimings)[] = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+  const reminderKeys: (keyof PrayerTimings)[] = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
 
   return (
     <div className="rounded-2xl border border-border/50 bg-gradient-to-br from-primary/10 via-accent/5 to-transparent p-4">
