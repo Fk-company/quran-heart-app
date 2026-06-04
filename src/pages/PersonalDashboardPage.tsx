@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import SEO from '@/components/SEO';
 import PageHeader from '@/components/PageHeader';
+import PrayerTimesWidget from '@/components/PrayerTimesWidget';
 import { useReadingTracker } from '@/hooks/useReadingTracker';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useAppStats, formatListenTime } from '@/hooks/useAppStats';
@@ -65,6 +66,11 @@ const PersonalDashboardPage: React.FC = () => {
         gradient="primary"
         showBack
       />
+
+      {/* Prayer times */}
+      <div className="px-4 mt-3">
+        <PrayerTimesWidget />
+      </div>
 
       {/* Headline stats */}
       <div className="grid grid-cols-2 gap-3 px-4 mt-3">
