@@ -59,6 +59,9 @@ import FaithJournalPage from "./pages/FaithJournalPage";
 import NotificationSettingsPage from "./pages/NotificationSettingsPage";
 import DailyKhatirahPage from "./pages/DailyKhatirahPage";
 import PersonalDashboardPage from "./pages/PersonalDashboardPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import TermsPage from "./pages/TermsPage";
+import TajweedPage from "./pages/TajweedPage";
 import NotFound from "./pages/NotFound";
 import { useSettings } from "@/hooks/useSettings";
 
@@ -118,6 +121,9 @@ const AnimatedRoutes = () => {
           <Route path="/notification-settings" element={<PageTransition><NotificationSettingsPage /></PageTransition>} />
           <Route path="/daily-khatirah" element={<PageTransition><DailyKhatirahPage /></PageTransition>} />
           <Route path="/dashboard" element={<PageTransition><PersonalDashboardPage /></PageTransition>} />
+          <Route path="/privacy" element={<PageTransition><PrivacyPage /></PageTransition>} />
+          <Route path="/terms" element={<PageTransition><TermsPage /></PageTransition>} />
+          <Route path="/tajweed" element={<PageTransition><TajweedPage /></PageTransition>} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         </Routes>
       </AnimatePresence>

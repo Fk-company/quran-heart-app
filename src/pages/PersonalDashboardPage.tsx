@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import SEO from '@/components/SEO';
 import PageHeader from '@/components/PageHeader';
+import PrayerTimesWidget from '@/components/PrayerTimesWidget';
 import { useReadingTracker } from '@/hooks/useReadingTracker';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useAppStats, formatListenTime } from '@/hooks/useAppStats';
