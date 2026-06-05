@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { MapPin, RefreshCw, Settings2, Clock, Sun, Sunrise, Sunset, Moon, CloudSun, Bell, BellOff } from 'lucide-react';
 import { usePrayerTimes, CALC_METHODS, PRAYER_NAMES_AR, PrayerTimings } from '@/hooks/usePrayerTimes';
 import { usePrayerReminders } from '@/hooks/usePrayerReminders';
+import { toast } from 'sonner';
 
 const ICONS: Record<keyof PrayerTimings, React.ElementType> = {
   Fajr: Sunrise,
