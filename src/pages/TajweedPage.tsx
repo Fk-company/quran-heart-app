@@ -1,8 +1,11 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Mic, Search, Play, Pause, GraduationCap, ChevronLeft, Headphones, Book, Compass, Brain } from 'lucide-react';
+import { BookOpen, Mic, Search, Play, Pause, GraduationCap, ChevronLeft, Headphones, Book, Compass, Brain, CheckCircle2, Circle, Star, RotateCcw, Link2 } from 'lucide-react';
 import SEO from '@/components/SEO';
 import PageHeader from '@/components/PageHeader';
+import { useTajweedProgress } from '@/hooks/useTajweedProgress';
+import { toast } from 'sonner';
+
 
 interface Rule {
   id: string;
@@ -121,6 +124,8 @@ const TajweedPage: React.FC = () => {
   const [cat, setCat] = useState<typeof CATEGORIES[number]>('الكل');
   const [tab, setTab] = useState<'rules' | 'lessons'>('rules');
   const [expandedLesson, setExpandedLesson] = useState<string | null>(LESSONS[0].id);
+  const { progress, toggleComplete, rate, reset, stats } = useTajweedProgress();
+  const lessonStats = stats(LESSONS.length);
 
   // audio state
   const [playingId, setPlayingId] = useState<string | null>(null);
@@ -136,6 +141,29 @@ const TajweedPage: React.FC = () => {
       return r.name.includes(q) || r.short.includes(q) || r.detail.includes(q) || r.example.includes(q);
     });
   }, [query, cat]);
+
+  const filteredLessons = useMemo(() => {
+    const q = query.trim();
+    if (!q) return LESSONS;
+    return LESSONS.filter((l) =>
+      l.title.includes(q) ||
+      l.steps.some((s) => s.includes(q)) ||
+      l.ruleIds.some((rid) => {
+        const r = RULES.find((x) => x.id === rid);
+        return r && (r.name.includes(q) || r.short.includes(q));
+      })
+    );
+  }, [query]);
+
+  // Reverse map: which lessons reference a given rule
+  const lessonsForRule = useMemo(() => {
+    const map: Record<string, Lesson[]> = {};
+    LESSONS.forEach((l) => l.ruleIds.forEach((rid) => {
+      (map[rid] = map[rid] || []).push(l);
+    }));
+    return map;
+  }, []);
+
 
   const togglePlay = async (rule: Rule) => {
     if (!rule.ref) return;
@@ -176,6 +204,22 @@ const TajweedPage: React.FC = () => {
     }, 80);
   };
 
+  const openLesson = (id: string) => {
+    setTab('lessons');
+    setQuery('');
+    setExpandedLesson(id);
+    setTimeout(() => {
+      const el = document.getElementById(`lesson-${id}`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 80);
+  };
+
+  const handleToggleComplete = (l: Lesson) => {
+    const wasDone = !!progress[l.id]?.completed;
+    toggleComplete(l.id);
+    toast.success(wasDone ? `أُلغي إكمال: ${l.title}` : `أحسنت! تم إكمال: ${l.title}`);
+  };
+
   return (
     <div className="page-content pb-24" dir="rtl">
       <SEO title="أحكام التجويد والتلاوة | قلب القرآن" description="مرجع تفاعلي لأحكام التجويد مع دروس قصيرة وأمثلة صوتية." />
@@ -204,17 +248,19 @@ const TajweedPage: React.FC = () => {
           })}
         </div>
 
+        {/* Unified search across rules + lessons */}
+        <div className="relative">
+          <Search className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={tab === 'rules' ? 'ابحث عن حكم...' : 'ابحث في الدروس...'}
+            className="w-full text-sm rounded-xl bg-card border border-border/50 py-2.5 pr-9 pl-3"
+          />
+        </div>
+
         {tab === 'rules' && (
           <>
-            <div className="relative">
-              <Search className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="ابحث عن حكم..."
-                className="w-full text-sm rounded-xl bg-card border border-border/50 py-2.5 pr-9 pl-3"
-              />
-            </div>
 
             <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
               {CATEGORIES.map((c) => (
@@ -287,6 +333,21 @@ const TajweedPage: React.FC = () => {
                       </div>
                       <div className="font-amiri text-lg text-foreground text-center" dir="rtl">{r.example}</div>
                     </div>
+                    {lessonsForRule[r.id]?.length > 0 && (
+                      <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                        <Link2 className="w-3 h-3 text-muted-foreground" />
+                        <span className="text-[10px] text-muted-foreground font-bold">يظهر في:</span>
+                        {lessonsForRule[r.id].map((l) => (
+                          <button
+                            key={l.id}
+                            onClick={() => openLesson(l.id)}
+                            className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-accent/15 text-accent border border-accent/25"
+                          >
+                            {l.title.split('—')[0].replace(/الدرس.*?:/, '').trim() || l.title}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </article>
                 );
               })}
@@ -300,29 +361,70 @@ const TajweedPage: React.FC = () => {
         {tab === 'lessons' && (
           <div className="space-y-2.5">
             <div className="rounded-2xl border border-accent/30 bg-gradient-to-l from-accent/10 to-transparent p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <GraduationCap className="w-4 h-4 text-accent" />
-                <div className="text-xs font-extrabold text-accent tracking-widest">المسار التدريبي</div>
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <div className="flex items-center gap-2">
+                  <GraduationCap className="w-4 h-4 text-accent" />
+                  <div className="text-xs font-extrabold text-accent tracking-widest">المسار التدريبي</div>
+                </div>
+                {lessonStats.done > 0 && (
+                  <button
+                    onClick={() => { reset(); toast.success('تمت إعادة ضبط التقدم'); }}
+                    className="inline-flex items-center gap-1 text-[10px] font-bold text-muted-foreground hover:text-foreground"
+                  >
+                    <RotateCcw className="w-3 h-3" /> إعادة
+                  </button>
+                )}
               </div>
-              <p className="text-[12px] leading-6 text-muted-foreground">
+              <p className="text-[12px] leading-6 text-muted-foreground mb-2">
                 خمس جلسات قصيرة (30 دقيقة إجمالاً) تأخذك من المبادئ حتى تطبيق الأحكام.
               </p>
+              <div className="flex items-center justify-between text-[11px] font-bold mb-1">
+                <span className="text-foreground">التقدم {lessonStats.done}/{lessonStats.total}</span>
+                <span className="text-accent">{lessonStats.percent}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-secondary/60 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-l from-primary to-accent transition-all"
+                  style={{ width: `${lessonStats.percent}%` }}
+                />
+              </div>
+              {lessonStats.avgRating > 0 && (
+                <div className="mt-2 text-[11px] text-muted-foreground flex items-center gap-1">
+                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                  متوسط تقييمك: {lessonStats.avgRating.toFixed(1)}/5
+                </div>
+              )}
             </div>
-            {LESSONS.map((l, idx) => {
+            {filteredLessons.map((l) => {
+              const idx = LESSONS.indexOf(l);
               const open = expandedLesson === l.id;
+              const rec = progress[l.id];
+              const done = !!rec?.completed;
+              const rating = rec?.rating || 0;
               return (
-                <article key={l.id} className="rounded-2xl border border-border/50 bg-card overflow-hidden">
+                <article
+                  id={`lesson-${l.id}`}
+                  key={l.id}
+                  className={`rounded-2xl border bg-card overflow-hidden transition-all ${done ? 'border-primary/40 bg-primary/5' : 'border-border/50'}`}
+                >
                   <button
                     onClick={() => setExpandedLesson(open ? null : l.id)}
                     className="w-full flex items-center justify-between gap-3 p-4 text-right"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-9 h-9 rounded-xl bg-primary/15 text-primary flex items-center justify-center text-sm font-extrabold shrink-0">
-                        {idx + 1}
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-extrabold shrink-0 ${done ? 'bg-primary text-primary-foreground' : 'bg-primary/15 text-primary'}`}>
+                        {done ? <CheckCircle2 className="w-4 h-4" /> : idx + 1}
                       </div>
                       <div className="min-w-0">
                         <div className="text-sm font-extrabold text-foreground truncate">{l.title}</div>
-                        <div className="text-[11px] text-muted-foreground">~{l.minutes} دقائق</div>
+                        <div className="text-[11px] text-muted-foreground flex items-center gap-2">
+                          <span>~{l.minutes} دقائق</span>
+                          {rating > 0 && (
+                            <span className="inline-flex items-center gap-0.5 text-amber-500">
+                              <Star className="w-3 h-3 fill-current" />{rating}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <ChevronLeft className={`w-4 h-4 text-muted-foreground transition-transform ${open ? '-rotate-90' : ''}`} />
@@ -352,11 +454,43 @@ const TajweedPage: React.FC = () => {
                           </div>
                         </div>
                       )}
+                      {/* Rating */}
+                      <div className="rounded-xl bg-background/60 border border-border/40 p-2.5">
+                        <div className="text-[11px] font-bold text-muted-foreground mb-1.5">قيّم هذا الدرس</div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-0.5">
+                            {[1, 2, 3, 4, 5].map((n) => (
+                              <button
+                                key={n}
+                                onClick={() => { rate(l.id, n); toast.success(`تقييمك: ${n}/5`); }}
+                                aria-label={`تقييم ${n}`}
+                                className="p-1"
+                              >
+                                <Star
+                                  className={`w-5 h-5 ${n <= rating ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/40'}`}
+                                />
+                              </button>
+                            ))}
+                          </div>
+                          <button
+                            onClick={() => handleToggleComplete(l)}
+                            className={`inline-flex items-center gap-1.5 text-xs font-extrabold px-3 py-1.5 rounded-full transition ${
+                              done ? 'bg-primary text-primary-foreground' : 'bg-secondary/70 text-foreground border border-border/40'
+                            }`}
+                          >
+                            {done ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Circle className="w-3.5 h-3.5" />}
+                            {done ? 'مكتمل' : 'اعتبره مكتملاً'}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </article>
               );
             })}
+            {filteredLessons.length === 0 && (
+              <div className="text-center text-sm text-muted-foreground py-8">لا توجد دروس مطابقة.</div>
+            )}
           </div>
         )}
 

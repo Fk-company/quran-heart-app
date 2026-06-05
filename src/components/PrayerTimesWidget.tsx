@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { MapPin, RefreshCw, Settings2, Clock, Sun, Sunrise, Sunset, Moon, CloudSun, Bell, BellOff } from 'lucide-react';
 import { usePrayerTimes, CALC_METHODS, PRAYER_NAMES_AR, PrayerTimings } from '@/hooks/usePrayerTimes';
 import { usePrayerReminders } from '@/hooks/usePrayerReminders';
+import { toast } from 'sonner';
 
 const ICONS: Record<keyof PrayerTimings, React.ElementType> = {
   Fajr: Sunrise,
@@ -182,11 +183,24 @@ const PrayerTimesWidget: React.FC = () => {
                 className="sr-only peer"
                 checked={reminders.settings.enabled}
                 onChange={async (e) => {
-                  if (e.target.checked && reminders.permission !== 'granted') {
-                    const p = await reminders.requestPermission();
-                    if (p !== 'granted') return;
+                  if (e.target.checked) {
+                    if (typeof Notification === 'undefined') {
+                      toast.error('متصفحك لا يدعم الإشعارات');
+                      return;
+                    }
+                    if (reminders.permission !== 'granted') {
+                      const p = await reminders.requestPermission();
+                      if (p !== 'granted') {
+                        toast.error('لم يتم منح إذن الإشعارات. فعّلها من إعدادات المتصفح.');
+                        return;
+                      }
+                    }
+                    reminders.setSettings({ ...reminders.settings, enabled: true });
+                    toast.success('تم تفعيل التنبيهات قبل الأذان');
+                  } else {
+                    reminders.setSettings({ ...reminders.settings, enabled: false });
+                    toast.message('تم إيقاف تنبيهات الأذان');
                   }
-                  reminders.setSettings({ ...reminders.settings, enabled: e.target.checked });
                 }}
               />
               <div className="w-10 h-6 bg-secondary rounded-full peer peer-checked:bg-primary relative after:content-[''] after:absolute after:top-0.5 after:right-0.5 after:bg-background after:w-5 after:h-5 after:rounded-full after:transition-all peer-checked:after:-translate-x-4" />
