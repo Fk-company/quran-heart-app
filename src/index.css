@@ -798,38 +798,66 @@
   /* Modal sheets must clear bottom-nav + mini-player */
   .modal-sheet-safe { padding-bottom: calc(var(--nav-height) + var(--player-height) + env(safe-area-inset-bottom, 0px) + 12px) !important; }
 
-  /* ===== Page Header ===== */
-  .page-header-wrapper { @apply mb-6 relative; }
+  /* ===== Page Header (premium unified) ===== */
+  .page-header-wrapper {
+    @apply mb-6 relative pt-2;
+  }
+  .page-header-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: -16px -24px auto -24px;
+    height: 140px;
+    pointer-events: none;
+    background:
+      radial-gradient(60% 80% at 80% 0%, hsl(var(--primary) / 0.10), transparent 60%),
+      radial-gradient(50% 70% at 20% 0%, hsl(var(--accent) / 0.10), transparent 65%);
+    z-index: 0;
+  }
+  .page-header-wrapper > * { position: relative; z-index: 1; }
   .page-header-icon-box {
     @apply w-12 h-12 rounded-2xl flex items-center justify-center relative;
-    box-shadow: var(--shadow-emerald);
+    box-shadow: var(--shadow-emerald), 0 0 0 1px hsl(var(--primary) / 0.15);
+  }
+  .page-header-icon-box::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 20px;
+    background: radial-gradient(circle, hsl(var(--primary) / 0.35), transparent 70%);
+    filter: blur(8px);
+    z-index: -1;
+    opacity: 0.7;
   }
   .page-header-icon-box::after {
     content: '';
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.2);
+    box-shadow: inset 0 1px 0 hsl(0 0% 100% / 0.25);
     pointer-events: none;
   }
   .page-header-title {
     @apply text-xl font-bold text-foreground tracking-tight;
     font-family: 'Reem Kufi', 'IBM Plex Sans Arabic', sans-serif;
+    background: linear-gradient(180deg, hsl(var(--foreground)) 0%, hsl(var(--foreground) / 0.85) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
   }
   .page-header-subtitle {
     @apply text-xs text-muted-foreground mt-0.5 font-medium;
   }
   .page-header-back {
     @apply w-10 h-10 rounded-xl bg-secondary flex items-center justify-center transition-all duration-200 border border-border/50;
+    backdrop-filter: blur(8px);
   }
   .page-header-back:hover { @apply bg-muted; transform: translateX(2px); }
   .page-header-line {
     @apply mt-4;
     height: 2px;
     background: linear-gradient(90deg,
-      transparent 0%, hsl(var(--primary) / 0.3) 18%,
-      hsl(var(--accent) / 0.45) 50%,
-      hsl(var(--primary) / 0.3) 82%, transparent 100%);
+      transparent 0%, hsl(var(--primary) / 0.35) 18%,
+      hsl(var(--accent) / 0.55) 50%,
+      hsl(var(--primary) / 0.35) 82%, transparent 100%);
     border-radius: 2px;
     position: relative;
   }
@@ -841,7 +869,7 @@
     width: 8px; height: 8px;
     border-radius: 50%;
     background: hsl(var(--accent));
-    box-shadow: 0 0 0 3px hsl(var(--background)), 0 0 0 4px hsl(var(--accent) / 0.3);
+    box-shadow: 0 0 0 3px hsl(var(--background)), 0 0 0 4px hsl(var(--accent) / 0.35), 0 0 12px hsl(var(--accent) / 0.5);
   }
 
   /* ===== Section title ===== */
