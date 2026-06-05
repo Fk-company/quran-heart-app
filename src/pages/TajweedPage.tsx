@@ -359,29 +359,70 @@ const TajweedPage: React.FC = () => {
         {tab === 'lessons' && (
           <div className="space-y-2.5">
             <div className="rounded-2xl border border-accent/30 bg-gradient-to-l from-accent/10 to-transparent p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <GraduationCap className="w-4 h-4 text-accent" />
-                <div className="text-xs font-extrabold text-accent tracking-widest">المسار التدريبي</div>
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <div className="flex items-center gap-2">
+                  <GraduationCap className="w-4 h-4 text-accent" />
+                  <div className="text-xs font-extrabold text-accent tracking-widest">المسار التدريبي</div>
+                </div>
+                {lessonStats.done > 0 && (
+                  <button
+                    onClick={() => { reset(); toast.success('تمت إعادة ضبط التقدم'); }}
+                    className="inline-flex items-center gap-1 text-[10px] font-bold text-muted-foreground hover:text-foreground"
+                  >
+                    <RotateCcw className="w-3 h-3" /> إعادة
+                  </button>
+                )}
               </div>
-              <p className="text-[12px] leading-6 text-muted-foreground">
+              <p className="text-[12px] leading-6 text-muted-foreground mb-2">
                 خمس جلسات قصيرة (30 دقيقة إجمالاً) تأخذك من المبادئ حتى تطبيق الأحكام.
               </p>
+              <div className="flex items-center justify-between text-[11px] font-bold mb-1">
+                <span className="text-foreground">التقدم {lessonStats.done}/{lessonStats.total}</span>
+                <span className="text-accent">{lessonStats.percent}%</span>
+              </div>
+              <div className="h-2 rounded-full bg-secondary/60 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-l from-primary to-accent transition-all"
+                  style={{ width: `${lessonStats.percent}%` }}
+                />
+              </div>
+              {lessonStats.avgRating > 0 && (
+                <div className="mt-2 text-[11px] text-muted-foreground flex items-center gap-1">
+                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                  متوسط تقييمك: {lessonStats.avgRating.toFixed(1)}/5
+                </div>
+              )}
             </div>
-            {LESSONS.map((l, idx) => {
+            {filteredLessons.map((l) => {
+              const idx = LESSONS.indexOf(l);
               const open = expandedLesson === l.id;
+              const rec = progress[l.id];
+              const done = !!rec?.completed;
+              const rating = rec?.rating || 0;
               return (
-                <article key={l.id} className="rounded-2xl border border-border/50 bg-card overflow-hidden">
+                <article
+                  id={`lesson-${l.id}`}
+                  key={l.id}
+                  className={`rounded-2xl border bg-card overflow-hidden transition-all ${done ? 'border-primary/40 bg-primary/5' : 'border-border/50'}`}
+                >
                   <button
                     onClick={() => setExpandedLesson(open ? null : l.id)}
                     className="w-full flex items-center justify-between gap-3 p-4 text-right"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-9 h-9 rounded-xl bg-primary/15 text-primary flex items-center justify-center text-sm font-extrabold shrink-0">
-                        {idx + 1}
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-extrabold shrink-0 ${done ? 'bg-primary text-primary-foreground' : 'bg-primary/15 text-primary'}`}>
+                        {done ? <CheckCircle2 className="w-4 h-4" /> : idx + 1}
                       </div>
                       <div className="min-w-0">
                         <div className="text-sm font-extrabold text-foreground truncate">{l.title}</div>
-                        <div className="text-[11px] text-muted-foreground">~{l.minutes} دقائق</div>
+                        <div className="text-[11px] text-muted-foreground flex items-center gap-2">
+                          <span>~{l.minutes} دقائق</span>
+                          {rating > 0 && (
+                            <span className="inline-flex items-center gap-0.5 text-amber-500">
+                              <Star className="w-3 h-3 fill-current" />{rating}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <ChevronLeft className={`w-4 h-4 text-muted-foreground transition-transform ${open ? '-rotate-90' : ''}`} />
@@ -411,11 +452,43 @@ const TajweedPage: React.FC = () => {
                           </div>
                         </div>
                       )}
+                      {/* Rating */}
+                      <div className="rounded-xl bg-background/60 border border-border/40 p-2.5">
+                        <div className="text-[11px] font-bold text-muted-foreground mb-1.5">قيّم هذا الدرس</div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-0.5">
+                            {[1, 2, 3, 4, 5].map((n) => (
+                              <button
+                                key={n}
+                                onClick={() => { rate(l.id, n); toast.success(`تقييمك: ${n}/5`); }}
+                                aria-label={`تقييم ${n}`}
+                                className="p-1"
+                              >
+                                <Star
+                                  className={`w-5 h-5 ${n <= rating ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground/40'}`}
+                                />
+                              </button>
+                            ))}
+                          </div>
+                          <button
+                            onClick={() => handleToggleComplete(l)}
+                            className={`inline-flex items-center gap-1.5 text-xs font-extrabold px-3 py-1.5 rounded-full transition ${
+                              done ? 'bg-primary text-primary-foreground' : 'bg-secondary/70 text-foreground border border-border/40'
+                            }`}
+                          >
+                            {done ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Circle className="w-3.5 h-3.5" />}
+                            {done ? 'مكتمل' : 'اعتبره مكتملاً'}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </article>
               );
             })}
+            {filteredLessons.length === 0 && (
+              <div className="text-center text-sm text-muted-foreground py-8">لا توجد دروس مطابقة.</div>
+            )}
           </div>
         )}
 
