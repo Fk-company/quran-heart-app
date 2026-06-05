@@ -124,6 +124,8 @@ const TajweedPage: React.FC = () => {
   const [cat, setCat] = useState<typeof CATEGORIES[number]>('الكل');
   const [tab, setTab] = useState<'rules' | 'lessons'>('rules');
   const [expandedLesson, setExpandedLesson] = useState<string | null>(LESSONS[0].id);
+  const { progress, toggleComplete, rate, reset, stats } = useTajweedProgress();
+  const lessonStats = stats(LESSONS.length);
 
   // audio state
   const [playingId, setPlayingId] = useState<string | null>(null);
@@ -139,6 +141,29 @@ const TajweedPage: React.FC = () => {
       return r.name.includes(q) || r.short.includes(q) || r.detail.includes(q) || r.example.includes(q);
     });
   }, [query, cat]);
+
+  const filteredLessons = useMemo(() => {
+    const q = query.trim();
+    if (!q) return LESSONS;
+    return LESSONS.filter((l) =>
+      l.title.includes(q) ||
+      l.steps.some((s) => s.includes(q)) ||
+      l.ruleIds.some((rid) => {
+        const r = RULES.find((x) => x.id === rid);
+        return r && (r.name.includes(q) || r.short.includes(q));
+      })
+    );
+  }, [query]);
+
+  // Reverse map: which lessons reference a given rule
+  const lessonsForRule = useMemo(() => {
+    const map: Record<string, Lesson[]> = {};
+    LESSONS.forEach((l) => l.ruleIds.forEach((rid) => {
+      (map[rid] = map[rid] || []).push(l);
+    }));
+    return map;
+  }, []);
+
 
   const togglePlay = async (rule: Rule) => {
     if (!rule.ref) return;
