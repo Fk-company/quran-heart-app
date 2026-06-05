@@ -331,6 +331,21 @@ const TajweedPage: React.FC = () => {
                       </div>
                       <div className="font-amiri text-lg text-foreground text-center" dir="rtl">{r.example}</div>
                     </div>
+                    {lessonsForRule[r.id]?.length > 0 && (
+                      <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                        <Link2 className="w-3 h-3 text-muted-foreground" />
+                        <span className="text-[10px] text-muted-foreground font-bold">يظهر في:</span>
+                        {lessonsForRule[r.id].map((l) => (
+                          <button
+                            key={l.id}
+                            onClick={() => openLesson(l.id)}
+                            className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-accent/15 text-accent border border-accent/25"
+                          >
+                            {l.title.split('—')[0].replace(/الدرس.*?:/, '').trim() || l.title}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </article>
                 );
               })}
