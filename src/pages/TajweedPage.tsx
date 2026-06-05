@@ -248,17 +248,19 @@ const TajweedPage: React.FC = () => {
           })}
         </div>
 
+        {/* Unified search across rules + lessons */}
+        <div className="relative">
+          <Search className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={tab === 'rules' ? 'ابحث عن حكم...' : 'ابحث في الدروس...'}
+            className="w-full text-sm rounded-xl bg-card border border-border/50 py-2.5 pr-9 pl-3"
+          />
+        </div>
+
         {tab === 'rules' && (
           <>
-            <div className="relative">
-              <Search className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="ابحث عن حكم..."
-                className="w-full text-sm rounded-xl bg-card border border-border/50 py-2.5 pr-9 pl-3"
-              />
-            </div>
 
             <div className="flex gap-1.5 overflow-x-auto pb-1 -mx-1 px-1">
               {CATEGORIES.map((c) => (
