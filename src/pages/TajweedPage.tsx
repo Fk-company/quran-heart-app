@@ -204,6 +204,22 @@ const TajweedPage: React.FC = () => {
     }, 80);
   };
 
+  const openLesson = (id: string) => {
+    setTab('lessons');
+    setQuery('');
+    setExpandedLesson(id);
+    setTimeout(() => {
+      const el = document.getElementById(`lesson-${id}`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 80);
+  };
+
+  const handleToggleComplete = (l: Lesson) => {
+    const wasDone = !!progress[l.id]?.completed;
+    toggleComplete(l.id);
+    toast.success(wasDone ? `أُلغي إكمال: ${l.title}` : `أحسنت! تم إكمال: ${l.title}`);
+  };
+
   return (
     <div className="page-content pb-24" dir="rtl">
       <SEO title="أحكام التجويد والتلاوة | قلب القرآن" description="مرجع تفاعلي لأحكام التجويد مع دروس قصيرة وأمثلة صوتية." />
