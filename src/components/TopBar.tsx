@@ -124,14 +124,26 @@ const TopBar: React.FC = () => {
         </div>
       </div>
 
-      {/* Premium gradient divider */}
-      <div
-        className="h-[1.5px]"
-        style={{
-          background:
-            'linear-gradient(90deg, transparent 0%, hsl(var(--primary)/0.35) 30%, hsl(var(--accent)/0.55) 50%, hsl(var(--primary)/0.35) 70%, transparent 100%)',
-        }}
-      />
+      {/* Premium gradient divider + scroll progress */}
+      <div className="relative h-[2px]">
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(90deg, transparent 0%, hsl(var(--primary)/0.30) 30%, hsl(var(--accent)/0.50) 50%, hsl(var(--primary)/0.30) 70%, transparent 100%)',
+          }}
+        />
+        <div
+          className="absolute inset-y-0 right-0 origin-right transition-transform duration-150"
+          style={{
+            transform: `scaleX(${progress})`,
+            background:
+              'linear-gradient(90deg, hsl(var(--accent)), hsl(var(--primary)))',
+            boxShadow: '0 0 8px hsl(var(--accent) / 0.6)',
+          }}
+        />
+      </div>
+
     </div>
   );
 };
