@@ -10,6 +10,7 @@ import { useAyahByAyahPlayer } from '@/hooks/useAyahByAyahPlayer';
 import { useBookmarks } from '@/hooks/useBookmarks';
 import { useSettings } from '@/hooks/useSettings';
 import { useTheme } from '@/contexts/ThemeContext';
+import ReadingProgress from '@/components/ReadingProgress';
 
 interface PageAyah {
   number: number;
