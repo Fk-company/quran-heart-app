@@ -7,6 +7,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { useReadingTracker } from '@/hooks/useReadingTracker';
 import { ArrowRight, BookOpen, Play, Pause, Mic, Heart, Share2, Layers, Download } from 'lucide-react';
 import { getCached, setCached } from '@/lib/dataCache';
+import ReadingProgress from '@/components/ReadingProgress';
 
 const SurahDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
