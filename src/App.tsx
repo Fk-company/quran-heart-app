@@ -146,6 +146,7 @@ const App = () => {
               <SettingsBootstrap />
               {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
               <div className="min-h-screen bg-background islamic-bg">
+                <a href="#main-content" className="skip-to-content">تخطّي إلى المحتوى الرئيسي</a>
                 <TopBar />
                 <AnimatedRoutes />
                 <MiniPlayer />
