@@ -5,6 +5,7 @@ import SEO from '@/components/SEO';
 import PageHeader from '@/components/PageHeader';
 import { useTajweedProgress } from '@/hooks/useTajweedProgress';
 import { toast } from 'sonner';
+import ReadingProgress from '@/components/ReadingProgress';
 
 
 interface Rule {
