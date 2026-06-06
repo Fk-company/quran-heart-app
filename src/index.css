@@ -1000,12 +1000,33 @@
   html { scroll-behavior: smooth; }
   ::selection { background: hsl(var(--accent) / 0.32); color: hsl(var(--foreground)); }
   :focus-visible {
-    outline: 2px solid hsl(var(--accent) / 0.7);
+    outline: 2px solid hsl(var(--accent) / 0.85);
     outline-offset: 2px;
     border-radius: 10px;
+    box-shadow: 0 0 0 4px hsl(var(--accent) / 0.18);
   }
   button, a { -webkit-tap-highlight-color: transparent; }
+  @media (max-width: 640px) {
+    button, a[role="button"], [role="button"] { min-height: 40px; }
+  }
 }
+
+/* Skip to content link for keyboard users */
+.skip-to-content {
+  position: fixed;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  padding: 0.6rem 1rem;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-radius: 0 0 12px 12px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: top 0.2s ease;
+}
+.skip-to-content:focus { top: 0; }
 
 @layer components {
   .page-content { @apply pt-16 pb-28; }
