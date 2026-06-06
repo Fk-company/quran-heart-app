@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { motion, LayoutGroup, useReducedMotion } from 'framer-motion';
 import {
   Book, Mic, Home, MoreHorizontal, Heart, Search, Radio, BookOpen,
   Sparkles, Target, CalendarDays, Quote, BarChart3,
@@ -13,7 +14,6 @@ export interface NavItemDef {
   path: string;
 }
 
-// All available items the user can pick for the bottom bar
 export const NAV_CATALOG: NavItemDef[] = [
   { id: 'home', label: 'الرئيسية', icon: Home, path: '/' },
   { id: 'quran', label: 'المصحف', icon: Book, path: '/quran' },
@@ -54,6 +54,7 @@ export const setNavIds = (ids: string[]) => {
 const BottomNav: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const reduce = useReducedMotion();
   const [moreOpen, setMoreOpen] = useState(false);
   const [navIds, setIds] = useState<string[]>(getNavIds);
 
@@ -74,6 +75,9 @@ const BottomNav: React.FC = () => {
   const isActive = (path: string) =>
     path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
+  const activeKey =
+    items.find((i) => isActive(i.path))?.id ?? null;
+
   return (
     <>
       <MoreSheet open={moreOpen} onClose={() => setMoreOpen(false)} />
@@ -81,52 +85,71 @@ const BottomNav: React.FC = () => {
         className="fixed bottom-0 left-0 right-0 z-40 safe-bottom"
         style={{
           background: 'hsl(var(--glass-strong))',
-          backdropFilter: 'blur(24px) saturate(200%)',
-          WebkitBackdropFilter: 'blur(24px) saturate(200%)',
+          backdropFilter: 'blur(28px) saturate(200%)',
+          WebkitBackdropFilter: 'blur(28px) saturate(200%)',
           borderTop: '1px solid hsl(var(--border) / 0.5)',
-          boxShadow: '0 -4px 20px -4px hsl(var(--primary) / 0.08)',
+          boxShadow: '0 -8px 28px -8px hsl(var(--primary) / 0.12)',
         }}
       >
         <div
-          className="absolute top-0 left-0 right-0 h-[1px]"
-          style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--accent) / 0.4) 50%, transparent)' }}
+          className="absolute top-0 left-0 right-0 h-[1.5px] pointer-events-none"
+          style={{
+            background:
+              'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.35) 30%, hsl(var(--accent) / 0.55) 50%, hsl(var(--primary) / 0.35) 70%, transparent)',
+          }}
         />
-        <div className="flex items-stretch justify-around max-w-lg mx-auto h-[68px]">
-          {items.map((item) => {
-            const active = isActive(item.path);
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.id}
-                onClick={() => navigate(item.path)}
-                className={`bottom-nav-item flex-1 pt-2 pb-1 ${active ? 'active' : ''}`}
-                aria-label={item.label}
-              >
-                <div className="nav-icon-box">
-                  <Icon
-                    className={`w-5 h-5 transition-all duration-300 ${active ? 'text-primary' : 'text-muted-foreground'}`}
-                    strokeWidth={active ? 2.5 : 1.8}
-                  />
-                </div>
-                <span
-                  className={`transition-all duration-300 ${active ? 'text-primary font-bold' : 'text-muted-foreground font-medium'}`}
+        <LayoutGroup id="bottom-nav">
+          <div className="flex items-stretch justify-around max-w-lg mx-auto h-[68px] px-1">
+            {items.map((item) => {
+              const active = isActive(item.path);
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => navigate(item.path)}
+                  className={`bottom-nav-item flex-1 pt-2 pb-1 relative ${active ? 'active' : ''}`}
+                  aria-label={item.label}
+                  aria-current={active ? 'page' : undefined}
                 >
-                  {item.label}
-                </span>
-              </button>
-            );
-          })}
-          <button
-            onClick={() => setMoreOpen(true)}
-            className="bottom-nav-item flex-1 pt-2 pb-1"
-            aria-label="المزيد"
-          >
-            <div className="nav-icon-box">
-              <MoreHorizontal className="w-5 h-5 text-muted-foreground transition-all duration-300" strokeWidth={1.8} />
-            </div>
-            <span className="text-muted-foreground font-medium transition-all duration-300">المزيد</span>
-          </button>
-        </div>
+                  <div className="nav-icon-box relative">
+                    {active && !reduce && (
+                      <motion.span
+                        layoutId="nav-active-pill"
+                        className="absolute inset-0 rounded-[14px] -z-0"
+                        style={{
+                          background:
+                            'linear-gradient(135deg, hsl(var(--primary) / 0.16), hsl(var(--accent) / 0.12))',
+                          boxShadow:
+                            '0 4px 14px -4px hsl(var(--primary) / 0.35), inset 0 0 0 1px hsl(var(--primary) / 0.22)',
+                        }}
+                        transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+                      />
+                    )}
+                    <Icon
+                      className={`relative w-5 h-5 transition-colors duration-200 ${active ? 'text-primary' : 'text-muted-foreground'}`}
+                      strokeWidth={active ? 2.4 : 1.8}
+                    />
+                  </div>
+                  <span
+                    className={`transition-colors duration-200 ${active ? 'text-primary font-bold' : 'text-muted-foreground font-medium'}`}
+                  >
+                    {item.label}
+                  </span>
+                </button>
+              );
+            })}
+            <button
+              onClick={() => setMoreOpen(true)}
+              className="bottom-nav-item flex-1 pt-2 pb-1 relative"
+              aria-label="المزيد"
+            >
+              <div className="nav-icon-box">
+                <MoreHorizontal className="w-5 h-5 text-muted-foreground transition-colors duration-200" strokeWidth={1.8} />
+              </div>
+              <span className="text-muted-foreground font-medium">المزيد</span>
+            </button>
+          </div>
+        </LayoutGroup>
       </nav>
     </>
   );

@@ -994,3 +994,41 @@
 
 .overflow-x-auto::-webkit-scrollbar { height: 0; display: none; }
 .overflow-x-auto { scrollbar-width: none; }
+
+/* ===== Unified Polish (cross-page) ===== */
+@layer base {
+  html { scroll-behavior: smooth; }
+  ::selection { background: hsl(var(--accent) / 0.32); color: hsl(var(--foreground)); }
+  :focus-visible {
+    outline: 2px solid hsl(var(--accent) / 0.7);
+    outline-offset: 2px;
+    border-radius: 10px;
+  }
+  button, a { -webkit-tap-highlight-color: transparent; }
+}
+
+@layer components {
+  .page-content { @apply pt-16 pb-28; }
+  .press { @apply transition-transform duration-150 active:scale-[0.97]; }
+  .lift-hover { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+  .lift-hover:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .chip {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border border-border/50 bg-secondary/70 text-foreground;
+  }
+  .sheet-content { animation: sheet-up 0.38s cubic-bezier(0.22, 1, 0.36, 1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-header-title { font-size: 1.05rem; }
+  .page-header-icon-box { width: 2.5rem; height: 2.5rem; }
+}
+
