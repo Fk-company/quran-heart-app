@@ -5,6 +5,7 @@ import SEO from '@/components/SEO';
 import PageHeader from '@/components/PageHeader';
 import { useTajweedProgress } from '@/hooks/useTajweedProgress';
 import { toast } from 'sonner';
+import ReadingProgress from '@/components/ReadingProgress';
 
 
 interface Rule {
@@ -223,6 +224,7 @@ const TajweedPage: React.FC = () => {
   return (
     <div className="page-content pb-24" dir="rtl">
       <SEO title="أحكام التجويد والتلاوة | قلب القرآن" description="مرجع تفاعلي لأحكام التجويد مع دروس قصيرة وأمثلة صوتية." />
+      <ReadingProgress storageKey={`read_pos_tajweed_${tab}`} label={tab === 'rules' ? 'الأحكام' : 'الدروس'} ariaLabel="تقدم صفحة التجويد" />
       <PageHeader icon={Mic} title="التجويد والتلاوة" subtitle="دروس وأمثلة صوتية" gradient="primary" showBack />
 
       <div className="px-4 mt-3 space-y-3">

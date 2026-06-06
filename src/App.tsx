@@ -70,7 +70,8 @@ const queryClient = new QueryClient();
 const AnimatedRoutes = () => {
   const location = useLocation();
   return (
-    <main>
+    <main id="main-content" tabIndex={-1}>
+
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageTransition><HomePage /></PageTransition>} />
@@ -145,6 +146,7 @@ const App = () => {
               <SettingsBootstrap />
               {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
               <div className="min-h-screen bg-background islamic-bg">
+                <a href="#main-content" className="skip-to-content">تخطّي إلى المحتوى الرئيسي</a>
                 <TopBar />
                 <AnimatedRoutes />
                 <MiniPlayer />
