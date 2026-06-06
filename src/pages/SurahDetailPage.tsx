@@ -116,8 +116,8 @@ const SurahDetailPage: React.FC = () => {
       <div className="px-4 pt-4 max-w-lg mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => navigate('/quran')} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
-            <ArrowRight className="w-4 h-4 text-foreground" />
+          <button onClick={() => navigate('/quran')} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center" aria-label="رجوع إلى قائمة السور">
+            <ArrowRight className="w-4 h-4 text-foreground" aria-hidden="true" />
           </button>
           <div className="flex-1">
             <h1 className="text-lg font-bold text-foreground">{surah?.name || ''}</h1>
