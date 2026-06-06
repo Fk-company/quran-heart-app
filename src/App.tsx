@@ -70,7 +70,8 @@ const queryClient = new QueryClient();
 const AnimatedRoutes = () => {
   const location = useLocation();
   return (
-    <main>
+    <main id="main-content" tabIndex={-1}>
+
       <AnimatePresence mode="wait">
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageTransition><HomePage /></PageTransition>} />
