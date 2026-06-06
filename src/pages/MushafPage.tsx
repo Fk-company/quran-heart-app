@@ -406,6 +406,11 @@ const MushafPage: React.FC = () => {
   return (
     <div className={`page-container page-with-topbar ${nightClass}`} dir="rtl"
       ref={containerRef} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
+      <ReadingProgress
+        storageKey={`read_pos_mushaf_${currentPage}`}
+        label={`صفحة ${currentPage}`}
+        ariaLabel="تقدم قراءة المصحف"
+      />
       <div className="px-4 pt-4 max-w-lg mx-auto">
         {/* Header */}
         <div className="flex items-center gap-2 mb-4">
