@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import SEO from '@/components/SEO';
 import { useFavorites } from '@/hooks/useFavorites';
 import {
@@ -240,9 +241,10 @@ const DuaPage: React.FC = () => {
         </div>
       </div>
 
-      {/* ============= Full-screen Reader ============= */}
-      {reader && (
-        <div className="fixed inset-0 z-[60] bg-background flex flex-col" dir="rtl">
+      {/* ============= Full-screen Reader (portaled to body to escape transform contexts) ============= */}
+      {reader && createPortal(
+        <div className="fixed inset-0 z-[100] bg-background flex flex-col overscroll-contain" dir="rtl" style={{ height: '100dvh' }}>
+
           {/* Reader header */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-card/80 backdrop-blur-md">
             <button
@@ -300,7 +302,8 @@ const DuaPage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
