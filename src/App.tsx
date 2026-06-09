@@ -62,6 +62,7 @@ import PersonalDashboardPage from "./pages/PersonalDashboardPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import TajweedPage from "./pages/TajweedPage";
+import FocusModePage from "./pages/FocusModePage";
 import NotFound from "./pages/NotFound";
 import { useSettings } from "@/hooks/useSettings";
 
@@ -125,6 +126,7 @@ const AnimatedRoutes = () => {
           <Route path="/privacy" element={<PageTransition><PrivacyPage /></PageTransition>} />
           <Route path="/terms" element={<PageTransition><TermsPage /></PageTransition>} />
           <Route path="/tajweed" element={<PageTransition><TajweedPage /></PageTransition>} />
+          <Route path="/focus-mode" element={<FocusModePage />} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         </Routes>
       </AnimatePresence>

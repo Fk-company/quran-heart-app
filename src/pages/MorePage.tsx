@@ -5,7 +5,7 @@ import {
   Heart, Radio, Users, Quote, Search, Star, BookOpen, BarChart3,
   X, Feather, Book, Grid3X3, List, ChevronLeft, TrendingUp, Baby, Sparkles, Mic,
   Brain, Smile, Lightbulb, Bot, Settings, CalendarDays, Target, Send, Globe,
-  Trophy, Mic2, Map as MapIcon, Layers, Waves, Sunrise, FileText, Compass, Coins, Moon, BookHeart, MapPin, Bell
+  Trophy, Mic2, Map as MapIcon, Layers, Waves, Sunrise, FileText, Compass, Coins, Moon, BookHeart, MapPin, Bell, Car
 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { MoreHorizontal } from 'lucide-react';
@@ -83,6 +83,7 @@ const moreCategories = [
     title: 'العلوم القرآنية',
     items: [
       { label: 'التجويد والتلاوة', icon: Mic2, path: '/tajweed', desc: 'أحكام التلاوة مع أمثلة', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
+      { label: 'وضع المسجد/السيارة', icon: Car, path: '/focus-mode', desc: 'شاشة عرض كبيرة للمواقيت والقبلة', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
     ]
   },
   {

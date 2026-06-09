@@ -44,13 +44,14 @@ interface Lesson {
   id: string;
   title: string;
   minutes: number;
+  level: 'beginner' | 'intermediate' | 'advanced';
   steps: string[];
   ruleIds: string[];
 }
 
 const LESSONS: Lesson[] = [
   {
-    id: 'L1', title: 'الدرس الأول: مدخل التجويد وآداب التلاوة', minutes: 5,
+    id: 'L1', title: 'الدرس الأول: مدخل التجويد وآداب التلاوة', minutes: 5, level: 'beginner',
     steps: [
       'تعريف التجويد: تحسين النطق بالقرآن وإعطاء الحروف حقها ومستحقها.',
       'حكم التجويد: العمل به واجب، والتعلّم النظري فرض كفاية.',
@@ -60,7 +61,7 @@ const LESSONS: Lesson[] = [
     ruleIds: ['madd-tabii', 'lam-qamari'],
   },
   {
-    id: 'L2', title: 'الدرس الثاني: أحكام النون الساكنة والتنوين', minutes: 7,
+    id: 'L2', title: 'الدرس الثاني: أحكام النون الساكنة والتنوين', minutes: 7, level: 'beginner',
     steps: [
       'الإظهار: عند حروف الحلق (ء هـ ع ح غ خ) بلا غنة كاملة.',
       'الإدغام: حروف «يرملون» مع الغنة في (ي ن م و) وبدونها في (ل ر).',
@@ -71,7 +72,7 @@ const LESSONS: Lesson[] = [
     ruleIds: ['idhhar', 'idgham', 'iqlab', 'ikhfa'],
   },
   {
-    id: 'L3', title: 'الدرس الثالث: أحكام الميم الساكنة', minutes: 5,
+    id: 'L3', title: 'الدرس الثالث: أحكام الميم الساكنة', minutes: 5, level: 'beginner',
     steps: [
       'إدغام شفوي: ميم ساكنة قبل ميم متحركة مع الغنة.',
       'إخفاء شفوي: ميم ساكنة قبل الباء مع الغنة.',
@@ -80,7 +81,7 @@ const LESSONS: Lesson[] = [
     ruleIds: ['mim-idgham', 'mim-ikhfa', 'mim-idhhar'],
   },
   {
-    id: 'L4', title: 'الدرس الرابع: المدود — الطبيعي والفرعي', minutes: 8,
+    id: 'L4', title: 'الدرس الرابع: المدود — الطبيعي والفرعي', minutes: 8, level: 'intermediate',
     steps: [
       'المد الطبيعي: حركتان فقط.',
       'المتصل: واجب 4-5 حركات (همزة في نفس الكلمة).',
@@ -91,13 +92,33 @@ const LESSONS: Lesson[] = [
     ruleIds: ['madd-tabii', 'madd-muttasil', 'madd-munfasil', 'madd-lazim'],
   },
   {
-    id: 'L5', title: 'الدرس الخامس: القلقلة واللام والراء', minutes: 6,
+    id: 'L5', title: 'الدرس الخامس: القلقلة واللام والراء', minutes: 6, level: 'intermediate',
     steps: [
       'القلقلة: اضطراب الصوت في «قطب جد» — صغرى في الوسط، كبرى عند الوقف.',
       'اللام الشمسية والقمرية في «أل» التعريف.',
       'تفخيم الراء وترقيقها بحسب حركتها وما قبلها.',
     ],
     ruleIds: ['qalqala', 'lam-shamsi', 'lam-qamari', 'ra-tafkhim', 'ra-tarqiq'],
+  },
+  {
+    id: 'L6', title: 'الدرس السادس: مخارج الحروف وصفاتها', minutes: 10, level: 'advanced',
+    steps: [
+      'المخارج العامة: الجوف، الحلق، اللسان، الشفتان، الخيشوم.',
+      'صفات الحروف لها ضد: الهمس/الجهر، الشدة/الرخاوة، الاستعلاء/الاستفال، الإطباق/الانفتاح.',
+      'صفات لا ضد لها: الصفير، القلقلة، اللين، الانحراف، التكرير، التفشي، الاستطالة، الغنة.',
+      'تطبيق: ميّز حروف الإطباق (ص ض ط ظ) وفخّمها دائماً.',
+    ],
+    ruleIds: ['qalqala', 'ra-tafkhim'],
+  },
+  {
+    id: 'L7', title: 'الدرس السابع: الوقف والابتداء', minutes: 8, level: 'advanced',
+    steps: [
+      'أنواع الوقف: تام، كافٍ، حسن، قبيح.',
+      'علامات المصحف: مـ (لازم)، لا (ممنوع)، ج (جائز)، صلى/قلى (الأولى الوصل/الوقف).',
+      'هاء التأنيث: تُقلب تاء عند الوصل وتاءً مربوطة عند الوقف.',
+      'الابتداء يجب أن يكون بكلام مستقل المعنى.',
+    ],
+    ruleIds: [],
   },
 ];
 
@@ -109,9 +130,17 @@ const TOPIC_LINKS = [
   { label: 'جلسة تدبر', path: '/guided-tadabbur', icon: BookOpen },
 ];
 
-const fetchAyahAudio = async (surah: number, ayah: number): Promise<string | null> => {
+const RECITERS = [
+  { id: 'ar.alafasy', name: 'مشاري العفاسي' },
+  { id: 'ar.husary', name: 'محمود الحصري' },
+  { id: 'ar.minshawi', name: 'محمد المنشاوي' },
+  { id: 'ar.abdulbasitmurattal', name: 'عبد الباسط' },
+  { id: 'ar.sudais', name: 'عبد الرحمن السديس' },
+];
+
+const fetchAyahAudio = async (surah: number, ayah: number, reciter: string): Promise<string | null> => {
   try {
-    const r = await fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/ar.alafasy`);
+    const r = await fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/${reciter}`);
     const j = await r.json();
     return j?.data?.audio || null;
   } catch {
@@ -119,12 +148,15 @@ const fetchAyahAudio = async (surah: number, ayah: number): Promise<string | nul
   }
 };
 
+
 const TajweedPage: React.FC = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [cat, setCat] = useState<typeof CATEGORIES[number]>('الكل');
   const [tab, setTab] = useState<'rules' | 'lessons'>('rules');
   const [expandedLesson, setExpandedLesson] = useState<string | null>(LESSONS[0].id);
+  const [levelFilter, setLevelFilter] = useState<'all' | 'beginner' | 'intermediate' | 'advanced'>('all');
+  const [reciter, setReciter] = useState<string>(() => localStorage.getItem('tajweed_reciter') || 'ar.alafasy');
   const { progress, toggleComplete, rate, reset, stats } = useTajweedProgress();
   const lessonStats = stats(LESSONS.length);
 
@@ -145,16 +177,17 @@ const TajweedPage: React.FC = () => {
 
   const filteredLessons = useMemo(() => {
     const q = query.trim();
-    if (!q) return LESSONS;
-    return LESSONS.filter((l) =>
-      l.title.includes(q) ||
-      l.steps.some((s) => s.includes(q)) ||
-      l.ruleIds.some((rid) => {
-        const r = RULES.find((x) => x.id === rid);
-        return r && (r.name.includes(q) || r.short.includes(q));
-      })
-    );
-  }, [query]);
+    return LESSONS.filter((l) => {
+      if (levelFilter !== 'all' && l.level !== levelFilter) return false;
+      if (!q) return true;
+      return l.title.includes(q) ||
+        l.steps.some((s) => s.includes(q)) ||
+        l.ruleIds.some((rid) => {
+          const r = RULES.find((x) => x.id === rid);
+          return r && (r.name.includes(q) || r.short.includes(q));
+        });
+    });
+  }, [query, levelFilter]);
 
   // Reverse map: which lessons reference a given rule
   const lessonsForRule = useMemo(() => {
@@ -165,6 +198,13 @@ const TajweedPage: React.FC = () => {
     return map;
   }, []);
 
+  const changeReciter = (id: string) => {
+    setReciter(id);
+    localStorage.setItem('tajweed_reciter', id);
+    cacheRef.current = {};
+    audioRef.current?.pause();
+    setPlayingId(null);
+  };
 
   const togglePlay = async (rule: Rule) => {
     if (!rule.ref) return;
@@ -175,16 +215,18 @@ const TajweedPage: React.FC = () => {
     }
     audioRef.current?.pause();
     setLoadingAudio(rule.id);
-    let url = cacheRef.current[rule.id];
+    const key = `${rule.id}_${reciter}`;
+    let url = cacheRef.current[key];
     if (!url) {
-      const got = await fetchAyahAudio(rule.ref.surah, rule.ref.ayah);
+      const got = await fetchAyahAudio(rule.ref.surah, rule.ref.ayah, reciter);
       if (got) {
         url = got;
-        cacheRef.current[rule.id] = got;
+        cacheRef.current[key] = got;
       }
     }
     setLoadingAudio(null);
     if (!url) return;
+
     const a = new Audio(url);
     audioRef.current = a;
     a.onended = () => setPlayingId(null);
@@ -279,6 +321,30 @@ const TajweedPage: React.FC = () => {
                 </button>
               ))}
             </div>
+
+            {/* Reciter selector — applies to all examples */}
+            <div className="rounded-2xl border border-accent/30 bg-gradient-to-l from-accent/10 to-transparent p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Headphones className="w-4 h-4 text-accent" />
+                <div className="text-[11px] font-extrabold text-accent tracking-widest">قارن بين القرّاء</div>
+              </div>
+              <div className="flex gap-1.5 overflow-x-auto -mx-1 px-1">
+                {RECITERS.map((rc) => (
+                  <button
+                    key={rc.id}
+                    onClick={() => changeReciter(rc.id)}
+                    className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold border transition ${
+                      reciter === rc.id
+                        ? 'bg-accent text-accent-foreground border-accent shadow-sm'
+                        : 'bg-secondary/60 text-foreground border-border/40'
+                    }`}
+                  >
+                    {rc.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
 
             <div className="rounded-2xl border border-primary/20 bg-gradient-to-l from-primary/10 to-transparent p-4">
               <div className="flex items-center gap-2 mb-1.5">
@@ -378,8 +444,30 @@ const TajweedPage: React.FC = () => {
                 )}
               </div>
               <p className="text-[12px] leading-6 text-muted-foreground mb-2">
-                خمس جلسات قصيرة (30 دقيقة إجمالاً) تأخذك من المبادئ حتى تطبيق الأحكام.
+                سبع جلسات قصيرة بمستويات متدرّجة — من المبادئ حتى المخارج والوقف.
               </p>
+              {/* Level filter */}
+              <div className="flex gap-1.5 mb-2">
+                {([
+                  { id: 'all', label: 'الكل' },
+                  { id: 'beginner', label: 'مبتدئ' },
+                  { id: 'intermediate', label: 'متوسط' },
+                  { id: 'advanced', label: 'متقدم' },
+                ] as const).map((lv) => (
+                  <button
+                    key={lv.id}
+                    onClick={() => setLevelFilter(lv.id)}
+                    className={`flex-1 px-2 py-1 rounded-lg text-[10px] font-extrabold border transition ${
+                      levelFilter === lv.id
+                        ? 'bg-accent text-accent-foreground border-accent'
+                        : 'bg-background/60 text-muted-foreground border-border/40'
+                    }`}
+                  >
+                    {lv.label}
+                  </button>
+                ))}
+              </div>
+
               <div className="flex items-center justify-between text-[11px] font-bold mb-1">
                 <span className="text-foreground">التقدم {lessonStats.done}/{lessonStats.total}</span>
                 <span className="text-accent">{lessonStats.percent}%</span>
