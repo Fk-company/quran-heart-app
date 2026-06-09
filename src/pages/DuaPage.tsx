@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import SEO from '@/components/SEO';
 import { useFavorites } from '@/hooks/useFavorites';
 import {
