@@ -83,6 +83,7 @@ const moreCategories = [
     title: 'العلوم القرآنية',
     items: [
       { label: 'التجويد والتلاوة', icon: Mic2, path: '/tajweed', desc: 'أحكام التلاوة مع أمثلة', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
+      { label: 'وضع المسجد/السيارة', icon: Car, path: '/focus-mode', desc: 'شاشة عرض كبيرة للمواقيت والقبلة', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
     ]
   },
   {
