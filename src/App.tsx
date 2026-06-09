@@ -62,6 +62,7 @@ import PersonalDashboardPage from "./pages/PersonalDashboardPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import TajweedPage from "./pages/TajweedPage";
+import FocusModePage from "./pages/FocusModePage";
 import NotFound from "./pages/NotFound";
 import { useSettings } from "@/hooks/useSettings";
 
