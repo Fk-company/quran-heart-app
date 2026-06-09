@@ -44,13 +44,14 @@ interface Lesson {
   id: string;
   title: string;
   minutes: number;
+  level: 'beginner' | 'intermediate' | 'advanced';
   steps: string[];
   ruleIds: string[];
 }
 
 const LESSONS: Lesson[] = [
   {
-    id: 'L1', title: 'الدرس الأول: مدخل التجويد وآداب التلاوة', minutes: 5,
+    id: 'L1', title: 'الدرس الأول: مدخل التجويد وآداب التلاوة', minutes: 5, level: 'beginner',
     steps: [
       'تعريف التجويد: تحسين النطق بالقرآن وإعطاء الحروف حقها ومستحقها.',
       'حكم التجويد: العمل به واجب، والتعلّم النظري فرض كفاية.',
@@ -60,7 +61,7 @@ const LESSONS: Lesson[] = [
     ruleIds: ['madd-tabii', 'lam-qamari'],
   },
   {
-    id: 'L2', title: 'الدرس الثاني: أحكام النون الساكنة والتنوين', minutes: 7,
+    id: 'L2', title: 'الدرس الثاني: أحكام النون الساكنة والتنوين', minutes: 7, level: 'beginner',
     steps: [
       'الإظهار: عند حروف الحلق (ء هـ ع ح غ خ) بلا غنة كاملة.',
       'الإدغام: حروف «يرملون» مع الغنة في (ي ن م و) وبدونها في (ل ر).',
@@ -71,7 +72,7 @@ const LESSONS: Lesson[] = [
     ruleIds: ['idhhar', 'idgham', 'iqlab', 'ikhfa'],
   },
   {
-    id: 'L3', title: 'الدرس الثالث: أحكام الميم الساكنة', minutes: 5,
+    id: 'L3', title: 'الدرس الثالث: أحكام الميم الساكنة', minutes: 5, level: 'beginner',
     steps: [
       'إدغام شفوي: ميم ساكنة قبل ميم متحركة مع الغنة.',
       'إخفاء شفوي: ميم ساكنة قبل الباء مع الغنة.',
@@ -80,7 +81,7 @@ const LESSONS: Lesson[] = [
     ruleIds: ['mim-idgham', 'mim-ikhfa', 'mim-idhhar'],
   },
   {
-    id: 'L4', title: 'الدرس الرابع: المدود — الطبيعي والفرعي', minutes: 8,
+    id: 'L4', title: 'الدرس الرابع: المدود — الطبيعي والفرعي', minutes: 8, level: 'intermediate',
     steps: [
       'المد الطبيعي: حركتان فقط.',
       'المتصل: واجب 4-5 حركات (همزة في نفس الكلمة).',
@@ -91,13 +92,33 @@ const LESSONS: Lesson[] = [
     ruleIds: ['madd-tabii', 'madd-muttasil', 'madd-munfasil', 'madd-lazim'],
   },
   {
-    id: 'L5', title: 'الدرس الخامس: القلقلة واللام والراء', minutes: 6,
+    id: 'L5', title: 'الدرس الخامس: القلقلة واللام والراء', minutes: 6, level: 'intermediate',
     steps: [
       'القلقلة: اضطراب الصوت في «قطب جد» — صغرى في الوسط، كبرى عند الوقف.',
       'اللام الشمسية والقمرية في «أل» التعريف.',
       'تفخيم الراء وترقيقها بحسب حركتها وما قبلها.',
     ],
     ruleIds: ['qalqala', 'lam-shamsi', 'lam-qamari', 'ra-tafkhim', 'ra-tarqiq'],
+  },
+  {
+    id: 'L6', title: 'الدرس السادس: مخارج الحروف وصفاتها', minutes: 10, level: 'advanced',
+    steps: [
+      'المخارج العامة: الجوف، الحلق، اللسان، الشفتان، الخيشوم.',
+      'صفات الحروف لها ضد: الهمس/الجهر، الشدة/الرخاوة، الاستعلاء/الاستفال، الإطباق/الانفتاح.',
+      'صفات لا ضد لها: الصفير، القلقلة، اللين، الانحراف، التكرير، التفشي، الاستطالة، الغنة.',
+      'تطبيق: ميّز حروف الإطباق (ص ض ط ظ) وفخّمها دائماً.',
+    ],
+    ruleIds: ['qalqala', 'ra-tafkhim'],
+  },
+  {
+    id: 'L7', title: 'الدرس السابع: الوقف والابتداء', minutes: 8, level: 'advanced',
+    steps: [
+      'أنواع الوقف: تام، كافٍ، حسن، قبيح.',
+      'علامات المصحف: مـ (لازم)، لا (ممنوع)، ج (جائز)، صلى/قلى (الأولى الوصل/الوقف).',
+      'هاء التأنيث: تُقلب تاء عند الوصل وتاءً مربوطة عند الوقف.',
+      'الابتداء يجب أن يكون بكلام مستقل المعنى.',
+    ],
+    ruleIds: [],
   },
 ];
 
@@ -109,15 +130,24 @@ const TOPIC_LINKS = [
   { label: 'جلسة تدبر', path: '/guided-tadabbur', icon: BookOpen },
 ];
 
-const fetchAyahAudio = async (surah: number, ayah: number): Promise<string | null> => {
+const RECITERS = [
+  { id: 'ar.alafasy', name: 'مشاري العفاسي' },
+  { id: 'ar.husary', name: 'محمود الحصري' },
+  { id: 'ar.minshawi', name: 'محمد المنشاوي' },
+  { id: 'ar.abdulbasitmurattal', name: 'عبد الباسط' },
+  { id: 'ar.sudais', name: 'عبد الرحمن السديس' },
+];
+
+const fetchAyahAudio = async (surah: number, ayah: number, reciter: string): Promise<string | null> => {
   try {
-    const r = await fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/ar.alafasy`);
+    const r = await fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/${reciter}`);
     const j = await r.json();
     return j?.data?.audio || null;
   } catch {
     return null;
   }
 };
+
 
 const TajweedPage: React.FC = () => {
   const navigate = useNavigate();
