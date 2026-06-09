@@ -155,6 +155,8 @@ const TajweedPage: React.FC = () => {
   const [cat, setCat] = useState<typeof CATEGORIES[number]>('الكل');
   const [tab, setTab] = useState<'rules' | 'lessons'>('rules');
   const [expandedLesson, setExpandedLesson] = useState<string | null>(LESSONS[0].id);
+  const [levelFilter, setLevelFilter] = useState<'all' | 'beginner' | 'intermediate' | 'advanced'>('all');
+  const [reciter, setReciter] = useState<string>(() => localStorage.getItem('tajweed_reciter') || 'ar.alafasy');
   const { progress, toggleComplete, rate, reset, stats } = useTajweedProgress();
   const lessonStats = stats(LESSONS.length);
 
@@ -175,16 +177,17 @@ const TajweedPage: React.FC = () => {
 
   const filteredLessons = useMemo(() => {
     const q = query.trim();
-    if (!q) return LESSONS;
-    return LESSONS.filter((l) =>
-      l.title.includes(q) ||
-      l.steps.some((s) => s.includes(q)) ||
-      l.ruleIds.some((rid) => {
-        const r = RULES.find((x) => x.id === rid);
-        return r && (r.name.includes(q) || r.short.includes(q));
-      })
-    );
-  }, [query]);
+    return LESSONS.filter((l) => {
+      if (levelFilter !== 'all' && l.level !== levelFilter) return false;
+      if (!q) return true;
+      return l.title.includes(q) ||
+        l.steps.some((s) => s.includes(q)) ||
+        l.ruleIds.some((rid) => {
+          const r = RULES.find((x) => x.id === rid);
+          return r && (r.name.includes(q) || r.short.includes(q));
+        });
+    });
+  }, [query, levelFilter]);
 
   // Reverse map: which lessons reference a given rule
   const lessonsForRule = useMemo(() => {
@@ -195,6 +198,13 @@ const TajweedPage: React.FC = () => {
     return map;
   }, []);
 
+  const changeReciter = (id: string) => {
+    setReciter(id);
+    localStorage.setItem('tajweed_reciter', id);
+    cacheRef.current = {};
+    audioRef.current?.pause();
+    setPlayingId(null);
+  };
 
   const togglePlay = async (rule: Rule) => {
     if (!rule.ref) return;
@@ -205,16 +215,18 @@ const TajweedPage: React.FC = () => {
     }
     audioRef.current?.pause();
     setLoadingAudio(rule.id);
-    let url = cacheRef.current[rule.id];
+    const key = `${rule.id}_${reciter}`;
+    let url = cacheRef.current[key];
     if (!url) {
-      const got = await fetchAyahAudio(rule.ref.surah, rule.ref.ayah);
+      const got = await fetchAyahAudio(rule.ref.surah, rule.ref.ayah, reciter);
       if (got) {
         url = got;
-        cacheRef.current[rule.id] = got;
+        cacheRef.current[key] = got;
       }
     }
     setLoadingAudio(null);
     if (!url) return;
+
     const a = new Audio(url);
     audioRef.current = a;
     a.onended = () => setPlayingId(null);
