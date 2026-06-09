@@ -322,6 +322,30 @@ const TajweedPage: React.FC = () => {
               ))}
             </div>
 
+            {/* Reciter selector — applies to all examples */}
+            <div className="rounded-2xl border border-accent/30 bg-gradient-to-l from-accent/10 to-transparent p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <Headphones className="w-4 h-4 text-accent" />
+                <div className="text-[11px] font-extrabold text-accent tracking-widest">قارن بين القرّاء</div>
+              </div>
+              <div className="flex gap-1.5 overflow-x-auto -mx-1 px-1">
+                {RECITERS.map((rc) => (
+                  <button
+                    key={rc.id}
+                    onClick={() => changeReciter(rc.id)}
+                    className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-bold border transition ${
+                      reciter === rc.id
+                        ? 'bg-accent text-accent-foreground border-accent shadow-sm'
+                        : 'bg-secondary/60 text-foreground border-border/40'
+                    }`}
+                  >
+                    {rc.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+
             <div className="rounded-2xl border border-primary/20 bg-gradient-to-l from-primary/10 to-transparent p-4">
               <div className="flex items-center gap-2 mb-1.5">
                 <BookOpen className="w-4 h-4 text-primary" />
