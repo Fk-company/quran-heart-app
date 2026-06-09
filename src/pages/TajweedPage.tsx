@@ -444,8 +444,30 @@ const TajweedPage: React.FC = () => {
                 )}
               </div>
               <p className="text-[12px] leading-6 text-muted-foreground mb-2">
-                خمس جلسات قصيرة (30 دقيقة إجمالاً) تأخذك من المبادئ حتى تطبيق الأحكام.
+                سبع جلسات قصيرة بمستويات متدرّجة — من المبادئ حتى المخارج والوقف.
               </p>
+              {/* Level filter */}
+              <div className="flex gap-1.5 mb-2">
+                {([
+                  { id: 'all', label: 'الكل' },
+                  { id: 'beginner', label: 'مبتدئ' },
+                  { id: 'intermediate', label: 'متوسط' },
+                  { id: 'advanced', label: 'متقدم' },
+                ] as const).map((lv) => (
+                  <button
+                    key={lv.id}
+                    onClick={() => setLevelFilter(lv.id)}
+                    className={`flex-1 px-2 py-1 rounded-lg text-[10px] font-extrabold border transition ${
+                      levelFilter === lv.id
+                        ? 'bg-accent text-accent-foreground border-accent'
+                        : 'bg-background/60 text-muted-foreground border-border/40'
+                    }`}
+                  >
+                    {lv.label}
+                  </button>
+                ))}
+              </div>
+
               <div className="flex items-center justify-between text-[11px] font-bold mb-1">
                 <span className="text-foreground">التقدم {lessonStats.done}/{lessonStats.total}</span>
                 <span className="text-accent">{lessonStats.percent}%</span>
