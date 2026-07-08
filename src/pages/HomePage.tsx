@@ -745,29 +745,58 @@ const HomePage: React.FC = () => {
           <p className="text-xs text-muted-foreground text-center font-medium">سورة {dailyVerse.surah} — آية {dailyVerse.ayah}</p>
         </button>
 
-        {/* Spiritual shortcuts — horizontal snap rail */}
-        <div className="mb-5">
+        {/* Spiritual shortcuts — horizontal snap rail with keyboard nav */}
+        <nav aria-label="اختصارات الروح والقلب" className="mb-5">
           <div className="section-title-row">
-            <h2 className="section-title mb-0">الروح والقلب</h2>
-            <span className="text-[10px] text-muted-foreground font-bold">{spiritualLinks.length} أداة</span>
+            <h2 className="section-title mb-0" id="spiritual-heading">الروح والقلب</h2>
+            <span className="text-[10px] text-muted-foreground font-bold" aria-hidden="true">{spiritualLinks.length} أداة</span>
           </div>
-          <div className="flex gap-2.5 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-1">
+          <ul
+            role="list"
+            aria-labelledby="spiritual-heading"
+            className="flex gap-2.5 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-1 list-none scroll-smooth focus-visible:outline-none"
+            onKeyDown={(e) => {
+              // In RTL: ArrowLeft moves to the next (visually leftwards), ArrowRight moves to the previous.
+              if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Home' && e.key !== 'End') return;
+              const container = e.currentTarget as HTMLElement;
+              const buttons = Array.from(container.querySelectorAll<HTMLButtonElement>('button[data-rail-item]'));
+              if (!buttons.length) return;
+              const active = document.activeElement as HTMLElement | null;
+              const currentIdx = buttons.findIndex((b) => b === active);
+              let nextIdx = currentIdx;
+              if (e.key === 'Home') nextIdx = 0;
+              else if (e.key === 'End') nextIdx = buttons.length - 1;
+              else if (e.key === 'ArrowLeft') nextIdx = currentIdx < 0 ? 0 : Math.min(currentIdx + 1, buttons.length - 1);
+              else if (e.key === 'ArrowRight') nextIdx = currentIdx < 0 ? 0 : Math.max(currentIdx - 1, 0);
+              if (nextIdx !== currentIdx && buttons[nextIdx]) {
+                e.preventDefault();
+                buttons[nextIdx].focus();
+                buttons[nextIdx].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+              }
+            }}
+          >
             {spiritualLinks.map((link, i) => (
-              <button
-                key={link.path}
-                onClick={() => navigate(link.path)}
-                className="snap-start shrink-0 w-[104px] relative rounded-2xl p-3 flex flex-col items-center gap-2 border border-border/50 bg-gradient-to-br from-card to-secondary/30 hover:from-primary/5 hover:to-accent/5 transition press overflow-hidden"
-              >
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${i % 2 === 0 ? 'gradient-primary shadow-emerald' : 'gradient-gold shadow-gold'} relative overflow-hidden`}>
-                  <link.icon className="w-5 h-5 text-primary-foreground relative z-10" />
-                  <span className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
-                </div>
-                <span className="text-[11px] font-extrabold text-foreground leading-tight text-center font-kufi w-full line-clamp-2">{link.label}</span>
-                <span className="absolute top-1.5 left-1.5 w-1.5 h-1.5 rounded-full bg-primary/40" />
-              </button>
+              <li key={link.path} className="snap-start shrink-0">
+                <button
+                  data-rail-item
+                  onClick={() => navigate(link.path)}
+                  aria-label={link.label}
+                  aria-posinset={i + 1}
+                  aria-setsize={spiritualLinks.length}
+                  className="w-[104px] relative rounded-2xl p-3 flex flex-col items-center gap-2 border border-border/50 bg-gradient-to-br from-card to-secondary/40 dark:from-card dark:to-secondary/60 hover:from-primary/8 hover:to-accent/8 dark:hover:from-primary/15 dark:hover:to-accent/15 transition press overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  <div aria-hidden="true" className={`w-12 h-12 rounded-2xl flex items-center justify-center ${i % 2 === 0 ? 'gradient-primary shadow-emerald' : 'gradient-gold shadow-gold'} relative overflow-hidden`}>
+                    <link.icon className="w-5 h-5 text-primary-foreground relative z-10" />
+                    <span className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
+                  </div>
+                  <span className="text-[11px] font-extrabold text-foreground leading-tight text-center font-kufi w-full line-clamp-2">{link.label}</span>
+                  <span aria-hidden="true" className="absolute top-1.5 left-1.5 w-1.5 h-1.5 rounded-full bg-primary/50 dark:bg-primary" />
+                </button>
+              </li>
             ))}
-          </div>
-        </div>
+          </ul>
+          <p className="sr-only">استخدم مفتاحي السهم يمين ويسار للتنقل، Home للعنصر الأول، End للأخير.</p>
+        </nav>
 
         {/* Featured Surahs */}
         <div className="mb-5">
