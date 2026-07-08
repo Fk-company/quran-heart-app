@@ -1,0 +1,86 @@
+// Curated list of countries + major cities for Aladhan API `timingsByCity`.
+// method suggests the best calculation method for that region.
+
+export interface CountryEntry {
+  code: string;
+  nameAr: string;
+  nameEn: string;
+  method: number;
+  cities: string[];
+}
+
+export const COUNTRIES: CountryEntry[] = [
+  { code: 'SA', nameAr: 'المملكة العربية السعودية', nameEn: 'Saudi Arabia', method: 4, cities: ['Mecca', 'Medina', 'Riyadh', 'Jeddah', 'Dammam', 'Taif', 'Abha', 'Tabuk', 'Buraydah', 'Khobar'] },
+  { code: 'EG', nameAr: 'مصر', nameEn: 'Egypt', method: 5, cities: ['Cairo', 'Alexandria', 'Giza', 'Luxor', 'Aswan', 'Mansoura', 'Tanta', 'Ismailia', 'Suez', 'Port Said'] },
+  { code: 'AE', nameAr: 'الإمارات', nameEn: 'UAE', method: 10, cities: ['Abu Dhabi', 'Dubai', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Al Ain'] },
+  { code: 'QA', nameAr: 'قطر', nameEn: 'Qatar', method: 8, cities: ['Doha', 'Al Rayyan', 'Al Wakrah', 'Al Khor'] },
+  { code: 'KW', nameAr: 'الكويت', nameEn: 'Kuwait', method: 9, cities: ['Kuwait City', 'Hawalli', 'Salmiya', 'Jahra'] },
+  { code: 'BH', nameAr: 'البحرين', nameEn: 'Bahrain', method: 4, cities: ['Manama', 'Muharraq', 'Riffa', 'Isa Town'] },
+  { code: 'OM', nameAr: 'عُمان', nameEn: 'Oman', method: 4, cities: ['Muscat', 'Salalah', 'Sohar', 'Nizwa', 'Sur'] },
+  { code: 'YE', nameAr: 'اليمن', nameEn: 'Yemen', method: 4, cities: ['Sanaa', 'Aden', 'Taiz', 'Hodeidah', 'Mukalla'] },
+  { code: 'IQ', nameAr: 'العراق', nameEn: 'Iraq', method: 3, cities: ['Baghdad', 'Basra', 'Mosul', 'Erbil', 'Najaf', 'Karbala', 'Kirkuk'] },
+  { code: 'JO', nameAr: 'الأردن', nameEn: 'Jordan', method: 3, cities: ['Amman', 'Zarqa', 'Irbid', 'Aqaba', 'Salt'] },
+  { code: 'PS', nameAr: 'فلسطين', nameEn: 'Palestine', method: 3, cities: ['Jerusalem', 'Gaza', 'Ramallah', 'Hebron', 'Nablus', 'Bethlehem'] },
+  { code: 'SY', nameAr: 'سوريا', nameEn: 'Syria', method: 3, cities: ['Damascus', 'Aleppo', 'Homs', 'Hama', 'Latakia', 'Tartous'] },
+  { code: 'LB', nameAr: 'لبنان', nameEn: 'Lebanon', method: 3, cities: ['Beirut', 'Tripoli', 'Sidon', 'Tyre'] },
+  { code: 'MA', nameAr: 'المغرب', nameEn: 'Morocco', method: 12, cities: ['Rabat', 'Casablanca', 'Marrakech', 'Fes', 'Tangier', 'Agadir', 'Meknes', 'Oujda'] },
+  { code: 'DZ', nameAr: 'الجزائر', nameEn: 'Algeria', method: 12, cities: ['Algiers', 'Oran', 'Constantine', 'Annaba', 'Setif', 'Blida'] },
+  { code: 'TN', nameAr: 'تونس', nameEn: 'Tunisia', method: 12, cities: ['Tunis', 'Sfax', 'Sousse', 'Kairouan', 'Bizerte', 'Gabes'] },
+  { code: 'LY', nameAr: 'ليبيا', nameEn: 'Libya', method: 12, cities: ['Tripoli', 'Benghazi', 'Misrata', 'Sabha'] },
+  { code: 'SD', nameAr: 'السودان', nameEn: 'Sudan', method: 5, cities: ['Khartoum', 'Omdurman', 'Port Sudan', 'Kassala'] },
+  { code: 'TR', nameAr: 'تركيا', nameEn: 'Turkey', method: 13, cities: ['Istanbul', 'Ankara', 'Izmir', 'Bursa', 'Antalya', 'Konya', 'Gaziantep'] },
+  { code: 'PK', nameAr: 'باكستان', nameEn: 'Pakistan', method: 1, cities: ['Islamabad', 'Karachi', 'Lahore', 'Rawalpindi', 'Faisalabad', 'Peshawar', 'Multan'] },
+  { code: 'IN', nameAr: 'الهند', nameEn: 'India', method: 1, cities: ['Delhi', 'Mumbai', 'Hyderabad', 'Bangalore', 'Kolkata', 'Chennai', 'Lucknow'] },
+  { code: 'BD', nameAr: 'بنغلاديش', nameEn: 'Bangladesh', method: 1, cities: ['Dhaka', 'Chittagong', 'Khulna', 'Rajshahi', 'Sylhet'] },
+  { code: 'ID', nameAr: 'إندونيسيا', nameEn: 'Indonesia', method: 20, cities: ['Jakarta', 'Surabaya', 'Bandung', 'Medan', 'Semarang', 'Makassar'] },
+  { code: 'MY', nameAr: 'ماليزيا', nameEn: 'Malaysia', method: 17, cities: ['Kuala Lumpur', 'Johor Bahru', 'Ipoh', 'Penang', 'Kota Kinabalu'] },
+  { code: 'AF', nameAr: 'أفغانستان', nameEn: 'Afghanistan', method: 1, cities: ['Kabul', 'Kandahar', 'Herat', 'Mazar-i-Sharif'] },
+  { code: 'IR', nameAr: 'إيران', nameEn: 'Iran', method: 7, cities: ['Tehran', 'Mashhad', 'Isfahan', 'Shiraz', 'Qom'] },
+  { code: 'US', nameAr: 'الولايات المتحدة', nameEn: 'United States', method: 2, cities: ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Dallas', 'Detroit', 'Washington'] },
+  { code: 'GB', nameAr: 'المملكة المتحدة', nameEn: 'United Kingdom', method: 15, cities: ['London', 'Birmingham', 'Manchester', 'Leeds', 'Glasgow', 'Liverpool'] },
+  { code: 'FR', nameAr: 'فرنسا', nameEn: 'France', method: 12, cities: ['Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice', 'Strasbourg'] },
+  { code: 'DE', nameAr: 'ألمانيا', nameEn: 'Germany', method: 12, cities: ['Berlin', 'Hamburg', 'Munich', 'Cologne', 'Frankfurt'] },
+  { code: 'CA', nameAr: 'كندا', nameEn: 'Canada', method: 2, cities: ['Toronto', 'Montreal', 'Vancouver', 'Ottawa', 'Calgary', 'Edmonton'] },
+  { code: 'AU', nameAr: 'أستراليا', nameEn: 'Australia', method: 2, cities: ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide'] },
+  { code: 'NG', nameAr: 'نيجيريا', nameEn: 'Nigeria', method: 5, cities: ['Lagos', 'Abuja', 'Kano', 'Ibadan', 'Kaduna'] },
+  { code: 'SO', nameAr: 'الصومال', nameEn: 'Somalia', method: 5, cities: ['Mogadishu', 'Hargeisa', 'Kismayo'] },
+  { code: 'MR', nameAr: 'موريتانيا', nameEn: 'Mauritania', method: 12, cities: ['Nouakchott', 'Nouadhibou'] },
+];
+
+export const CITIES_AR: Record<string, string> = {
+  Mecca: 'مكة المكرمة', Medina: 'المدينة المنورة', Riyadh: 'الرياض', Jeddah: 'جدة', Dammam: 'الدمام', Taif: 'الطائف', Abha: 'أبها', Tabuk: 'تبوك', Buraydah: 'بريدة', Khobar: 'الخبر',
+  Cairo: 'القاهرة', Alexandria: 'الإسكندرية', Giza: 'الجيزة', Luxor: 'الأقصر', Aswan: 'أسوان', Mansoura: 'المنصورة', Tanta: 'طنطا', Ismailia: 'الإسماعيلية', Suez: 'السويس', 'Port Said': 'بورسعيد',
+  'Abu Dhabi': 'أبوظبي', Dubai: 'دبي', Sharjah: 'الشارقة', Ajman: 'عجمان', 'Ras Al Khaimah': 'رأس الخيمة', Fujairah: 'الفجيرة', 'Al Ain': 'العين',
+  Doha: 'الدوحة', 'Al Rayyan': 'الريان', 'Al Wakrah': 'الوكرة', 'Al Khor': 'الخور',
+  'Kuwait City': 'مدينة الكويت', Hawalli: 'حولي', Salmiya: 'السالمية', Jahra: 'الجهراء',
+  Manama: 'المنامة', Muharraq: 'المحرق', Riffa: 'الرفاع', 'Isa Town': 'مدينة عيسى',
+  Muscat: 'مسقط', Salalah: 'صلالة', Sohar: 'صحار', Nizwa: 'نزوى', Sur: 'صور',
+  Sanaa: 'صنعاء', Aden: 'عدن', Taiz: 'تعز', Hodeidah: 'الحديدة', Mukalla: 'المكلا',
+  Baghdad: 'بغداد', Basra: 'البصرة', Mosul: 'الموصل', Erbil: 'أربيل', Najaf: 'النجف', Karbala: 'كربلاء', Kirkuk: 'كركوك',
+  Amman: 'عمّان', Zarqa: 'الزرقاء', Irbid: 'إربد', Aqaba: 'العقبة', Salt: 'السلط',
+  Jerusalem: 'القدس', Gaza: 'غزة', Ramallah: 'رام الله', Hebron: 'الخليل', Nablus: 'نابلس', Bethlehem: 'بيت لحم',
+  Damascus: 'دمشق', Aleppo: 'حلب', Homs: 'حمص', Hama: 'حماة', Latakia: 'اللاذقية', Tartous: 'طرطوس',
+  Beirut: 'بيروت', Tripoli: 'طرابلس', Sidon: 'صيدا', Tyre: 'صور',
+  Rabat: 'الرباط', Casablanca: 'الدار البيضاء', Marrakech: 'مراكش', Fes: 'فاس', Tangier: 'طنجة', Agadir: 'أكادير', Meknes: 'مكناس', Oujda: 'وجدة',
+  Algiers: 'الجزائر', Oran: 'وهران', Constantine: 'قسنطينة', Annaba: 'عنابة', Setif: 'سطيف', Blida: 'البليدة',
+  Tunis: 'تونس', Sfax: 'صفاقس', Sousse: 'سوسة', Kairouan: 'القيروان', Bizerte: 'بنزرت', Gabes: 'قابس',
+  Benghazi: 'بنغازي', Misrata: 'مصراتة', Sabha: 'سبها',
+  Khartoum: 'الخرطوم', Omdurman: 'أم درمان', 'Port Sudan': 'بورتسودان', Kassala: 'كسلا',
+  Istanbul: 'إسطنبول', Ankara: 'أنقرة', Izmir: 'إزمير', Bursa: 'بورصة', Antalya: 'أنطاليا', Konya: 'قونية', Gaziantep: 'غازي عنتاب',
+  Islamabad: 'إسلام أباد', Karachi: 'كراتشي', Lahore: 'لاهور', Rawalpindi: 'روالبندي', Faisalabad: 'فيصل أباد', Peshawar: 'بيشاور', Multan: 'ملتان',
+  Delhi: 'دلهي', Mumbai: 'مومباي', Hyderabad: 'حيدر أباد', Bangalore: 'بنغالور', Kolkata: 'كولكاتا', Chennai: 'تشيناي', Lucknow: 'لكناو',
+  Dhaka: 'دكا', Chittagong: 'شيتاغونغ', Khulna: 'خولنا', Rajshahi: 'راجشاهي', Sylhet: 'سيلهيت',
+  Jakarta: 'جاكرتا', Surabaya: 'سورابايا', Bandung: 'باندونغ', Medan: 'ميدان', Semarang: 'سيمارانغ', Makassar: 'ماكاسار',
+  'Kuala Lumpur': 'كوالالمبور', 'Johor Bahru': 'جوهور بارو', Ipoh: 'إيبوه', Penang: 'بينانغ', 'Kota Kinabalu': 'كوتا كينابالو',
+  Kabul: 'كابول', Kandahar: 'قندهار', Herat: 'هرات', 'Mazar-i-Sharif': 'مزار شريف',
+  Tehran: 'طهران', Mashhad: 'مشهد', Isfahan: 'أصفهان', Shiraz: 'شيراز', Qom: 'قم',
+  'New York': 'نيويورك', 'Los Angeles': 'لوس أنجلوس', Chicago: 'شيكاغو', Houston: 'هيوستن', Dallas: 'دالاس', Detroit: 'ديترويت', Washington: 'واشنطن',
+  London: 'لندن', Birmingham: 'برمنغهام', Manchester: 'مانشستر', Leeds: 'ليدز', Glasgow: 'غلاسكو', Liverpool: 'ليفربول',
+  Paris: 'باريس', Marseille: 'مرسيليا', Lyon: 'ليون', Toulouse: 'تولوز', Nice: 'نيس', Strasbourg: 'ستراسبورغ',
+  Berlin: 'برلين', Hamburg: 'هامبورغ', Munich: 'ميونخ', Cologne: 'كولونيا', Frankfurt: 'فرانكفورت',
+  Toronto: 'تورنتو', Montreal: 'مونتريال', Vancouver: 'فانكوفر', Ottawa: 'أوتاوا', Calgary: 'كالغاري', Edmonton: 'إدمونتون',
+  Sydney: 'سيدني', Melbourne: 'ملبورن', Brisbane: 'بريسبان', Perth: 'بيرث', Adelaide: 'أديلايد',
+  Lagos: 'لاغوس', Abuja: 'أبوجا', Kano: 'كانو', Ibadan: 'إبادان', Kaduna: 'كادونا',
+  Mogadishu: 'مقديشو', Hargeisa: 'هرجيسا', Kismayo: 'كيسمايو',
+  Nouakchott: 'نواكشوط', Nouadhibou: 'نواذيبو',
+};

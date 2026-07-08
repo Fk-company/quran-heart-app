@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { MapPin, RefreshCw, Settings2, Clock, Sun, Sunrise, Sunset, Moon, CloudSun, Bell, BellOff } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { MapPin, RefreshCw, Settings2, Clock, Sun, Sunrise, Sunset, Moon, CloudSun, Bell, BellOff, Calendar, AlertTriangle, X, Globe } from 'lucide-react';
 import { usePrayerTimes, CALC_METHODS, PRAYER_NAMES_AR, PrayerTimings } from '@/hooks/usePrayerTimes';
 import { usePrayerReminders } from '@/hooks/usePrayerReminders';
+import { COUNTRIES, CITIES_AR } from '@/data/prayerCountries';
 import { toast } from 'sonner';
 
 const ICONS: Record<keyof PrayerTimings, React.ElementType> = {
@@ -14,6 +15,7 @@ const ICONS: Record<keyof PrayerTimings, React.ElementType> = {
 };
 
 const fmtTime = (t: string) => {
+  if (!t) return '--:--';
   const [hh, mm] = t.split(':').map(Number);
   const period = hh >= 12 ? 'م' : 'ص';
   const h12 = ((hh + 11) % 12) + 1;
@@ -27,14 +29,38 @@ const fmtUntil = (m: number) => {
   return `بعد ${h} س ${min} د`;
 };
 
+const cityLabel = (c?: string) => (c ? CITIES_AR[c] || c : '');
+
 const PrayerTimesWidget: React.FC = () => {
-  const { settings, setSettings, data, loading, error, refresh, nextPrayer } = usePrayerTimes();
+  const { settings, setSettings, data, tomorrow, loading, error, refresh, nextPrayer, changes, dismissChanges } = usePrayerTimes();
   const [openSettings, setOpenSettings] = useState(false);
   const [openReminders, setOpenReminders] = useState(false);
+  const [showTomorrow, setShowTomorrow] = useState(false);
   const reminders = usePrayerReminders(data?.timings || null);
+  const toastedRef = useRef(false);
 
   const order: (keyof PrayerTimings)[] = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
   const reminderKeys: (keyof PrayerTimings)[] = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+
+  const selectedCountry = useMemo(
+    () => COUNTRIES.find((c) => c.code === settings.countryCode) || COUNTRIES.find((c) => c.nameEn === settings.country),
+    [settings.countryCode, settings.country]
+  );
+
+  useEffect(() => {
+    if (changes.length && !toastedRef.current) {
+      toastedRef.current = true;
+      const first = changes[0];
+      const sign = first.diffMin > 0 ? '+' : '';
+      toast.warning('تغيّرت مواقيت الصلاة اليوم', {
+        description: `${first.name}: ${first.before} ← ${first.after} (${sign}${first.diffMin} د)${changes.length > 1 ? ` و${changes.length - 1} أخرى` : ''}`,
+        duration: 8000,
+      });
+    }
+    if (!changes.length) toastedRef.current = false;
+  }, [changes]);
+
+  const showDisplay = cityLabel(settings.city) || selectedCountry?.nameAr || settings.country || (data ? data.meta.timezone : '—');
 
   return (
     <div className="rounded-2xl border border-border/50 bg-gradient-to-br from-primary/10 via-accent/5 to-transparent p-4">
@@ -45,8 +71,8 @@ const PrayerTimesWidget: React.FC = () => {
             <div className="text-sm font-extrabold text-foreground">مواقيت الصلاة</div>
             <div className="text-[11px] text-muted-foreground flex items-center gap-1 truncate">
               <MapPin className="w-3 h-3" />
-              {settings.city || settings.country || (data ? data.meta.timezone : '—')}
-              {settings.country && settings.city ? ` • ${settings.country}` : ''}
+              {showDisplay}
+              {selectedCountry && settings.city ? ` • ${selectedCountry.nameAr}` : ''}
             </div>
           </div>
         </div>
@@ -54,7 +80,7 @@ const PrayerTimesWidget: React.FC = () => {
           <button
             onClick={() => refresh({ useGeo: true })}
             className="w-8 h-8 rounded-lg bg-secondary/60 flex items-center justify-center active:scale-95"
-            aria-label="تحديد الموقع"
+            aria-label="تحديد الموقع تلقائياً"
             title="تحديد الموقع تلقائياً"
           >
             <MapPin className="w-4 h-4 text-foreground" />
@@ -70,7 +96,6 @@ const PrayerTimesWidget: React.FC = () => {
             onClick={() => setOpenReminders((v) => !v)}
             className={`w-8 h-8 rounded-lg flex items-center justify-center active:scale-95 ${reminders.settings.enabled ? 'bg-primary/20 text-primary' : 'bg-secondary/60 text-foreground'}`}
             aria-label="التنبيهات"
-            title="إشعارات قبل الأذان"
           >
             {reminders.settings.enabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
           </button>
@@ -83,6 +108,29 @@ const PrayerTimesWidget: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {changes.length > 0 && (
+        <div className="mb-3 rounded-xl border border-amber-500/40 bg-amber-500/10 p-2.5 flex items-start gap-2">
+          <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <div className="text-[11px] font-extrabold text-amber-600 dark:text-amber-400">تغيّرت مواقيت اليوم</div>
+            <div className="text-[11px] text-foreground/80 space-y-0.5 mt-0.5">
+              {changes.slice(0, 3).map((c) => (
+                <div key={c.key} className="flex items-center gap-1">
+                  <span className="font-bold">{c.name}:</span>
+                  <span className="line-through opacity-60">{fmtTime(c.before)}</span>
+                  <span>←</span>
+                  <span className="font-bold">{fmtTime(c.after)}</span>
+                  <span className="text-muted-foreground">({c.diffMin > 0 ? '+' : ''}{c.diffMin} د)</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <button onClick={dismissChanges} className="p-1 -m-1 text-muted-foreground active:scale-95" aria-label="إغلاق">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
 
       {nextPrayer && (
         <div className="rounded-xl bg-primary/15 border border-primary/25 p-3 mb-3 flex items-center justify-between">
@@ -101,22 +149,30 @@ const PrayerTimesWidget: React.FC = () => {
         <div className="text-xs text-destructive text-center py-2">{error}</div>
       )}
 
-      <div className="grid grid-cols-3 gap-2">
-        {data && order.map((k) => {
-          const Icon = ICONS[k];
-          const isNext = nextPrayer?.key === k;
-          return (
-            <div
-              key={k}
-              className={`rounded-xl p-2.5 text-center border ${isNext ? 'border-primary/40 bg-primary/10' : 'border-border/40 bg-card'}`}
-            >
-              <Icon className={`w-4 h-4 mx-auto mb-1 ${isNext ? 'text-primary' : 'text-muted-foreground'}`} />
-              <div className="text-[10px] font-bold text-muted-foreground">{PRAYER_NAMES_AR[k]}</div>
-              <div className="text-xs font-extrabold text-foreground mt-0.5">{fmtTime(data.timings[k])}</div>
-            </div>
-          );
-        })}
-      </div>
+      {!data && !error && !loading && !settings.city && settings.lat == null && (
+        <div className="text-xs text-muted-foreground text-center py-3">
+          اختر دولتك ومدينتك من الإعدادات، أو استخدم الموقع التلقائي.
+        </div>
+      )}
+
+      {data && (
+        <div className="grid grid-cols-3 gap-2">
+          {order.map((k) => {
+            const Icon = ICONS[k];
+            const isNext = nextPrayer?.key === k;
+            return (
+              <div
+                key={k}
+                className={`rounded-xl p-2.5 text-center border ${isNext ? 'border-primary/40 bg-primary/10' : 'border-border/40 bg-card'}`}
+              >
+                <Icon className={`w-4 h-4 mx-auto mb-1 ${isNext ? 'text-primary' : 'text-muted-foreground'}`} />
+                <div className="text-[10px] font-bold text-muted-foreground">{PRAYER_NAMES_AR[k]}</div>
+                <div className="text-xs font-extrabold text-foreground mt-0.5">{fmtTime(data.timings[k])}</div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {data?.date?.hijri && (
         <div className="mt-3 text-[11px] text-muted-foreground text-center">
@@ -124,8 +180,85 @@ const PrayerTimesWidget: React.FC = () => {
         </div>
       )}
 
+      {tomorrow && (
+        <div className="mt-3">
+          <button
+            onClick={() => setShowTomorrow((v) => !v)}
+            className="w-full flex items-center justify-between text-[11px] font-extrabold text-foreground bg-secondary/50 hover:bg-secondary/70 rounded-lg px-3 py-2 active:scale-[0.98] transition"
+          >
+            <span className="flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-primary" />
+              مواقيت الغد
+              {tomorrow.date?.hijri && (
+                <span className="text-muted-foreground font-bold">
+                  ({tomorrow.date.hijri.date} {tomorrow.date.hijri.month?.ar})
+                </span>
+              )}
+            </span>
+            <span className="text-muted-foreground">{showTomorrow ? '−' : '+'}</span>
+          </button>
+          {showTomorrow && (
+            <div className="grid grid-cols-3 gap-2 mt-2">
+              {order.map((k) => {
+                const Icon = ICONS[k];
+                return (
+                  <div key={k} className="rounded-xl p-2 text-center border border-border/40 bg-card/60">
+                    <Icon className="w-3.5 h-3.5 mx-auto mb-1 text-muted-foreground" />
+                    <div className="text-[10px] font-bold text-muted-foreground">{PRAYER_NAMES_AR[k]}</div>
+                    <div className="text-[11px] font-extrabold text-foreground mt-0.5">{fmtTime(tomorrow.timings[k])}</div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
       {openSettings && (
         <div className="mt-3 pt-3 border-t border-border/40 space-y-3">
+          <div>
+            <label className="text-[11px] font-bold text-muted-foreground mb-1 flex items-center gap-1">
+              <Globe className="w-3 h-3" /> الدولة
+            </label>
+            <select
+              value={settings.countryCode || ''}
+              onChange={(e) => {
+                const c = COUNTRIES.find((x) => x.code === e.target.value);
+                if (!c) return;
+                setSettings({
+                  ...settings,
+                  countryCode: c.code,
+                  country: c.nameEn,
+                  city: c.cities[0],
+                  method: c.method,
+                  lat: undefined,
+                  lng: undefined,
+                });
+              }}
+              className="w-full text-xs rounded-lg border border-border/50 bg-background px-2 py-2"
+            >
+              <option value="">— اختر الدولة —</option>
+              {COUNTRIES.map((c) => (
+                <option key={c.code} value={c.code}>{c.nameAr}</option>
+              ))}
+            </select>
+          </div>
+
+          {selectedCountry && (
+            <div>
+              <label className="text-[11px] font-bold text-muted-foreground block mb-1">المدينة</label>
+              <select
+                value={settings.city || ''}
+                onChange={(e) => setSettings({ ...settings, city: e.target.value, lat: undefined, lng: undefined })}
+                className="w-full text-xs rounded-lg border border-border/50 bg-background px-2 py-2"
+              >
+                {selectedCountry.cities.map((city) => (
+                  <option key={city} value={city}>{CITIES_AR[city] || city}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div>
             <label className="text-[11px] font-bold text-muted-foreground block mb-1">طريقة الحساب</label>
             <select
@@ -138,6 +271,17 @@ const PrayerTimesWidget: React.FC = () => {
               ))}
             </select>
           </div>
+
+          <label className="flex items-center justify-between text-xs bg-secondary/40 rounded-lg px-2.5 py-2">
+            <span className="font-bold text-foreground">تنبيهي عند تغيّر المواقيت</span>
+            <input
+              type="checkbox"
+              checked={settings.changeAlerts !== false}
+              onChange={(e) => setSettings({ ...settings, changeAlerts: e.target.checked })}
+              className="w-4 h-4 accent-primary"
+            />
+          </label>
+
           <div>
             <div className="text-[11px] font-bold text-muted-foreground mb-1">تعديل دقائق (± لكل صلاة)</div>
             <div className="grid grid-cols-3 gap-1.5">
