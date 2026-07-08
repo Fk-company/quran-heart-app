@@ -783,14 +783,19 @@ const HomePage: React.FC = () => {
                   aria-label={link.label}
                   aria-posinset={i + 1}
                   aria-setsize={spiritualLinks.length}
-                  className="w-[104px] relative rounded-2xl p-3 flex flex-col items-center gap-2 border border-border/50 bg-gradient-to-br from-card to-secondary/40 dark:from-card dark:to-secondary/60 hover:from-primary/8 hover:to-accent/8 dark:hover:from-primary/15 dark:hover:to-accent/15 transition press overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="shortcut-tile w-[108px] press focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
-                  <div aria-hidden="true" className={`w-12 h-12 rounded-2xl flex items-center justify-center ${i % 2 === 0 ? 'gradient-primary shadow-emerald' : 'gradient-gold shadow-gold'} relative overflow-hidden`}>
-                    <link.icon className="w-5 h-5 text-primary-foreground relative z-10" />
-                    <span className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
-                  </div>
+                  <span aria-hidden="true" className="shortcut-medallion">
+                    <span className={`sm-bg ${i % 2 === 0 ? 'gradient-primary' : 'gradient-gold'}`} />
+                    <span className="sm-shine" />
+                    <span className="sm-ring" />
+                    <link.icon className="sm-icon w-5 h-5 text-primary-foreground" />
+                    <span className="sm-corner" style={{ top: 2, left: '50%', transform: 'translateX(-50%)' }} />
+                    <span className="sm-corner" style={{ bottom: 2, left: '50%', transform: 'translateX(-50%)' }} />
+                    <span className="sm-corner" style={{ top: '50%', left: 2, transform: 'translateY(-50%)' }} />
+                    <span className="sm-corner" style={{ top: '50%', right: 2, transform: 'translateY(-50%)' }} />
+                  </span>
                   <span className="text-[11px] font-extrabold text-foreground leading-tight text-center font-kufi w-full line-clamp-2">{link.label}</span>
-                  <span aria-hidden="true" className="absolute top-1.5 left-1.5 w-1.5 h-1.5 rounded-full bg-primary/50 dark:bg-primary" />
                 </button>
               </li>
             ))}
