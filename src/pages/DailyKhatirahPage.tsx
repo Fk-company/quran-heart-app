@@ -92,6 +92,7 @@ const DailyKhatirahPage: React.FC = () => {
           );
         })}
       </div>
+      </div>
     </div>
   );
 };

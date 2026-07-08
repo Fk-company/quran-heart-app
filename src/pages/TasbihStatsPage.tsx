@@ -39,8 +39,8 @@ const TasbihStatsPage: React.FC = () => {
   return (
     <>
       <SEO title="إحصاء التسبيح اليومي — قلب القرآن" description="تتبع ذكرك وتسبيحك اليومي بالأرقام." />
-      <div className="page-container page-with-topbar pb-32" dir="rtl">
-      <div className="px-4 pt-4 max-w-lg mx-auto">
+      <div className="page-container page-with-topbar" dir="rtl">
+      <div className="page-inner">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
           <button
