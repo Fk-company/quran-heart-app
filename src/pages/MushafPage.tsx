@@ -11,6 +11,7 @@ import { useBookmarks } from '@/hooks/useBookmarks';
 import { useSettings } from '@/hooks/useSettings';
 import { useTheme } from '@/contexts/ThemeContext';
 import ReadingProgress from '@/components/ReadingProgress';
+import { MushafOrnateBorder, SurahCartouche } from '@/components/MushafOrnaments';
 
 interface PageAyah {
   number: number;
@@ -783,18 +784,18 @@ const MushafPage: React.FC = () => {
 
         {/* Page Content */}
         {loading && ayahs.length === 0 ? (
-          <div className="mushaf-page-frame">
-            <span className="mushaf-corner tl" /><span className="mushaf-corner tr" />
-            <span className="mushaf-corner bl" /><span className="mushaf-corner br" />
-            <div className="space-y-3 p-6">
+          <MushafOrnateBorder nightMode={nightMode}>
+            <div className="mushaf-page-head">
+              <span className="h-side">—</span>
+              <span className="h-center">جاري التحميل</span>
+              <span className="h-side">—</span>
+            </div>
+            <div className="space-y-3 p-4">
               {Array.from({ length: 8 }).map((_, i) => <div key={i} className="skeleton-pulse h-6 w-full" />)}
             </div>
-          </div>
+          </MushafOrnateBorder>
         ) : (
-          <div className={`mushaf-page-frame ${nightMode ? 'mushaf-night-frame' : ''} animate-fade-in`} key={currentPage}>
-            <span className="mushaf-corner tl" /><span className="mushaf-corner tr" />
-            <span className="mushaf-corner bl" /><span className="mushaf-corner br" />
-
+          <MushafOrnateBorder nightMode={nightMode}>
             <div className="mushaf-page-head">
               <span className="h-side">{ayahs[0]?.surah.name || ''}</span>
               <span className="h-center">الجزء {juzNumber}</span>
@@ -803,10 +804,11 @@ const MushafPage: React.FC = () => {
 
             <div className="px-4 sm:px-6 pb-2">
               {ayahs.length > 0 && ayahs[0].numberInSurah === 1 && (
-                <div className="mushaf-surah-banner">
-                  <span className="name">سورة {ayahs[0].surah.name}</span>
-                  <span className="meta">{ayahs[0].surah.englishName} · رقم {ayahs[0].surah.number}</span>
-                </div>
+                <SurahCartouche
+                  name={ayahs[0].surah.name.replace(/^سورة\s*/, '')}
+                  number={ayahs[0].surah.number}
+                  english={ayahs[0].surah.englishName}
+                />
               )}
               {ayahs.length > 0 && ayahs[0].numberInSurah === 1 && ayahs[0].surah.number !== 1 && ayahs[0].surah.number !== 9 && (
                 <div className="mushaf-bismillah">بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</div>
@@ -824,10 +826,11 @@ const MushafPage: React.FC = () => {
                       <React.Fragment key={ayah.number}>
                         {showSurahHeader && (
                           <div className="my-3">
-                            <div className="mushaf-surah-banner">
-                              <span className="name">سورة {ayah.surah.name}</span>
-                              <span className="meta">{ayah.surah.englishName} · رقم {ayah.surah.number}</span>
-                            </div>
+                            <SurahCartouche
+                              name={ayah.surah.name.replace(/^سورة\s*/, '')}
+                              number={ayah.surah.number}
+                              english={ayah.surah.englishName}
+                            />
                             {ayah.surah.number !== 9 && (
                               <div className="mushaf-bismillah">بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</div>
                             )}
@@ -943,7 +946,7 @@ const MushafPage: React.FC = () => {
             <div className="mushaf-page-foot">
               <span className="mushaf-page-number">{currentPage}</span>
             </div>
-          </div>
+          </MushafOrnateBorder>
         )}
 
         {/* Navigation — RTL-correct: prev on right, next (primary) on left, plus quick page dots */}
