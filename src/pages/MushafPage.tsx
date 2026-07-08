@@ -11,6 +11,7 @@ import { useBookmarks } from '@/hooks/useBookmarks';
 import { useSettings } from '@/hooks/useSettings';
 import { useTheme } from '@/contexts/ThemeContext';
 import ReadingProgress from '@/components/ReadingProgress';
+import { MushafOrnateBorder, SurahCartouche } from '@/components/MushafOrnaments';
 
 interface PageAyah {
   number: number;
