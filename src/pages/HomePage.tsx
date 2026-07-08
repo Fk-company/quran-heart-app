@@ -347,7 +347,7 @@ const HomePage: React.FC = () => {
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-2xl bg-card/90 border border-border/60 flex items-center justify-center shadow-emerald relative overflow-hidden">
-              <img src={appLogo} alt="قلب القرآن" width={44} height={44} className="w-full h-full object-contain" />
+              <img src={appLogo} alt="قلب القرآن" width={44} height={44} className="w-full h-full object-contain dark:invert-[0.88] dark:brightness-110 transition-all duration-300" />
             </div>
             <div>
               <h1 className="text-xl font-bold font-kufi text-gradient-primary leading-tight">قلب القرآن</h1>
