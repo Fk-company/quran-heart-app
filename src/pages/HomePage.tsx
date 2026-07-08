@@ -310,10 +310,10 @@ const HomePage: React.FC = () => {
   };
 
   const primaryActions = [
-    { label: 'المصحف', icon: Book, path: '/quran', gradient: 'gradient-primary' },
-    { label: 'القراء', icon: Mic, path: '/reciters', gradient: 'gradient-gold' },
-    { label: 'الأذكار', icon: Heart, path: '/adhkar', gradient: 'gradient-primary' },
-    { label: 'الراديو', icon: Radio, path: '/radio', gradient: 'gradient-gold' },
+    { label: 'المصحف', desc: 'قراءة وتلاوة', icon: Book, path: '/quran', gradient: 'gradient-primary' },
+    { label: 'القراء', desc: 'استمع', icon: Mic, path: '/reciters', gradient: 'gradient-gold' },
+    { label: 'الأذكار', desc: 'صباح ومساء', icon: Heart, path: '/adhkar', gradient: 'gradient-primary' },
+    { label: 'الراديو', desc: 'بث مباشر', icon: Radio, path: '/radio', gradient: 'gradient-gold' },
   ];
 
   const spiritualLinks = [
@@ -574,23 +574,69 @@ const HomePage: React.FC = () => {
           </div>
         )}
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-2 mb-5">
-          <button onClick={() => navigate('/reading-stats')} className="stat-card text-right">
-            <div className="stat-card-icon bg-primary/10"><Flame className="w-4 h-4 text-primary" /></div>
-            <div className="stat-card-value">{streak}</div>
-            <div className="stat-card-label">يوم متتالي</div>
-          </button>
-          <button onClick={() => navigate('/quran-stats')} className="stat-card text-right">
-            <div className="stat-card-icon bg-gold-light"><Trophy className="w-4 h-4 text-gold-deep" /></div>
-            <div className="stat-card-value">{totalAyahsRead}</div>
-            <div className="stat-card-label">آية مقروءة</div>
-          </button>
-          <button onClick={() => navigate('/favorites')} className="stat-card text-right">
-            <div className="stat-card-icon bg-destructive/10"><Heart className="w-4 h-4 text-destructive" /></div>
-            <div className="stat-card-value">{favCount}</div>
-            <div className="stat-card-label">المفضلة</div>
-          </button>
+        {/* Premium Stats Bar — unified card with divided cells */}
+        <div className="relative mb-5 rounded-3xl overflow-hidden border border-border/50 shadow-sm">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-accent/5 to-transparent" />
+          <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-primary/8 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-12 -right-8 w-40 h-40 rounded-full bg-accent/8 blur-3xl pointer-events-none" />
+          <div className="relative grid grid-cols-3 divide-x divide-x-reverse divide-border/40">
+            {/* Streak with mini progress ring */}
+            <button onClick={() => navigate('/reading-stats')} className="p-3.5 text-right active:scale-[0.97] transition group">
+              <div className="flex items-center gap-2.5">
+                <div className="relative w-11 h-11 shrink-0">
+                  <svg className="w-11 h-11 -rotate-90" viewBox="0 0 44 44" aria-hidden>
+                    <circle cx="22" cy="22" r="18" fill="none" stroke="hsl(var(--primary) / 0.12)" strokeWidth="3.5" />
+                    <circle
+                      cx="22" cy="22" r="18" fill="none"
+                      stroke="hsl(var(--primary))" strokeWidth="3.5" strokeLinecap="round"
+                      strokeDasharray={2 * Math.PI * 18}
+                      strokeDashoffset={2 * Math.PI * 18 * (1 - Math.min(streak / 30, 1))}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Flame className="w-4 h-4 text-primary" />
+                  </div>
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xl font-extrabold text-foreground font-kufi tabular-nums leading-none">{streak}</div>
+                  <div className="text-[10px] text-muted-foreground font-bold mt-1 leading-none">يوم متتالٍ</div>
+                  <div className="text-[9px] text-primary/70 font-bold mt-1">من 30</div>
+                </div>
+              </div>
+            </button>
+
+            {/* Ayahs read */}
+            <button onClick={() => navigate('/quran-stats')} className="p-3.5 text-right active:scale-[0.97] transition">
+              <div className="flex items-center gap-2.5">
+                <div className="w-11 h-11 rounded-2xl gradient-gold flex items-center justify-center shadow-gold shrink-0">
+                  <Trophy className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xl font-extrabold text-foreground font-kufi tabular-nums leading-none truncate">
+                    {totalAyahsRead > 999 ? `${(totalAyahsRead / 1000).toFixed(1)}K` : totalAyahsRead}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground font-bold mt-1 leading-none">آية مقروءة</div>
+                  <div className="text-[9px] text-accent font-bold mt-1 flex items-center gap-0.5">
+                    <TrendingUp className="w-2.5 h-2.5" /> نموّ
+                  </div>
+                </div>
+              </div>
+            </button>
+
+            {/* Favorites */}
+            <button onClick={() => navigate('/favorites')} className="p-3.5 text-right active:scale-[0.97] transition">
+              <div className="flex items-center gap-2.5">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-destructive/15 to-destructive/5 border border-destructive/20 flex items-center justify-center shrink-0">
+                  <Heart className="w-5 h-5 text-destructive fill-destructive/30" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xl font-extrabold text-foreground font-kufi tabular-nums leading-none">{favCount}</div>
+                  <div className="text-[10px] text-muted-foreground font-bold mt-1 leading-none">مفضّلة</div>
+                  <div className="text-[9px] text-destructive/70 font-bold mt-1">محفوظات</div>
+                </div>
+              </div>
+            </button>
+          </div>
         </div>
 
         {/* Continue reading */}
@@ -614,17 +660,48 @@ const HomePage: React.FC = () => {
         {/* Wisdom Carousel — auto-rotating cards (dhikr / ayah / hadith / names / dua) */}
         <WisdomCarousel />
 
-        {/* Primary Actions — Big icons */}
-        <div className="grid grid-cols-4 gap-2 mb-5 stagger-children">
-          {primaryActions.map((link) => (
-            <button key={link.path} onClick={() => navigate(link.path)} className="quick-link-btn press">
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${link.gradient} shadow-emerald relative overflow-hidden`}>
-                <link.icon className="w-6 h-6 text-primary-foreground relative z-10" />
-                <span className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
-              </div>
-              <span className="text-xs font-bold text-foreground leading-tight text-center">{link.label}</span>
-            </button>
-          ))}
+        {/* Primary Actions — Bento (1 hero + 3 compact) */}
+        <div className="mb-5">
+          <div className="grid grid-cols-3 gap-2.5 stagger-children">
+            {/* Hero tile — full-width */}
+            {(() => {
+              const hero = primaryActions[0];
+              return (
+                <button
+                  onClick={() => navigate(hero.path)}
+                  className="col-span-3 relative overflow-hidden rounded-3xl p-4 flex items-center gap-3 text-right border border-primary/20 press"
+                  style={{ background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12) 0%, hsl(var(--accent) / 0.10) 50%, transparent 100%)' }}
+                >
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${hero.gradient} shadow-emerald relative overflow-hidden shrink-0`}>
+                    <hero.icon className="w-7 h-7 text-primary-foreground relative z-10" />
+                    <span className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[10px] font-bold text-primary uppercase tracking-widest">ابدأ الآن</div>
+                    <div className="text-base font-extrabold text-foreground font-kufi">{hero.label}</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">{hero.desc}</div>
+                  </div>
+                  <ChevronLeft className="w-5 h-5 text-primary/60 shrink-0" />
+                  <span className="absolute -top-6 -left-6 w-24 h-24 rounded-full bg-primary/10 blur-2xl pointer-events-none" />
+                </button>
+              );
+            })()}
+            {/* Compact tiles */}
+            {primaryActions.slice(1).map((link) => (
+              <button
+                key={link.path}
+                onClick={() => navigate(link.path)}
+                className="relative rounded-2xl p-3 flex flex-col items-center gap-1.5 border border-border/50 bg-card hover:bg-secondary/40 press overflow-hidden"
+              >
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${link.gradient} shadow-emerald relative overflow-hidden`}>
+                  <link.icon className="w-5 h-5 text-primary-foreground relative z-10" />
+                  <span className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
+                </div>
+                <span className="text-xs font-extrabold text-foreground leading-tight text-center font-kufi">{link.label}</span>
+                <span className="text-[9px] text-muted-foreground leading-none">{link.desc}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Daily Verse — Premium */}
@@ -645,16 +722,25 @@ const HomePage: React.FC = () => {
           <p className="text-xs text-muted-foreground text-center font-medium">سورة {dailyVerse.surah} — آية {dailyVerse.ayah}</p>
         </button>
 
-        {/* Spiritual shortcuts */}
+        {/* Spiritual shortcuts — horizontal snap rail */}
         <div className="mb-5">
-          <h2 className="section-title">الروح والقلب</h2>
-          <div className="grid grid-cols-4 gap-2 stagger-children">
-            {spiritualLinks.map((link) => (
-              <button key={link.path} onClick={() => navigate(link.path)} className="quick-link-btn press">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-border/50 flex items-center justify-center hover:from-primary/15 hover:to-accent/15 transition-colors">
-                  <link.icon className="w-5 h-5 text-primary" />
+          <div className="section-title-row">
+            <h2 className="section-title mb-0">الروح والقلب</h2>
+            <span className="text-[10px] text-muted-foreground font-bold">{spiritualLinks.length} أداة</span>
+          </div>
+          <div className="flex gap-2.5 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-1">
+            {spiritualLinks.map((link, i) => (
+              <button
+                key={link.path}
+                onClick={() => navigate(link.path)}
+                className="snap-start shrink-0 w-[104px] relative rounded-2xl p-3 flex flex-col items-center gap-2 border border-border/50 bg-gradient-to-br from-card to-secondary/30 hover:from-primary/5 hover:to-accent/5 transition press overflow-hidden"
+              >
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${i % 2 === 0 ? 'gradient-primary shadow-emerald' : 'gradient-gold shadow-gold'} relative overflow-hidden`}>
+                  <link.icon className="w-5 h-5 text-primary-foreground relative z-10" />
+                  <span className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
                 </div>
-                <span className="text-[10px] font-semibold text-foreground leading-tight text-center">{link.label}</span>
+                <span className="text-[11px] font-extrabold text-foreground leading-tight text-center font-kufi w-full line-clamp-2">{link.label}</span>
+                <span className="absolute top-1.5 left-1.5 w-1.5 h-1.5 rounded-full bg-primary/40" />
               </button>
             ))}
           </div>
