@@ -217,30 +217,57 @@
   .font-amiri { font-family: 'Amiri', serif; }
   .font-kufi { font-family: 'Reem Kufi', sans-serif; }
 
-  /* ===== Verse number — minimal, refined circular chip ===== */
+  /* ===== Verse number — refined dual-ring medallion ===== */
   .verse-number {
-    @apply inline-flex items-center justify-center w-8 h-8 rounded-full text-[11px] font-bold relative select-none tabular-nums;
-    color: hsl(var(--primary));
-    font-family: 'IBM Plex Sans Arabic', sans-serif;
-    background: hsl(var(--primary) / 0.06);
-    border: 1px solid hsl(var(--primary) / 0.18);
-    box-shadow:
-      inset 0 1px 0 hsl(0 0% 100% / 0.6),
-      0 1px 2px hsl(var(--primary) / 0.08);
+    @apply inline-flex items-center justify-center relative select-none tabular-nums;
+    width: 34px; height: 34px;
+    font-family: 'Reem Kufi', 'IBM Plex Sans Arabic', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: hsl(var(--gold-deep));
     letter-spacing: 0;
-    transition: background .2s ease, border-color .2s ease, transform .2s ease;
+    background:
+      radial-gradient(circle at 30% 25%, hsl(0 0% 100% / 0.85), hsl(var(--gold-light) / 0.55) 60%, hsl(var(--gold) / 0.15) 100%);
+    border: 1px solid hsl(var(--gold) / 0.45);
+    border-radius: 50%;
+    box-shadow:
+      inset 0 0 0 3px hsl(var(--card)),
+      inset 0 0 0 4px hsl(var(--gold) / 0.35),
+      0 1px 2px hsl(var(--gold-deep) / 0.15),
+      0 2px 6px -2px hsl(var(--gold-deep) / 0.18);
+    transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+  }
+  .verse-number::after {
+    content: '';
+    position: absolute; inset: 2px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, hsl(0 0% 100% / 0.5) 0%, transparent 45%);
+    pointer-events: none;
   }
   .verse-number:hover {
-    background: hsl(var(--primary) / 0.1);
-    border-color: hsl(var(--primary) / 0.28);
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 0 0 3px hsl(var(--card)),
+      inset 0 0 0 4px hsl(var(--gold) / 0.55),
+      0 2px 4px hsl(var(--gold-deep) / 0.2),
+      0 6px 14px -4px hsl(var(--gold-deep) / 0.28);
   }
   .dark .verse-number {
-    color: hsl(var(--primary-foreground));
-    background: hsl(var(--primary) / 0.18);
-    border-color: hsl(var(--primary) / 0.35);
+    color: hsl(var(--gold-light));
+    background:
+      radial-gradient(circle at 30% 25%, hsl(var(--gold) / 0.35), hsl(var(--gold-deep) / 0.5) 60%, hsl(220 30% 10%) 100%);
+    border-color: hsl(var(--gold) / 0.55);
     box-shadow:
-      inset 0 1px 0 hsl(0 0% 100% / 0.08),
-      0 1px 2px hsl(0 0% 0% / 0.3);
+      inset 0 0 0 3px hsl(var(--card)),
+      inset 0 0 0 4px hsl(var(--gold) / 0.45),
+      0 1px 2px hsl(0 0% 0% / 0.4),
+      0 3px 8px -2px hsl(0 0% 0% / 0.5);
+  }
+
+  /* Larger variant for mushaf pages */
+  .verse-number-lg {
+    width: 42px; height: 42px;
+    font-size: 14px;
   }
 
   /* ===== Luxurious Ayah Card (inline tafsir mode) ===== */
@@ -482,27 +509,67 @@
     background: var(--grad-gold);
   }
 
-  /* ===== Stat Cards ===== */
+  /* ===== Stat Cards — professional, layered ===== */
   .stat-card {
-    @apply rounded-2xl p-3.5 border transition-all duration-300;
-    background: var(--grad-card);
+    @apply relative rounded-2xl p-4 border transition-all duration-300 overflow-hidden;
+    background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--gold-light) / 0.08) 100%);
     border-color: hsl(var(--border));
     box-shadow: var(--shadow-sm);
   }
-  .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    border-color: hsl(var(--primary) / 0.2);
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, hsl(var(--gold) / 0.55), hsl(var(--primary) / 0.55), transparent);
+    opacity: 0.7;
+    transition: opacity .3s ease;
   }
+  .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: hsl(var(--primary) / 0.28);
+  }
+  .stat-card:hover::before { opacity: 1; }
   .stat-card-icon {
     @apply w-9 h-9 rounded-xl flex items-center justify-center mb-2;
   }
   .stat-card-value {
-    @apply text-xl font-bold text-foreground;
+    @apply text-2xl font-bold text-foreground tabular-nums leading-none tracking-tight;
     font-family: 'Reem Kufi', sans-serif;
+    background: linear-gradient(180deg, hsl(var(--foreground)) 0%, hsl(var(--gold-deep) / 0.85) 130%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .dark .stat-card-value {
+    background: linear-gradient(180deg, hsl(var(--foreground)) 0%, hsl(var(--gold) / 0.9) 130%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
   .stat-card-label {
-    @apply text-[11px] text-muted-foreground font-medium mt-0.5;
+    @apply text-[11px] text-muted-foreground font-medium mt-1.5 tracking-wide;
+  }
+
+  /* Standalone numeric emphasis (for inline stats) */
+  .num-display {
+    @apply inline-flex items-baseline gap-1 tabular-nums font-bold tracking-tight;
+    font-family: 'Reem Kufi', sans-serif;
+    background: linear-gradient(180deg, hsl(var(--foreground)) 0%, hsl(var(--gold-deep) / 0.9) 140%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .dark .num-display {
+    background: linear-gradient(180deg, hsl(var(--foreground)) 0%, hsl(var(--gold) / 0.95) 140%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .num-display-suffix {
+    @apply text-[11px] font-semibold text-muted-foreground -ms-0.5;
+    -webkit-text-fill-color: initial;
   }
 
   .stat-badge {
