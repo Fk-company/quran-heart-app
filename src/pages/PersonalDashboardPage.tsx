@@ -54,11 +54,12 @@ const PersonalDashboardPage: React.FC = () => {
   const RecIcon = recommendation.icon;
 
   return (
-    <div className="page-content pb-24" dir="rtl">
+    <div className="page-container page-with-topbar" dir="rtl">
       <SEO
         title="لوحتي الشخصية | قلب القرآن"
         description="تابع تقدمك في القراءة والذكر والاستماع، واحصل على اقتراحات إيمانية ذكية حسب وقتك."
       />
+      <div className="max-w-lg mx-auto w-full px-4 pt-6">
       <PageHeader
         icon={TrendingUp}
         title="لوحتي الشخصية"
@@ -243,6 +244,7 @@ const PersonalDashboardPage: React.FC = () => {
             </button>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );
