@@ -946,23 +946,38 @@ const MushafPage: React.FC = () => {
           </div>
         )}
 
-        {/* Navigation — clear prev/next with progress dots */}
+        {/* Navigation — RTL-correct: prev on right, next (primary) on left, plus quick page dots */}
         <div className="mt-5 mb-4 space-y-3">
           <div className="flex items-center gap-2">
-            <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage >= TOTAL_PAGES}
-              className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-2xl text-sm font-bold shadow-sm transition-all active:scale-95 disabled:opacity-40 ${
+            <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage <= 1}
+              className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-2xl text-sm font-bold shadow-sm transition-all active:scale-95 disabled:opacity-40 press ${
                 nightMode ? 'bg-amber-500/15 text-amber-200 border border-amber-700/30' : 'bg-secondary text-foreground border border-border'
               }`}>
               <ChevronRight className="w-5 h-5" />
-              الصفحة التالية
-            </button>
-            <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage <= 1}
-              className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-2xl text-sm font-bold shadow-md transition-all active:scale-95 disabled:opacity-40 ${
-                nightMode ? 'bg-amber-500/25 text-amber-100 border border-amber-500/40' : 'gradient-primary text-primary-foreground'
-              }`}>
               الصفحة السابقة
+            </button>
+            <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage >= TOTAL_PAGES}
+              className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-2xl text-sm font-bold shadow-md transition-all active:scale-95 disabled:opacity-40 press ${
+                nightMode ? 'bg-amber-500/25 text-amber-100 border border-amber-500/40' : 'gradient-primary text-primary-foreground shadow-emerald'
+              }`}>
+              الصفحة التالية
               <ChevronLeft className="w-5 h-5" />
             </button>
+          </div>
+
+          {/* Progress bar showing overall position in mushaf */}
+          <div className="space-y-1.5">
+            <div className={`h-1.5 rounded-full overflow-hidden ${nightMode ? 'bg-amber-900/25' : 'bg-secondary'}`}>
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${nightMode ? 'bg-amber-400' : 'bg-primary'}`}
+                style={{ width: `${(currentPage / TOTAL_PAGES) * 100}%` }}
+              />
+            </div>
+            <div className={`flex items-center justify-between text-[10px] font-semibold ${nightMode ? 'text-amber-400/70' : 'text-muted-foreground'}`}>
+              <span>ص 1</span>
+              <span className="tabular-nums">{Math.round((currentPage / TOTAL_PAGES) * 100)}%</span>
+              <span>ص {TOTAL_PAGES}</span>
+            </div>
           </div>
 
           <div className="flex items-center justify-center gap-1.5">
@@ -981,7 +996,7 @@ const MushafPage: React.FC = () => {
         </div>
 
         <p className={`text-center text-[10px] mb-4 ${nightMode ? 'text-amber-400/50' : 'text-muted-foreground'}`}>
-          اسحب يميناً أو يساراً للتنقل بين الصفحات
+          اسحب أفقياً للتنقل — أو استخدم مفاتيح ← / → على الحاسوب
         </p>
       </div>
 
