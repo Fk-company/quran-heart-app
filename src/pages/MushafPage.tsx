@@ -534,14 +534,96 @@ const MushafPage: React.FC = () => {
           </>
         )}
 
+        {/* Jump Sheet — page slider + juz grid + direct input */}
         {showJumpSheet && (
-          <div className="card-surface mb-4 flex items-center gap-2 animate-fade-in">
-            <input type="number" value={pageInput} onChange={e => setPageInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleJump()} placeholder={`1 - ${TOTAL_PAGES}`}
-              min={1} max={TOTAL_PAGES} className="search-input flex-1 text-center" />
-            <button onClick={handleJump} className="px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium">انتقال</button>
-          </div>
+          <>
+            <div className="sheet-overlay" onClick={() => setShowJumpSheet(false)} />
+            <div className="sheet-content" dir="rtl">
+              <div className="sheet-handle" />
+              <div className="px-5 pb-6 pt-2 max-h-[75vh] overflow-y-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-base font-bold text-foreground">تنقّل سريع</h3>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">اسحب الشريط أو اختر الجزء أو أدخل رقم الصفحة</p>
+                  </div>
+                  <button onClick={() => setShowJumpSheet(false)} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+                    <X className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                </div>
+
+                {/* Slider */}
+                <div className="card-surface mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-semibold text-muted-foreground">الصفحة</span>
+                    <span className="text-lg font-bold text-primary tabular-nums">{sliderPage} <span className="text-[10px] text-muted-foreground font-normal">/ {TOTAL_PAGES}</span></span>
+                  </div>
+                  <input
+                    type="range"
+                    min={1}
+                    max={TOTAL_PAGES}
+                    value={sliderPage}
+                    onChange={(e) => setSliderPage(Number(e.target.value))}
+                    className="w-full accent-primary"
+                    dir="ltr"
+                  />
+                  <div className="flex items-center justify-between text-[10px] text-muted-foreground mt-1 font-medium">
+                    <span>1</span>
+                    <span>151</span>
+                    <span>302</span>
+                    <span>453</span>
+                    <span>604</span>
+                  </div>
+                  <button
+                    onClick={() => { goToPage(sliderPage); }}
+                    className="w-full mt-3 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-emerald"
+                  >
+                    الانتقال إلى صفحة {sliderPage}
+                  </button>
+                </div>
+
+                {/* Direct input */}
+                <div className="card-surface mb-4">
+                  <label className="text-[11px] font-semibold text-muted-foreground mb-2 block">رقم الصفحة مباشرة</label>
+                  <div className="flex items-center gap-2">
+                    <input type="number" value={pageInput} onChange={e => setPageInput(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleJump()} placeholder={`1 - ${TOTAL_PAGES}`}
+                      min={1} max={TOTAL_PAGES} className="search-input flex-1 text-center" autoFocus />
+                    <button onClick={handleJump} className="px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold">انتقال</button>
+                  </div>
+                </div>
+
+                {/* Juz grid */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-[11px] font-semibold text-muted-foreground">الأجزاء ({TOTAL_JUZ})</label>
+                    <span className="text-[10px] text-primary bg-primary/10 rounded-full px-2 py-0.5 font-semibold">الحالي: الجزء {juzNumber}</span>
+                  </div>
+                  <div className="grid grid-cols-5 gap-1.5">
+                    {JUZ_START_PAGES.map((startPage, i) => {
+                      const juzN = i + 1;
+                      const isCurrent = juzN === juzNumber;
+                      return (
+                        <button
+                          key={juzN}
+                          onClick={() => { goToPage(startPage); setShowJumpSheet(false); }}
+                          className={`aspect-[4/3] rounded-xl text-xs font-bold transition-all press flex flex-col items-center justify-center gap-0.5 ${
+                            isCurrent
+                              ? 'bg-primary text-primary-foreground shadow-emerald scale-105'
+                              : 'bg-secondary text-foreground hover:bg-muted border border-border/40'
+                          }`}
+                        >
+                          <span className="text-sm">{juzN}</span>
+                          <span className="text-[9px] opacity-70 font-medium">ص {startPage}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
         )}
+
 
         {/* Player controls */}
         <div className="card-surface mb-3 flex items-center gap-2">
