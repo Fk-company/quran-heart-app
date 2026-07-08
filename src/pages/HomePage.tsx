@@ -310,10 +310,10 @@ const HomePage: React.FC = () => {
   };
 
   const primaryActions = [
-    { label: 'المصحف', icon: Book, path: '/quran', gradient: 'gradient-primary' },
-    { label: 'القراء', icon: Mic, path: '/reciters', gradient: 'gradient-gold' },
-    { label: 'الأذكار', icon: Heart, path: '/adhkar', gradient: 'gradient-primary' },
-    { label: 'الراديو', icon: Radio, path: '/radio', gradient: 'gradient-gold' },
+    { label: 'المصحف', desc: 'قراءة وتلاوة', icon: Book, path: '/quran', gradient: 'gradient-primary' },
+    { label: 'القراء', desc: 'استمع', icon: Mic, path: '/reciters', gradient: 'gradient-gold' },
+    { label: 'الأذكار', desc: 'صباح ومساء', icon: Heart, path: '/adhkar', gradient: 'gradient-primary' },
+    { label: 'الراديو', desc: 'بث مباشر', icon: Radio, path: '/radio', gradient: 'gradient-gold' },
   ];
 
   const spiritualLinks = [
