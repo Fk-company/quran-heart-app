@@ -509,27 +509,67 @@
     background: var(--grad-gold);
   }
 
-  /* ===== Stat Cards ===== */
+  /* ===== Stat Cards — professional, layered ===== */
   .stat-card {
-    @apply rounded-2xl p-3.5 border transition-all duration-300;
-    background: var(--grad-card);
+    @apply relative rounded-2xl p-4 border transition-all duration-300 overflow-hidden;
+    background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--gold-light) / 0.08) 100%);
     border-color: hsl(var(--border));
     box-shadow: var(--shadow-sm);
   }
-  .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    border-color: hsl(var(--primary) / 0.2);
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, hsl(var(--gold) / 0.55), hsl(var(--primary) / 0.55), transparent);
+    opacity: 0.7;
+    transition: opacity .3s ease;
   }
+  .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: hsl(var(--primary) / 0.28);
+  }
+  .stat-card:hover::before { opacity: 1; }
   .stat-card-icon {
     @apply w-9 h-9 rounded-xl flex items-center justify-center mb-2;
   }
   .stat-card-value {
-    @apply text-xl font-bold text-foreground;
+    @apply text-2xl font-bold text-foreground tabular-nums leading-none tracking-tight;
     font-family: 'Reem Kufi', sans-serif;
+    background: linear-gradient(180deg, hsl(var(--foreground)) 0%, hsl(var(--gold-deep) / 0.85) 130%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .dark .stat-card-value {
+    background: linear-gradient(180deg, hsl(var(--foreground)) 0%, hsl(var(--gold) / 0.9) 130%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
   .stat-card-label {
-    @apply text-[11px] text-muted-foreground font-medium mt-0.5;
+    @apply text-[11px] text-muted-foreground font-medium mt-1.5 tracking-wide;
+  }
+
+  /* Standalone numeric emphasis (for inline stats) */
+  .num-display {
+    @apply inline-flex items-baseline gap-1 tabular-nums font-bold tracking-tight;
+    font-family: 'Reem Kufi', sans-serif;
+    background: linear-gradient(180deg, hsl(var(--foreground)) 0%, hsl(var(--gold-deep) / 0.9) 140%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .dark .num-display {
+    background: linear-gradient(180deg, hsl(var(--foreground)) 0%, hsl(var(--gold) / 0.95) 140%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .num-display-suffix {
+    @apply text-[11px] font-semibold text-muted-foreground -ms-0.5;
+    -webkit-text-fill-color: initial;
   }
 
   .stat-badge {
