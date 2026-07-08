@@ -336,9 +336,9 @@ const AdhkarPage: React.FC = () => {
             {searchResults.length === 0 ? (
               <div className="card-surface text-center py-8 text-sm text-muted-foreground">لا توجد نتائج مطابقة</div>
             ) : (
-              <div className="space-y-2.5">
+              <div className="space-y-2.5 stagger-children">
                 {searchResults.map(({ category, categoryName, item }) => (
-                  <button key={`${category}-${item.id}`} onClick={() => { setSearch(''); setSelectedCategory(category); }} className="card-surface-hover w-full text-right">
+                  <button key={`${category}-${item.id}`} onClick={() => { setSearch(''); setSelectedCategory(category); }} className="card-surface-hover w-full text-right press">
                     <p className="font-amiri text-base leading-[1.9] text-foreground mb-2">{item.text}</p>
                     <div className="flex items-center justify-between">
                       <span className="stat-badge text-[10px]">{categoryName}</span>
@@ -352,7 +352,7 @@ const AdhkarPage: React.FC = () => {
         ) : (
           <>
             <h2 className="section-title">الأذكار</h2>
-            <div className="space-y-2.5">
+            <div className="space-y-2.5 stagger-children">
               {adhkarCategories
                 .filter(cat => !quickFilter || cat.id === quickFilter)
                 .map(cat => {
@@ -360,13 +360,21 @@ const AdhkarPage: React.FC = () => {
                   const count = adhkarData[cat.id]?.length || 0;
                   return (
                     <button key={cat.id} onClick={() => setSelectedCategory(cat.id)}
-                      className="card-surface-hover w-full flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <Icon className="w-5 h-5 text-primary" />
+                      className="card-surface-hover w-full flex items-center gap-3 press">
+                      <div className="icon-tile icon-tile-primary flex-shrink-0">
+                        <Icon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 text-right">
                         <div className="font-semibold text-foreground text-sm">{cat.name}</div>
-                        <div className="text-xs text-muted-foreground">{count} ذكر</div>
+                        <div className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                          <span>{count} ذكر</span>
+                          {(dailyStats[cat.name] ?? 0) > 0 && (
+                            <>
+                              <span className="w-1 h-1 rounded-full bg-border" />
+                              <span className="text-primary">مقروء اليوم</span>
+                            </>
+                          )}
+                        </div>
                       </div>
                       <ChevronLeft className="w-4 h-4 text-muted-foreground" />
                     </button>
