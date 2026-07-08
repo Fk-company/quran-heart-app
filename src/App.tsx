@@ -63,7 +63,6 @@ import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import TajweedPage from "./pages/TajweedPage";
 import FocusModePage from "./pages/FocusModePage";
-import FatihaFramedPage from "./pages/FatihaFramedPage";
 import NotFound from "./pages/NotFound";
 import { useSettings } from "@/hooks/useSettings";
 
@@ -80,7 +79,6 @@ const AnimatedRoutes = () => {
           <Route path="/quran" element={<PageTransition><QuranPage /></PageTransition>} />
           <Route path="/quran/:id" element={<PageTransition><SurahDetailPage /></PageTransition>} />
           <Route path="/mushaf" element={<PageTransition><MushafPage /></PageTransition>} />
-          <Route path="/fatiha-framed" element={<PageTransition><FatihaFramedPage /></PageTransition>} />
           <Route path="/reciters" element={<PageTransition><RecitersPage /></PageTransition>} />
           <Route path="/adhkar" element={<PageTransition><AdhkarPage /></PageTransition>} />
           <Route path="/radio" element={<PageTransition><RadioPage /></PageTransition>} />
