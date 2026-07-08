@@ -11,6 +11,8 @@ import BottomNav from "@/components/BottomNav";
 import MiniPlayer from "@/components/MiniPlayer";
 import PageTransition from "@/components/PageTransition";
 import SplashScreen from "@/components/SplashScreen";
+import OnboardingModal from "@/components/OnboardingModal";
+import AboutPage from "./pages/AboutPage";
 import HomePage from "./pages/HomePage";
 import QuranPage from "./pages/QuranPage";
 import SurahDetailPage from "./pages/SurahDetailPage";
@@ -127,6 +129,7 @@ const AnimatedRoutes = () => {
           <Route path="/terms" element={<PageTransition><TermsPage /></PageTransition>} />
           <Route path="/tajweed" element={<PageTransition><TajweedPage /></PageTransition>} />
           <Route path="/focus-mode" element={<FocusModePage />} />
+          <Route path="/about" element={<PageTransition><AboutPage /></PageTransition>} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
         </Routes>
       </AnimatePresence>
@@ -147,6 +150,7 @@ const App = () => {
             <BrowserRouter>
               <SettingsBootstrap />
               {showSplash && <SplashScreen onDone={() => setShowSplash(false)} />}
+              {!showSplash && <OnboardingModal />}
               <div className="min-h-screen bg-background islamic-bg">
                 <a href="#main-content" className="skip-to-content">تخطّي إلى المحتوى الرئيسي</a>
                 <TopBar />
