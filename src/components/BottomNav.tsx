@@ -126,7 +126,7 @@ const BottomNav: React.FC = () => {
                       />
                     )}
                     <Icon
-                      className={`relative w-5 h-5 transition-colors duration-200 ${active ? 'text-primary' : 'text-muted-foreground'}`}
+                      className={`relative w-5 h-5 transition-all duration-300 ${active ? 'text-primary scale-110' : 'text-muted-foreground'}`}
                       strokeWidth={active ? 2.4 : 1.8}
                     />
                   </div>
@@ -135,7 +135,19 @@ const BottomNav: React.FC = () => {
                   >
                     {item.label}
                   </span>
+                  {active && !reduce && (
+                    <motion.span
+                      layoutId="nav-active-dot"
+                      className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                      style={{
+                        background: 'hsl(var(--accent))',
+                        boxShadow: '0 0 8px hsl(var(--accent) / 0.8)',
+                      }}
+                      transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+                    />
+                  )}
                 </button>
+
               );
             })}
             <button
