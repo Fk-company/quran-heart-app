@@ -689,14 +689,14 @@ const HomePage: React.FC = () => {
               {Array.from({ length: 5 }).map((_, i) => <div key={i} className="skeleton-pulse h-16 w-full" />)}
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2 stagger-children">
               {surahs.slice(0, 8).map((surah) => (
-                <button key={surah.number} onClick={() => navigate(`/quran/${surah.number}`)} className="card-surface-hover w-full flex items-center gap-3 text-right">
+                <button key={surah.number} onClick={() => navigate(`/quran/${surah.number}`)} className="card-surface-hover w-full flex items-center gap-3 text-right press">
                   <div className="verse-number flex-shrink-0">{surah.number}</div>
                   <div className="flex-1 min-w-0">
                     <div className="font-bold text-foreground text-sm font-kufi">{surah.name}</div>
                     <div className="text-[11px] text-muted-foreground flex items-center gap-2 mt-0.5">
-                      <span>{surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</span>
+                      <span className={surah.revelationType === 'Meccan' ? 'text-primary' : 'text-accent'}>{surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</span>
                       <span className="w-1 h-1 rounded-full bg-border inline-block" />
                       <span>{surah.numberOfAyahs} آيات</span>
                     </div>
