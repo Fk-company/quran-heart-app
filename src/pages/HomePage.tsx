@@ -646,10 +646,10 @@ const HomePage: React.FC = () => {
         {/* Spiritual shortcuts */}
         <div className="mb-5">
           <h2 className="section-title">الروح والقلب</h2>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 gap-2 stagger-children">
             {spiritualLinks.map((link) => (
-              <button key={link.path} onClick={() => navigate(link.path)} className="quick-link-btn">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary/8 to-accent/8 border border-border/50 flex items-center justify-center">
+              <button key={link.path} onClick={() => navigate(link.path)} className="quick-link-btn press">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-border/50 flex items-center justify-center hover:from-primary/15 hover:to-accent/15 transition-colors">
                   <link.icon className="w-5 h-5 text-primary" />
                 </div>
                 <span className="text-[10px] font-semibold text-foreground leading-tight text-center">{link.label}</span>
@@ -666,9 +666,9 @@ const HomePage: React.FC = () => {
               الكل <ChevronLeft className="w-3.5 h-3.5" />
             </button>
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 stagger-children">
             {featuredSurahs.map((s) => (
-              <button key={s.num} onClick={() => navigate(`/quran/${s.num}`)} className="card-surface-hover flex flex-col items-center py-3 gap-1.5">
+              <button key={s.num} onClick={() => navigate(`/quran/${s.num}`)} className="card-surface-hover flex flex-col items-center py-3 gap-1.5 press">
                 <span className="verse-number">{s.num}</span>
                 <span className="text-xs font-bold text-foreground mt-1 font-kufi">{s.label}</span>
               </button>
