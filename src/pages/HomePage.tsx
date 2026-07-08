@@ -613,11 +613,12 @@ const HomePage: React.FC = () => {
         <WisdomCarousel />
 
         {/* Primary Actions — Big icons */}
-        <div className="grid grid-cols-4 gap-2 mb-5">
+        <div className="grid grid-cols-4 gap-2 mb-5 stagger-children">
           {primaryActions.map((link) => (
-            <button key={link.path} onClick={() => navigate(link.path)} className="quick-link-btn">
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${link.gradient} shadow-emerald`}>
-                <link.icon className="w-6 h-6 text-primary-foreground" />
+            <button key={link.path} onClick={() => navigate(link.path)} className="quick-link-btn press">
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${link.gradient} shadow-emerald relative overflow-hidden`}>
+                <link.icon className="w-6 h-6 text-primary-foreground relative z-10" />
+                <span className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
               </div>
               <span className="text-xs font-bold text-foreground leading-tight text-center">{link.label}</span>
             </button>
