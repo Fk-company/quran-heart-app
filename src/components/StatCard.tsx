@@ -1,5 +1,5 @@
 import React from 'react';
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface StatCardProps {
   icon: LucideIcon;
@@ -7,30 +7,51 @@ interface StatCardProps {
   label: string;
   variant?: 'primary' | 'gold' | 'emerald' | 'muted';
   trend?: string;
+  trendDirection?: 'up' | 'down' | 'flat';
   onClick?: () => void;
+  hint?: string;
 }
 
-const variantStyles: Record<string, { bg: string; iconColor: string }> = {
-  primary: { bg: 'bg-primary/10', iconColor: 'text-primary' },
-  gold: { bg: 'bg-gold-light', iconColor: 'text-gold-deep' },
-  emerald: { bg: 'bg-emerald-light', iconColor: 'text-primary' },
-  muted: { bg: 'bg-secondary', iconColor: 'text-muted-foreground' },
+const variantStyles: Record<string, string> = {
+  primary: 'icon-tile',
+  gold: 'icon-tile icon-tile-gold',
+  emerald: 'icon-tile icon-tile-emerald',
+  muted: 'icon-tile',
 };
 
-const StatCard: React.FC<StatCardProps> = ({ icon: Icon, value, label, variant = 'primary', trend, onClick }) => {
-  const style = variantStyles[variant];
+const StatCard: React.FC<StatCardProps> = ({
+  icon: Icon,
+  value,
+  label,
+  variant = 'primary',
+  trend,
+  trendDirection,
+  onClick,
+  hint,
+}) => {
+  const TrendIcon = trendDirection === 'down' ? TrendingDown : TrendingUp;
   return (
     <button
       onClick={onClick}
       disabled={!onClick}
-      className={`stat-card text-right ${onClick ? 'cursor-pointer' : 'cursor-default'} w-full`}
+      title={hint}
+      className={`stat-card text-right ${onClick ? 'cursor-pointer' : 'cursor-default'} w-full relative overflow-hidden`}
     >
-      <div className={`stat-card-icon ${style.bg}`}>
-        <Icon className={`w-4.5 h-4.5 ${style.iconColor}`} style={{ width: 18, height: 18 }} />
+      <div className={`${variantStyles[variant]} !w-9 !h-9 !rounded-xl mb-2`}>
+        <Icon className="w-4 h-4" />
       </div>
       <div className="stat-card-value">{value}</div>
       <div className="stat-card-label">{label}</div>
-      {trend && <div className="text-[10px] text-primary font-semibold mt-1">{trend}</div>}
+      {trend && (
+        <div
+          className={`inline-flex items-center gap-1 text-[10px] font-bold mt-1.5 ${
+            trendDirection === 'down' ? 'text-destructive' : 'text-primary'
+          }`}
+        >
+          {trendDirection && trendDirection !== 'flat' && <TrendIcon className="w-3 h-3" />}
+          {trend}
+        </div>
+      )}
     </button>
   );
 };
