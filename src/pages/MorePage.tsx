@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import SEO from '@/components/SEO';
 import { useNavigate } from 'react-router-dom';
 import {
   Heart, Radio, Users, Quote, Search, Star, BookOpen, BarChart3,
   X, Feather, Book, Grid3X3, List, ChevronLeft, TrendingUp, Baby, Sparkles, Mic,
   Brain, Smile, Lightbulb, Bot, Settings, CalendarDays, Target, Send, Globe,
-  Trophy, Mic2, Map as MapIcon, Layers, Waves, Sunrise, FileText, Compass, Coins, Moon, BookHeart, MapPin, Bell, Car
+  Trophy, Mic2, Map as MapIcon, Layers, Waves, Sunrise, FileText, Compass, Coins, Moon, BookHeart, MapPin, Bell, Car, SearchX
 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
+import EmptyState from '@/components/EmptyState';
 import { MoreHorizontal } from 'lucide-react';
+
 
 const moreCategories = [
   {
