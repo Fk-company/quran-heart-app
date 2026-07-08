@@ -196,7 +196,7 @@ const SurahDetailPage: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3 stagger-children">
             {ayahs.map((ayah) => {
               const ayahTafsir = tafsir.find((t) => t.numberInSurah === ayah.numberInSurah);
               const favId = `ayah-${surahNum}-${ayah.numberInSurah}`;
