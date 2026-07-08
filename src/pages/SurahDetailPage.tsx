@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import SEO from '@/components/SEO';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchSurahAyahs, fetchTafsir, fetchSurahs, fetchReciters, type Ayah, type Surah, type Reciter } from '@/lib/api';
 import { useAudioPlayer } from '@/contexts/AudioContext';
 import { useLastRead } from '@/hooks/useLastRead';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useReadingTracker } from '@/hooks/useReadingTracker';
-import { ArrowRight, BookOpen, Play, Pause, Mic, Heart, Share2, Layers, Download } from 'lucide-react';
+import { ArrowRight, ArrowLeft, BookOpen, Play, Pause, Mic, Heart, Share2, Layers, Download, ChevronRight, ChevronLeft } from 'lucide-react';
 import { getCached, setCached } from '@/lib/dataCache';
 import ReadingProgress from '@/components/ReadingProgress';
 
