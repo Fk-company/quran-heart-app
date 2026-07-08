@@ -401,7 +401,7 @@ const HomePage: React.FC = () => {
         )}
 
         {/* Location Picker Sheet */}
-        {showLocationPicker && (
+        {showLocationPicker && createPortal(
           <>
             <div className="sheet-overlay" onClick={() => setShowLocationPicker(false)} />
             <div className="sheet-content" dir="rtl">
@@ -481,7 +481,8 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
             </div>
-          </>
+          </>,
+          document.body
         )}
 
 
