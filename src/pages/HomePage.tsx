@@ -613,11 +613,12 @@ const HomePage: React.FC = () => {
         <WisdomCarousel />
 
         {/* Primary Actions — Big icons */}
-        <div className="grid grid-cols-4 gap-2 mb-5">
+        <div className="grid grid-cols-4 gap-2 mb-5 stagger-children">
           {primaryActions.map((link) => (
-            <button key={link.path} onClick={() => navigate(link.path)} className="quick-link-btn">
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${link.gradient} shadow-emerald`}>
-                <link.icon className="w-6 h-6 text-primary-foreground" />
+            <button key={link.path} onClick={() => navigate(link.path)} className="quick-link-btn press">
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${link.gradient} shadow-emerald relative overflow-hidden`}>
+                <link.icon className="w-6 h-6 text-primary-foreground relative z-10" />
+                <span className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
               </div>
               <span className="text-xs font-bold text-foreground leading-tight text-center">{link.label}</span>
             </button>
@@ -645,10 +646,10 @@ const HomePage: React.FC = () => {
         {/* Spiritual shortcuts */}
         <div className="mb-5">
           <h2 className="section-title">الروح والقلب</h2>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 gap-2 stagger-children">
             {spiritualLinks.map((link) => (
-              <button key={link.path} onClick={() => navigate(link.path)} className="quick-link-btn">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary/8 to-accent/8 border border-border/50 flex items-center justify-center">
+              <button key={link.path} onClick={() => navigate(link.path)} className="quick-link-btn press">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-border/50 flex items-center justify-center hover:from-primary/15 hover:to-accent/15 transition-colors">
                   <link.icon className="w-5 h-5 text-primary" />
                 </div>
                 <span className="text-[10px] font-semibold text-foreground leading-tight text-center">{link.label}</span>
@@ -665,9 +666,9 @@ const HomePage: React.FC = () => {
               الكل <ChevronLeft className="w-3.5 h-3.5" />
             </button>
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-2 stagger-children">
             {featuredSurahs.map((s) => (
-              <button key={s.num} onClick={() => navigate(`/quran/${s.num}`)} className="card-surface-hover flex flex-col items-center py-3 gap-1.5">
+              <button key={s.num} onClick={() => navigate(`/quran/${s.num}`)} className="card-surface-hover flex flex-col items-center py-3 gap-1.5 press">
                 <span className="verse-number">{s.num}</span>
                 <span className="text-xs font-bold text-foreground mt-1 font-kufi">{s.label}</span>
               </button>
@@ -688,14 +689,14 @@ const HomePage: React.FC = () => {
               {Array.from({ length: 5 }).map((_, i) => <div key={i} className="skeleton-pulse h-16 w-full" />)}
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2 stagger-children">
               {surahs.slice(0, 8).map((surah) => (
-                <button key={surah.number} onClick={() => navigate(`/quran/${surah.number}`)} className="card-surface-hover w-full flex items-center gap-3 text-right">
+                <button key={surah.number} onClick={() => navigate(`/quran/${surah.number}`)} className="card-surface-hover w-full flex items-center gap-3 text-right press">
                   <div className="verse-number flex-shrink-0">{surah.number}</div>
                   <div className="flex-1 min-w-0">
                     <div className="font-bold text-foreground text-sm font-kufi">{surah.name}</div>
                     <div className="text-[11px] text-muted-foreground flex items-center gap-2 mt-0.5">
-                      <span>{surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</span>
+                      <span className={surah.revelationType === 'Meccan' ? 'text-primary' : 'text-accent'}>{surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</span>
                       <span className="w-1 h-1 rounded-full bg-border inline-block" />
                       <span>{surah.numberOfAyahs} آيات</span>
                     </div>
