@@ -217,27 +217,52 @@
   .font-amiri { font-family: 'Amiri', serif; }
   .font-kufi { font-family: 'Reem Kufi', sans-serif; }
 
+  /* ===== Verse number — refined Islamic medallion ===== */
   .verse-number {
-    @apply inline-flex items-center justify-center w-9 h-9 rounded-full text-xs font-bold relative;
-    background:
-      radial-gradient(circle at 30% 30%, hsl(var(--gold-light)) 0%, hsl(var(--gold) / 0.55) 55%, hsl(var(--primary) / 0.25) 100%);
+    @apply inline-flex items-center justify-center w-9 h-9 text-xs font-extrabold relative select-none;
     color: hsl(var(--primary));
     font-family: 'IBM Plex Sans Arabic', sans-serif;
-    border: 1.5px solid hsl(var(--gold) / 0.65);
-    box-shadow:
-      0 0 0 2px hsl(var(--background)),
-      0 0 0 3px hsl(var(--gold) / 0.45),
-      0 4px 12px -2px hsl(var(--primary) / 0.25),
-      inset 0 1px 0 hsl(40 80% 98% / 0.7);
-    text-shadow: 0 1px 0 hsl(40 60% 100% / 0.6);
+    background:
+      radial-gradient(circle at 30% 25%, hsl(40 90% 96%) 0%, hsl(var(--gold-light)) 35%, hsl(var(--gold) / 0.85) 70%, hsl(var(--primary) / 0.35) 100%);
+    /* 8-point rosette silhouette via conic-carved edges */
+    clip-path: polygon(
+      50% 0%, 61% 8%, 71% 4%, 76% 15%, 88% 18%, 85% 30%, 96% 39%, 88% 50%,
+      96% 61%, 85% 70%, 88% 82%, 76% 85%, 71% 96%, 61% 92%, 50% 100%, 39% 92%,
+      29% 96%, 24% 85%, 12% 82%, 15% 70%, 4% 61%, 12% 50%, 4% 39%, 15% 30%,
+      12% 18%, 24% 15%, 29% 4%, 39% 8%
+    );
+    filter: drop-shadow(0 1px 0 hsl(40 60% 100% / 0.6)) drop-shadow(0 4px 10px hsl(var(--primary) / 0.28));
+    text-shadow: 0 1px 0 hsl(40 60% 100% / 0.7);
   }
   .verse-number::before {
     content: '';
     position: absolute;
-    inset: -6px;
+    inset: 3px;
     border-radius: 9999px;
-    border: 1px dashed hsl(var(--gold) / 0.35);
+    background:
+      conic-gradient(from 210deg, hsl(var(--gold) / 0) 0deg, hsl(40 90% 98% / 0.9) 60deg, hsl(var(--gold) / 0) 140deg, hsl(var(--gold) / 0) 360deg);
+    mix-blend-mode: overlay;
     pointer-events: none;
+  }
+  .verse-number::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 9999px;
+    border: 1px solid hsl(var(--primary) / 0.35);
+    box-shadow: inset 0 0 0 2px hsl(40 90% 98% / 0.55);
+    pointer-events: none;
+  }
+  .dark .verse-number {
+    color: hsl(40 92% 78%);
+    background:
+      radial-gradient(circle at 30% 25%, hsl(40 55% 40%) 0%, hsl(38 60% 28%) 55%, hsl(var(--primary) / 0.55) 100%);
+    filter: drop-shadow(0 0 0.5px hsl(40 80% 60% / 0.8)) drop-shadow(0 4px 12px hsl(var(--primary) / 0.35));
+    text-shadow: 0 1px 0 hsl(30 30% 10% / 0.6);
+  }
+  .dark .verse-number::after {
+    border-color: hsl(40 80% 65% / 0.55);
+    box-shadow: inset 0 0 0 2px hsl(40 70% 30% / 0.5);
   }
 
   /* ===== Luxurious Ayah Card (inline tafsir mode) ===== */
