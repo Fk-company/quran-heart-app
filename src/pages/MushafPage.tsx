@@ -238,15 +238,38 @@ const MushafPage: React.FC = () => {
     return () => ayahPlayer.setOnAyahEnd?.(null);
   }, [isRepeating, ayahPlayer]);
 
-  const fetchPage = useCallback(async (page: number) => {
-    setLoading(true);
+  const pageCache = useRef<Map<number, PageAyah[]>>(new Map());
+
+  const fetchPageData = useCallback(async (page: number): Promise<PageAyah[] | null> => {
+    if (pageCache.current.has(page)) return pageCache.current.get(page)!;
     try {
       const res = await fetch(`https://api.alquran.cloud/v1/page/${page}`);
       const data = await res.json();
-      setAyahs(data.data.ayahs || []);
-    } catch (e) { console.error(e); }
-    setLoading(false);
+      const list: PageAyah[] = data.data?.ayahs || [];
+      pageCache.current.set(page, list);
+      // Keep cache bounded
+      if (pageCache.current.size > 20) {
+        const firstKey = pageCache.current.keys().next().value;
+        if (firstKey !== undefined) pageCache.current.delete(firstKey);
+      }
+      return list;
+    } catch (e) { console.error(e); return null; }
   }, []);
+
+  const fetchPage = useCallback(async (page: number) => {
+    if (pageCache.current.has(page)) {
+      setAyahs(pageCache.current.get(page)!);
+      setLoading(false);
+    } else {
+      setLoading(true);
+      const list = await fetchPageData(page);
+      if (list) setAyahs(list);
+      setLoading(false);
+    }
+    // Prefetch neighbors silently
+    if (page + 1 <= TOTAL_PAGES) fetchPageData(page + 1);
+    if (page - 1 >= 1) fetchPageData(page - 1);
+  }, [fetchPageData]);
 
   useEffect(() => {
     fetchReciters().then(r => { setReciters(r.slice(0, 20)); if (r.length) setSelectedReciter(r[0]); });
@@ -256,7 +279,22 @@ const MushafPage: React.FC = () => {
     fetchPage(currentPage);
     setSearchParams({ page: String(currentPage) });
     localStorage.setItem('mushaf_last_page', String(currentPage));
+    setSliderPage(currentPage);
   }, [currentPage, fetchPage, setSearchParams]);
+
+  // Keyboard shortcuts: ← / → to navigate, G to open jump sheet
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === 'ArrowLeft') { e.preventDefault(); setCurrentPage(p => Math.min(TOTAL_PAGES, p + 1)); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); setCurrentPage(p => Math.max(1, p - 1)); }
+      else if (e.key.toLowerCase() === 'g') { setShowJumpSheet(s => !s); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
+
 
   // Fetch tafsir for the page when inline mode is on
   useEffect(() => {
