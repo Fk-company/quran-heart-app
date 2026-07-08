@@ -784,18 +784,18 @@ const MushafPage: React.FC = () => {
 
         {/* Page Content */}
         {loading && ayahs.length === 0 ? (
-          <div className="mushaf-page-frame">
-            <span className="mushaf-corner tl" /><span className="mushaf-corner tr" />
-            <span className="mushaf-corner bl" /><span className="mushaf-corner br" />
-            <div className="space-y-3 p-6">
+          <MushafOrnateBorder nightMode={nightMode}>
+            <div className="mushaf-page-head">
+              <span className="h-side">—</span>
+              <span className="h-center">جاري التحميل</span>
+              <span className="h-side">—</span>
+            </div>
+            <div className="space-y-3 p-4">
               {Array.from({ length: 8 }).map((_, i) => <div key={i} className="skeleton-pulse h-6 w-full" />)}
             </div>
-          </div>
+          </MushafOrnateBorder>
         ) : (
-          <div className={`mushaf-page-frame ${nightMode ? 'mushaf-night-frame' : ''} animate-fade-in`} key={currentPage}>
-            <span className="mushaf-corner tl" /><span className="mushaf-corner tr" />
-            <span className="mushaf-corner bl" /><span className="mushaf-corner br" />
-
+          <MushafOrnateBorder nightMode={nightMode}>
             <div className="mushaf-page-head">
               <span className="h-side">{ayahs[0]?.surah.name || ''}</span>
               <span className="h-center">الجزء {juzNumber}</span>
