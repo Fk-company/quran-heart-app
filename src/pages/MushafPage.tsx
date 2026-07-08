@@ -296,7 +296,7 @@ const MushafPage: React.FC = () => {
       setSelectedAyah(null);
       setShowReciterPicker(false);
       setShowBookmarks(false);
-      setShowJumpInput(false);
+      setShowJumpSheet(false);
     }
   }, [ayahPlayer.playingAyahNumber]);
 
@@ -323,7 +323,7 @@ const MushafPage: React.FC = () => {
 
   const handleJump = () => {
     const p = Number(pageInput);
-    if (p >= 1 && p <= TOTAL_PAGES) { setCurrentPage(p); setShowJumpInput(false); setPageInput(''); }
+    if (p >= 1 && p <= TOTAL_PAGES) { setCurrentPage(p); setShowJumpSheet(false); setPageInput(''); }
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -452,7 +452,7 @@ const MushafPage: React.FC = () => {
             title="تبديل الوضع الليلي">
             {nightMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
-          <button onClick={() => setShowJumpInput(!showJumpInput)}
+          <button onClick={() => setShowJumpSheet(!showJumpSheet)}
             className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-xs font-medium">
             انتقال
           </button>
@@ -496,7 +496,7 @@ const MushafPage: React.FC = () => {
           </>
         )}
 
-        {showJumpInput && (
+        {showJumpSheet && (
           <div className="card-surface mb-4 flex items-center gap-2 animate-fade-in">
             <input type="number" value={pageInput} onChange={e => setPageInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleJump()} placeholder={`1 - ${TOTAL_PAGES}`}
