@@ -110,7 +110,7 @@ const TafsirPage: React.FC = () => {
           icon={BookOpen}
           title="التفسير"
           subtitle="تفاسير متعددة مع إمكانية المقارنة"
-          badge={{ text: `${TAFSIR_EDITIONS.length} تفسير`, tone: 'primary' }}
+          badge={<span className="stat-badge">{TAFSIR_EDITIONS.length} تفسير</span>}
         />
 
         {/* Stats overview */}
@@ -149,7 +149,7 @@ const TafsirPage: React.FC = () => {
             icon={SearchX}
             title="لا توجد نتائج"
             description={`لم نجد سورة تطابق "${search}"`}
-            action={{ label: 'مسح البحث', onClick: () => setSearch('') }}
+            action={<button onClick={() => setSearch('')} className="btn-primary text-xs px-4 py-2 rounded-full">مسح البحث</button>}
           />
         ) : (
           <div className="space-y-2 stagger-children">
