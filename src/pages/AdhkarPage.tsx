@@ -336,9 +336,9 @@ const AdhkarPage: React.FC = () => {
             {searchResults.length === 0 ? (
               <div className="card-surface text-center py-8 text-sm text-muted-foreground">لا توجد نتائج مطابقة</div>
             ) : (
-              <div className="space-y-2.5">
+              <div className="space-y-2.5 stagger-children">
                 {searchResults.map(({ category, categoryName, item }) => (
-                  <button key={`${category}-${item.id}`} onClick={() => { setSearch(''); setSelectedCategory(category); }} className="card-surface-hover w-full text-right">
+                  <button key={`${category}-${item.id}`} onClick={() => { setSearch(''); setSelectedCategory(category); }} className="card-surface-hover w-full text-right press">
                     <p className="font-amiri text-base leading-[1.9] text-foreground mb-2">{item.text}</p>
                     <div className="flex items-center justify-between">
                       <span className="stat-badge text-[10px]">{categoryName}</span>
