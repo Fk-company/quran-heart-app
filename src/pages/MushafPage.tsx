@@ -22,6 +22,9 @@ interface PageAyah {
 }
 
 const TOTAL_PAGES = 604;
+const TOTAL_JUZ = 30;
+// Approximate juz → starting page (Madani mushaf, 604 pages)
+const JUZ_START_PAGES = [1,22,42,62,82,102,122,142,162,182,202,222,242,262,282,302,322,342,362,382,402,422,442,462,482,502,522,542,562,582];
 
 const AyahByAyahControls: React.FC<{
   player: ReturnType<typeof useAyahByAyahPlayer>;
@@ -167,7 +170,8 @@ const MushafPage: React.FC = () => {
   const [ayahs, setAyahs] = useState<PageAyah[]>([]);
   const [loading, setLoading] = useState(true);
   const [pageInput, setPageInput] = useState('');
-  const [showJumpInput, setShowJumpInput] = useState(false);
+  const [showJumpSheet, setShowJumpSheet] = useState(false);
+  const [sliderPage, setSliderPage] = useState(initialPage);
   const { theme, toggleTheme } = useTheme();
   const nightMode = theme === 'dark';
   const [reciters, setReciters] = useState<Reciter[]>([]);
@@ -234,15 +238,38 @@ const MushafPage: React.FC = () => {
     return () => ayahPlayer.setOnAyahEnd?.(null);
   }, [isRepeating, ayahPlayer]);
 
-  const fetchPage = useCallback(async (page: number) => {
-    setLoading(true);
+  const pageCache = useRef<Map<number, PageAyah[]>>(new Map());
+
+  const fetchPageData = useCallback(async (page: number): Promise<PageAyah[] | null> => {
+    if (pageCache.current.has(page)) return pageCache.current.get(page)!;
     try {
       const res = await fetch(`https://api.alquran.cloud/v1/page/${page}`);
       const data = await res.json();
-      setAyahs(data.data.ayahs || []);
-    } catch (e) { console.error(e); }
-    setLoading(false);
+      const list: PageAyah[] = data.data?.ayahs || [];
+      pageCache.current.set(page, list);
+      // Keep cache bounded
+      if (pageCache.current.size > 20) {
+        const firstKey = pageCache.current.keys().next().value;
+        if (firstKey !== undefined) pageCache.current.delete(firstKey);
+      }
+      return list;
+    } catch (e) { console.error(e); return null; }
   }, []);
+
+  const fetchPage = useCallback(async (page: number) => {
+    if (pageCache.current.has(page)) {
+      setAyahs(pageCache.current.get(page)!);
+      setLoading(false);
+    } else {
+      setLoading(true);
+      const list = await fetchPageData(page);
+      if (list) setAyahs(list);
+      setLoading(false);
+    }
+    // Prefetch neighbors silently
+    if (page + 1 <= TOTAL_PAGES) fetchPageData(page + 1);
+    if (page - 1 >= 1) fetchPageData(page - 1);
+  }, [fetchPageData]);
 
   useEffect(() => {
     fetchReciters().then(r => { setReciters(r.slice(0, 20)); if (r.length) setSelectedReciter(r[0]); });
@@ -252,7 +279,22 @@ const MushafPage: React.FC = () => {
     fetchPage(currentPage);
     setSearchParams({ page: String(currentPage) });
     localStorage.setItem('mushaf_last_page', String(currentPage));
+    setSliderPage(currentPage);
   }, [currentPage, fetchPage, setSearchParams]);
+
+  // Keyboard shortcuts: ← / → to navigate, G to open jump sheet
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === 'ArrowLeft') { e.preventDefault(); setCurrentPage(p => Math.min(TOTAL_PAGES, p + 1)); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); setCurrentPage(p => Math.max(1, p - 1)); }
+      else if (e.key.toLowerCase() === 'g') { setShowJumpSheet(s => !s); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
+
+
 
   // Fetch tafsir for the page when inline mode is on
   useEffect(() => {
@@ -292,7 +334,7 @@ const MushafPage: React.FC = () => {
       setSelectedAyah(null);
       setShowReciterPicker(false);
       setShowBookmarks(false);
-      setShowJumpInput(false);
+      setShowJumpSheet(false);
     }
   }, [ayahPlayer.playingAyahNumber]);
 
@@ -319,7 +361,7 @@ const MushafPage: React.FC = () => {
 
   const handleJump = () => {
     const p = Number(pageInput);
-    if (p >= 1 && p <= TOTAL_PAGES) { setCurrentPage(p); setShowJumpInput(false); setPageInput(''); }
+    if (p >= 1 && p <= TOTAL_PAGES) { setCurrentPage(p); setShowJumpSheet(false); setPageInput(''); }
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -448,7 +490,7 @@ const MushafPage: React.FC = () => {
             title="تبديل الوضع الليلي">
             {nightMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
-          <button onClick={() => setShowJumpInput(!showJumpInput)}
+          <button onClick={() => setShowJumpSheet(!showJumpSheet)}
             className="px-3 py-1.5 rounded-xl bg-primary/10 text-primary text-xs font-medium">
             انتقال
           </button>
@@ -492,14 +534,96 @@ const MushafPage: React.FC = () => {
           </>
         )}
 
-        {showJumpInput && (
-          <div className="card-surface mb-4 flex items-center gap-2 animate-fade-in">
-            <input type="number" value={pageInput} onChange={e => setPageInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleJump()} placeholder={`1 - ${TOTAL_PAGES}`}
-              min={1} max={TOTAL_PAGES} className="search-input flex-1 text-center" />
-            <button onClick={handleJump} className="px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium">انتقال</button>
-          </div>
+        {/* Jump Sheet — page slider + juz grid + direct input */}
+        {showJumpSheet && (
+          <>
+            <div className="sheet-overlay" onClick={() => setShowJumpSheet(false)} />
+            <div className="sheet-content" dir="rtl">
+              <div className="sheet-handle" />
+              <div className="px-5 pb-6 pt-2 max-h-[75vh] overflow-y-auto">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-base font-bold text-foreground">تنقّل سريع</h3>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">اسحب الشريط أو اختر الجزء أو أدخل رقم الصفحة</p>
+                  </div>
+                  <button onClick={() => setShowJumpSheet(false)} className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+                    <X className="w-4 h-4 text-muted-foreground" />
+                  </button>
+                </div>
+
+                {/* Slider */}
+                <div className="card-surface mb-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-semibold text-muted-foreground">الصفحة</span>
+                    <span className="text-lg font-bold text-primary tabular-nums">{sliderPage} <span className="text-[10px] text-muted-foreground font-normal">/ {TOTAL_PAGES}</span></span>
+                  </div>
+                  <input
+                    type="range"
+                    min={1}
+                    max={TOTAL_PAGES}
+                    value={sliderPage}
+                    onChange={(e) => setSliderPage(Number(e.target.value))}
+                    className="w-full accent-primary"
+                    dir="ltr"
+                  />
+                  <div className="flex items-center justify-between text-[10px] text-muted-foreground mt-1 font-medium">
+                    <span>1</span>
+                    <span>151</span>
+                    <span>302</span>
+                    <span>453</span>
+                    <span>604</span>
+                  </div>
+                  <button
+                    onClick={() => { goToPage(sliderPage); }}
+                    className="w-full mt-3 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold shadow-emerald"
+                  >
+                    الانتقال إلى صفحة {sliderPage}
+                  </button>
+                </div>
+
+                {/* Direct input */}
+                <div className="card-surface mb-4">
+                  <label className="text-[11px] font-semibold text-muted-foreground mb-2 block">رقم الصفحة مباشرة</label>
+                  <div className="flex items-center gap-2">
+                    <input type="number" value={pageInput} onChange={e => setPageInput(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleJump()} placeholder={`1 - ${TOTAL_PAGES}`}
+                      min={1} max={TOTAL_PAGES} className="search-input flex-1 text-center" autoFocus />
+                    <button onClick={handleJump} className="px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold">انتقال</button>
+                  </div>
+                </div>
+
+                {/* Juz grid */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-[11px] font-semibold text-muted-foreground">الأجزاء ({TOTAL_JUZ})</label>
+                    <span className="text-[10px] text-primary bg-primary/10 rounded-full px-2 py-0.5 font-semibold">الحالي: الجزء {juzNumber}</span>
+                  </div>
+                  <div className="grid grid-cols-5 gap-1.5">
+                    {JUZ_START_PAGES.map((startPage, i) => {
+                      const juzN = i + 1;
+                      const isCurrent = juzN === juzNumber;
+                      return (
+                        <button
+                          key={juzN}
+                          onClick={() => { goToPage(startPage); setShowJumpSheet(false); }}
+                          className={`aspect-[4/3] rounded-xl text-xs font-bold transition-all press flex flex-col items-center justify-center gap-0.5 ${
+                            isCurrent
+                              ? 'bg-primary text-primary-foreground shadow-emerald scale-105'
+                              : 'bg-secondary text-foreground hover:bg-muted border border-border/40'
+                          }`}
+                        >
+                          <span className="text-sm">{juzN}</span>
+                          <span className="text-[9px] opacity-70 font-medium">ص {startPage}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
         )}
+
 
         {/* Player controls */}
         <div className="card-surface mb-3 flex items-center gap-2">
@@ -822,23 +946,38 @@ const MushafPage: React.FC = () => {
           </div>
         )}
 
-        {/* Navigation — clear prev/next with progress dots */}
+        {/* Navigation — RTL-correct: prev on right, next (primary) on left, plus quick page dots */}
         <div className="mt-5 mb-4 space-y-3">
           <div className="flex items-center gap-2">
-            <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage >= TOTAL_PAGES}
-              className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-2xl text-sm font-bold shadow-sm transition-all active:scale-95 disabled:opacity-40 ${
+            <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage <= 1}
+              className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-2xl text-sm font-bold shadow-sm transition-all active:scale-95 disabled:opacity-40 press ${
                 nightMode ? 'bg-amber-500/15 text-amber-200 border border-amber-700/30' : 'bg-secondary text-foreground border border-border'
               }`}>
               <ChevronRight className="w-5 h-5" />
-              الصفحة التالية
-            </button>
-            <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage <= 1}
-              className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-2xl text-sm font-bold shadow-md transition-all active:scale-95 disabled:opacity-40 ${
-                nightMode ? 'bg-amber-500/25 text-amber-100 border border-amber-500/40' : 'gradient-primary text-primary-foreground'
-              }`}>
               الصفحة السابقة
+            </button>
+            <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage >= TOTAL_PAGES}
+              className={`flex-1 h-12 flex items-center justify-center gap-2 rounded-2xl text-sm font-bold shadow-md transition-all active:scale-95 disabled:opacity-40 press ${
+                nightMode ? 'bg-amber-500/25 text-amber-100 border border-amber-500/40' : 'gradient-primary text-primary-foreground shadow-emerald'
+              }`}>
+              الصفحة التالية
               <ChevronLeft className="w-5 h-5" />
             </button>
+          </div>
+
+          {/* Progress bar showing overall position in mushaf */}
+          <div className="space-y-1.5">
+            <div className={`h-1.5 rounded-full overflow-hidden ${nightMode ? 'bg-amber-900/25' : 'bg-secondary'}`}>
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${nightMode ? 'bg-amber-400' : 'bg-primary'}`}
+                style={{ width: `${(currentPage / TOTAL_PAGES) * 100}%` }}
+              />
+            </div>
+            <div className={`flex items-center justify-between text-[10px] font-semibold ${nightMode ? 'text-amber-400/70' : 'text-muted-foreground'}`}>
+              <span>ص 1</span>
+              <span className="tabular-nums">{Math.round((currentPage / TOTAL_PAGES) * 100)}%</span>
+              <span>ص {TOTAL_PAGES}</span>
+            </div>
           </div>
 
           <div className="flex items-center justify-center gap-1.5">
@@ -857,7 +996,7 @@ const MushafPage: React.FC = () => {
         </div>
 
         <p className={`text-center text-[10px] mb-4 ${nightMode ? 'text-amber-400/50' : 'text-muted-foreground'}`}>
-          اسحب يميناً أو يساراً للتنقل بين الصفحات
+          اسحب أفقياً للتنقل — أو استخدم مفاتيح ← / → على الحاسوب
         </p>
       </div>
 
