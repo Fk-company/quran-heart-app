@@ -234,18 +234,19 @@ const SurahDetailPage: React.FC = () => {
           </div>
         )}
 
-        <div className="flex items-center justify-between mt-6 mb-4">
+        <div className="flex items-center justify-between mt-6 mb-4 gap-2">
           <button onClick={() => surahNum > 1 && navigate(`/quran/${surahNum - 1}`)} disabled={surahNum <= 1}
-            className="px-4 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium disabled:opacity-40 transition-colors">
-            السورة السابقة
+            className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium disabled:opacity-40 transition-colors press">
+            <ChevronRight className="w-4 h-4" />السورة السابقة
           </button>
           <button onClick={() => surahNum < 114 && navigate(`/quran/${surahNum + 1}`)} disabled={surahNum >= 114}
-            className="px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium disabled:opacity-40 transition-colors">
-            السورة التالية
+            className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium disabled:opacity-40 transition-colors press shadow-emerald">
+            السورة التالية<ChevronLeft className="w-4 h-4" />
           </button>
         </div>
       </div>
     </div>
+    </>
   );
 };
 
