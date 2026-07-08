@@ -22,6 +22,9 @@ interface PageAyah {
 }
 
 const TOTAL_PAGES = 604;
+const TOTAL_JUZ = 30;
+// Approximate juz → starting page (Madani mushaf, 604 pages)
+const JUZ_START_PAGES = [1,22,42,62,82,102,122,142,162,182,202,222,242,262,282,302,322,342,362,382,402,422,442,462,482,502,522,542,562,582];
 
 const AyahByAyahControls: React.FC<{
   player: ReturnType<typeof useAyahByAyahPlayer>;
