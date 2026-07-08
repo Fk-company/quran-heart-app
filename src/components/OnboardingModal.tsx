@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, Search, Sparkles, Heart, ChevronLeft, X } from 'lucide-react';
+import { BookOpen, Search, Sparkles, Heart, ChevronLeft, X, Radio, Compass, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const STORAGE_KEY = 'qh_onboarding_seen_v1';
@@ -167,15 +167,40 @@ export const OnboardingModal: React.FC<Props> = ({ forceOpen, onClose }) => {
               </div>
 
               {step === SLIDES.length - 1 && (
-                <button
-                  onClick={() => {
-                    finish();
-                    navigate('/about');
-                  }}
-                  className="mt-3 text-[12px] text-primary font-bold press"
-                >
-                  اعرف المزيد عن التطبيق
-                </button>
+                <>
+                  <div className="mt-5 pt-4 border-t border-border/50">
+                    <div className="text-[11px] font-bold text-muted-foreground mb-2">انتقل مباشرة إلى:</div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { icon: BookOpen, label: 'المصحف', to: '/mushaf' },
+                        { icon: Search, label: 'البحث', to: '/search' },
+                        { icon: Sparkles, label: 'المساعد', to: '/ai-tafsir' },
+                        { icon: Heart, label: 'قرآن القلب', to: '/heart-quran' },
+                        { icon: Radio, label: 'الإذاعات', to: '/radio' },
+                        { icon: Compass, label: 'القبلة', to: '/qibla' },
+                      ].map((q) => {
+                        const QIcon = q.icon;
+                        return (
+                          <button
+                            key={q.to}
+                            onClick={() => { finish(); navigate(q.to); }}
+                            className="flex flex-col items-center gap-1 p-2 rounded-xl border border-border/50 bg-card/60 hover:bg-card press"
+                          >
+                            <QIcon className="w-4 h-4 text-primary" />
+                            <span className="text-[11px] font-bold text-foreground">{q.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => { finish(); navigate('/about'); }}
+                    className="mt-3 text-[12px] text-primary font-bold press inline-flex items-center gap-1"
+                  >
+                    <Info className="w-3.5 h-3.5" />
+                    اعرف المزيد عن التطبيق
+                  </button>
+                </>
               )}
             </div>
           </motion.div>
