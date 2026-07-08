@@ -804,10 +804,11 @@ const MushafPage: React.FC = () => {
 
             <div className="px-4 sm:px-6 pb-2">
               {ayahs.length > 0 && ayahs[0].numberInSurah === 1 && (
-                <div className="mushaf-surah-banner">
-                  <span className="name">سورة {ayahs[0].surah.name}</span>
-                  <span className="meta">{ayahs[0].surah.englishName} · رقم {ayahs[0].surah.number}</span>
-                </div>
+                <SurahCartouche
+                  name={ayahs[0].surah.name.replace(/^سورة\s*/, '')}
+                  number={ayahs[0].surah.number}
+                  english={ayahs[0].surah.englishName}
+                />
               )}
               {ayahs.length > 0 && ayahs[0].numberInSurah === 1 && ayahs[0].surah.number !== 1 && ayahs[0].surah.number !== 9 && (
                 <div className="mushaf-bismillah">بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</div>
