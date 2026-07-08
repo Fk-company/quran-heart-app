@@ -214,26 +214,35 @@ const RecitersPage: React.FC = () => {
           icon={Mic}
           title="القراء"
           subtitle={loading ? 'جاري التحميل...' : `${filtered.length} من ${reciters.length} قارئ`}
+          badge={
+            currentTrack ? (
+              <span className="badge-tone badge-tone-primary">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary live-pulse inline-block" />
+                يعمل الآن
+              </span>
+            ) : undefined
+          }
         />
 
         {/* Quick stats */}
-        <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="grid grid-cols-3 gap-2 mb-4 stagger-children">
           <div className="stat-card text-right">
-            <div className="stat-card-icon bg-primary/10"><Mic className="w-4 h-4 text-primary" /></div>
+            <div className="icon-tile !w-9 !h-9 !rounded-xl mb-2"><Mic className="w-4 h-4" /></div>
             <div className="stat-card-value">{reciters.length}</div>
             <div className="stat-card-label">قارئ</div>
           </div>
           <div className="stat-card text-right">
-            <div className="stat-card-icon bg-gold-light"><Heart className="w-4 h-4 text-gold-deep" /></div>
+            <div className="icon-tile icon-tile-gold !w-9 !h-9 !rounded-xl mb-2"><Heart className="w-4 h-4" /></div>
             <div className="stat-card-value">{favorites.reciters.length}</div>
             <div className="stat-card-label">المفضلون</div>
           </div>
           <div className="stat-card text-right">
-            <div className="stat-card-icon bg-emerald-light"><History className="w-4 h-4 text-primary" /></div>
+            <div className="icon-tile icon-tile-emerald !w-9 !h-9 !rounded-xl mb-2"><History className="w-4 h-4" /></div>
             <div className="stat-card-value">{recent.length}</div>
             <div className="stat-card-label">مستمع مؤخراً</div>
           </div>
         </div>
+
 
         <SearchFilterBar
           searchValue={search}
