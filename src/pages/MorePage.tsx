@@ -156,14 +156,32 @@ const MorePage: React.FC = () => {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>(() =>
     (localStorage.getItem('view-mode-more') as 'list' | 'grid') || 'grid'
   );
+  const [query, setQuery] = useState('');
+
+  const filteredCategories = useMemo(() => {
+    const q = query.trim();
+    if (!q) return moreCategories;
+    return moreCategories
+      .map((c) => ({
+        ...c,
+        items: c.items.filter(
+          (i) => i.label.includes(q) || i.desc?.includes(q)
+        ),
+      }))
+      .filter((c) => c.items.length > 0);
+  }, [query]);
+
+  const totalMatches = filteredCategories.reduce((n, c) => n + c.items.length, 0);
 
   return (
     <div className="page-container page-with-topbar" dir="rtl">
+      <SEO title="جميع الأقسام والميزات — قلب القرآن" description="استكشف كل ميزات التطبيق: القرآن، الأذكار، الأدعية، القبلة، الزكاة، القصص، والاختبارات." />
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={MoreHorizontal}
           title="جميع الأقسام"
           subtitle={`${allItems.length} خدمة وميزة`}
+          badge={<span className="badge-tone badge-tone-gold">{moreCategories.length} قسم</span>}
           actions={
             <div className="flex gap-1 p-1 bg-secondary rounded-2xl">
               <button onClick={() => { setViewMode('list'); localStorage.setItem('view-mode-more', 'list'); }} className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`} aria-label="قائمة"><List className="w-4 h-4" /></button>
@@ -172,69 +190,113 @@ const MorePage: React.FC = () => {
           }
         />
 
+        {/* Search bar */}
+        <div className="relative mb-4">
+          <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="ابحث في جميع الميزات..."
+            className="search-input"
+            aria-label="بحث في الأقسام"
+          />
+          {query && (
+            <button
+              onClick={() => setQuery('')}
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl flex items-center justify-center hover:bg-muted"
+              aria-label="مسح"
+            >
+              <X className="w-4 h-4 text-muted-foreground" />
+            </button>
+          )}
+        </div>
+
         {/* Stats overview */}
-        <div className="grid grid-cols-3 gap-2 mb-5">
+        <div className="grid grid-cols-3 gap-2 mb-5 stagger-children">
           <div className="stat-card text-right">
-            <div className="stat-card-icon bg-primary/10"><MoreHorizontal className="w-4 h-4 text-primary" /></div>
+            <div className="icon-tile !w-9 !h-9 !rounded-xl mb-2"><MoreHorizontal className="w-4 h-4" /></div>
             <div className="stat-card-value">{moreCategories.length}</div>
             <div className="stat-card-label">قسم</div>
           </div>
           <div className="stat-card text-right">
-            <div className="stat-card-icon bg-gold-light"><Sparkles className="w-4 h-4 text-gold-deep" /></div>
+            <div className="icon-tile icon-tile-gold !w-9 !h-9 !rounded-xl mb-2"><Sparkles className="w-4 h-4" /></div>
             <div className="stat-card-value">{allItems.length}</div>
             <div className="stat-card-label">خدمة</div>
           </div>
           <button onClick={() => navigate('/settings')} className="stat-card text-right">
-            <div className="stat-card-icon bg-emerald-light"><Settings className="w-4 h-4 text-primary" /></div>
+            <div className="icon-tile icon-tile-emerald !w-9 !h-9 !rounded-xl mb-2"><Settings className="w-4 h-4" /></div>
             <div className="stat-card-value text-base mt-1">—</div>
             <div className="stat-card-label">الإعدادات</div>
           </button>
         </div>
 
-        {moreCategories.map((category) => (
-          <div key={category.title} className="mb-6">
-            <h2 className="section-title">{category.title}</h2>
-            {viewMode === 'grid' ? (
-              <div className="grid grid-cols-3 gap-2.5">
-                {category.items.map((item) => (
-                  <button
-                    key={item.path}
-                    onClick={() => navigate(item.path)}
-                    className="card-surface-hover flex flex-col items-center py-4 px-2 gap-2 text-center"
-                  >
-                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${item.gradient} shadow-emerald`}>
-                      <item.icon className="w-5 h-5 text-primary-foreground" />
-                    </div>
-                    <span className="font-bold text-foreground text-xs leading-tight font-kufi">{item.label}</span>
-                    <span className="text-[10px] text-muted-foreground leading-tight line-clamp-2">{item.desc}</span>
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {category.items.map((item) => (
-                  <button
-                    key={item.path}
-                    onClick={() => navigate(item.path)}
-                    className="card-surface-hover w-full flex items-center gap-3"
-                  >
-                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${item.gradient} shadow-emerald`}>
-                      <item.icon className="w-5 h-5 text-primary-foreground" />
-                    </div>
-                    <div className="flex-1 text-right min-w-0">
-                      <div className="font-bold text-foreground text-sm font-kufi">{item.label}</div>
-                      <div className="text-[11px] text-muted-foreground">{item.desc}</div>
-                    </div>
-                    <ChevronLeft className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                  </button>
-                ))}
-              </div>
-            )}
+        {query && (
+          <div className="text-xs text-muted-foreground mb-3">
+            {totalMatches > 0 ? `${totalMatches} نتيجة` : 'لا نتائج مطابقة'}
           </div>
-        ))}
+        )}
+
+        {totalMatches === 0 && query ? (
+          <EmptyState
+            icon={SearchX}
+            title="لا توجد نتائج"
+            description={`لم نجد ميزات تطابق "${query}"، جرّب كلمة أخرى.`}
+            action={
+              <button onClick={() => setQuery('')} className="chip">
+                <X className="w-3 h-3" /> مسح البحث
+              </button>
+            }
+          />
+        ) : (
+          filteredCategories.map((category) => (
+            <div key={category.title} className="mb-6">
+              <div className="section-header-pro">
+                <h2 className="st-title">{category.title}</h2>
+                <span className="badge-tone badge-tone-muted">{category.items.length}</span>
+              </div>
+              {viewMode === 'grid' ? (
+                <div className="grid grid-cols-3 gap-2.5 stagger-children">
+                  {category.items.map((item) => (
+                    <button
+                      key={item.path}
+                      onClick={() => navigate(item.path)}
+                      className="action-tile !items-center !text-center press"
+                    >
+                      <div className={`icon-tile icon-tile-lg mx-auto ${item.gradient} !border-transparent shadow-emerald`}>
+                        <item.icon className="w-5 h-5 text-primary-foreground" />
+                      </div>
+                      <span className="font-bold text-foreground text-xs leading-tight font-kufi w-full">{item.label}</span>
+                      <span className="text-[10px] text-muted-foreground leading-tight line-clamp-2 w-full">{item.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-2 stagger-children">
+                  {category.items.map((item) => (
+                    <button
+                      key={item.path}
+                      onClick={() => navigate(item.path)}
+                      className="list-row press"
+                    >
+                      <div className={`icon-tile flex-shrink-0 ${item.gradient} !border-transparent shadow-emerald`}>
+                        <item.icon className="w-5 h-5 text-primary-foreground" />
+                      </div>
+                      <div className="flex-1 text-right min-w-0">
+                        <div className="list-row-title font-kufi">{item.label}</div>
+                        <div className="list-row-sub">{item.desc}</div>
+                      </div>
+                      <ChevronLeft className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
 };
 
 export default MorePage;
+
