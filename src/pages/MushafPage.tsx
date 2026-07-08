@@ -170,7 +170,8 @@ const MushafPage: React.FC = () => {
   const [ayahs, setAyahs] = useState<PageAyah[]>([]);
   const [loading, setLoading] = useState(true);
   const [pageInput, setPageInput] = useState('');
-  const [showJumpInput, setShowJumpInput] = useState(false);
+  const [showJumpSheet, setShowJumpSheet] = useState(false);
+  const [sliderPage, setSliderPage] = useState(initialPage);
   const { theme, toggleTheme } = useTheme();
   const nightMode = theme === 'dark';
   const [reciters, setReciters] = useState<Reciter[]>([]);
