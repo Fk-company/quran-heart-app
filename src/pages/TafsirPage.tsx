@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import SEO from '@/components/SEO';
 import { useNavigate } from 'react-router-dom';
 import { fetchSurahs, type Surah } from '@/lib/api';
-import { Search, BookOpen, ArrowRight } from 'lucide-react';
+import { Search, BookOpen, ArrowRight, Layers, Library, Sparkles, SearchX, X } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
+import EmptyState from '@/components/EmptyState';
 import { getCached, setCached } from '@/lib/dataCache';
 
 const TAFSIR_EDITIONS = [
