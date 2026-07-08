@@ -805,7 +805,7 @@ const MushafPage: React.FC = () => {
             <div className="px-4 sm:px-6 pb-2">
               {ayahs.length > 0 && ayahs[0].numberInSurah === 1 && (
                 <SurahCartouche
-                  name={ayahs[0].surah.name.replace(/^سورة\s*/, '')}
+                  name={ayahs[0].surah.name.replace(/[\u064B-\u0652\u0670]/g, '').replace(/^\s*سورة\s*/, '').trim()}
                   number={ayahs[0].surah.number}
                   english={ayahs[0].surah.englishName}
                 />
