@@ -47,7 +47,7 @@ const SmartWirdPage: React.FC = () => {
     <>
       <SEO title="الورد الذكي — قلب القرآن" description="اقتراح يومي للورد القرآني حسب وقتك وروتينك." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={Sparkles} title="الورد القرآني الذكي" subtitle="اقتراح يومي حسب وقتك وسرعتك" showBack />
 
         <div className="card-surface mb-4 space-y-4">

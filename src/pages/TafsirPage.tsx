@@ -105,7 +105,7 @@ const TafsirPage: React.FC = () => {
     <>
     <SEO title="التفسير — قلب القرآن" description="تفاسير القرآن الكريم بمصادر متعددة مع إمكانية المقارنة والبحث." />
     <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader
           icon={BookOpen}
           title="التفسير"

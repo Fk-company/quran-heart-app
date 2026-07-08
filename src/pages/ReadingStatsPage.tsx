@@ -76,7 +76,7 @@ const ReadingStatsPage: React.FC = () => {
     <>
       <SEO title="تقدم القراءة اليومية — قلب القرآن" description="تتبع ختمتك وسجل قراءتك اليومية للقرآن." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto pb-28">
+      <div className="page-inner pb-28">
         <PageHeader
           icon={TrendingUp}
           title="لوحة الإحصائيات"

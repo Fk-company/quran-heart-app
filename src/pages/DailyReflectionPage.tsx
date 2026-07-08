@@ -49,7 +49,7 @@ const DailyReflectionPage: React.FC = () => {
     <>
       <SEO title="تأملات يومية — آية وتدبر وعمل" description="آية يومية مع تدبر وعمل لتعزيز علاقتك بالقرآن." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={Lightbulb} title="تأملات يومية" subtitle="آية وتدبر وعمل" gradient="gold"
           actions={
             <div className="flex gap-1">

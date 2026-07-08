@@ -53,7 +53,7 @@ const SakinahPage: React.FC = () => {
     <>
       <SEO title="آيات السكينة والطمأنينة — قلب القرآن" description="مجموعة آيات للراحة والسكينة وطمأنينة القلب." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader
           icon={Heart}
           title="آيات السكينة"

@@ -134,7 +134,7 @@ const WeeklyChallengePage: React.FC = () => {
     <>
       <SEO title="التحدي الأسبوعي — قلب القرآن" description="تحديات أسبوعية للقراءة والحفظ والذكر مع شارات إنجاز." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={Trophy} title="التحدي الأسبوعي" subtitle="أنجز التحديات واكسب الشارات" showBack />
 
         <div className="gradient-hero islamic-pattern islamic-pattern-arabesque rounded-3xl p-5 mb-4 text-primary-foreground shadow-emerald">

@@ -59,7 +59,7 @@ const HeartQuranPage: React.FC = () => {
     <>
       <SEO title="قلب القرآن — سورة يس وآيات القلب" description="سورة يس وآيات تثبيت القلب والسكينة." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={Heart} title="قلب القرآن" subtitle="آيات تطمئن القلب وتشفي الصدر" gradient="gold" />
 
         {selectedSection === null ? (

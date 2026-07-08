@@ -97,7 +97,7 @@ const DailyImanPage: React.FC = () => {
     <>
       <SEO title="رسالة الصباح الإيمانية — قلب القرآن" description="آية وتفسير ورسالة إيمانية لبداية يومك." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={Sunrise} title="رسائل إيمانية يومية" subtitle="آية وتفسير قصير كل صباح" showBack />
 
         {loading ? (

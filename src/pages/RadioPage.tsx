@@ -81,7 +81,7 @@ const RadioPage: React.FC = () => {
     <>
       <SEO title="راديو القرآن الكريم — بث مباشر" description="استمع للبث المباشر لإذاعات القرآن الكريم من مختلف الدول الإسلامية." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader
           icon={Radio}
           title="الراديو والبث المباشر"

@@ -94,7 +94,7 @@ const NearbyMosquesPage: React.FC = () => {
     <>
       <SEO title="المساجد القريبة منك — قلب القرآن" description="ابحث عن أقرب المساجد إلى موقعك مع المسافة والاتجاهات." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={MapPin} title="المساجد القريبة" subtitle="ابحث عن أقرب المساجد إليك" showBack gradient="primary" />
 
         <div className="card-surface p-4 mb-4">

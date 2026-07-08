@@ -341,7 +341,7 @@ const HeartAmbientPage: React.FC = () => {
     <>
       <SEO title="خلفية قلبية للتركيز — قلب القرآن" description="أصوات هادئة وتلاوة خافتة للتركيز والاسترخاء." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={Waves} title="خلفية قلبية" subtitle="مزج أصوات الطبيعة والتلاوة لراحة القلب" showBack />
 
         {/* Sleep timer */}

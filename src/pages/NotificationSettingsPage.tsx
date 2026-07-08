@@ -40,7 +40,7 @@ const NotificationSettingsPage: React.FC = () => {
     <>
       <SEO title="إعدادات الإشعارات والأذان — قلب القرآن" description="تحكم بإشعارات الأذان والتذكيرات واختر صوت المؤذن وأوقات الهدوء." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={Bell} title="إعدادات الإشعارات" subtitle="تحكم كامل بالتذكيرات والأذان" showBack gradient="primary" />
 
         {/* Permission status */}

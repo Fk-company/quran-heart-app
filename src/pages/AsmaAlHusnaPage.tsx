@@ -127,7 +127,7 @@ const AsmaAlHusnaPage: React.FC = () => {
     <>
       <SEO title="أسماء الله الحسنى — التسعة والتسعون اسماً" description="استعرض أسماء الله الحسنى الـ99 مع المعاني والشرح والفضل." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader
           icon={Star}
           title="أسماء الله الحسنى"

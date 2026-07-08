@@ -49,7 +49,7 @@ const ReciterComparePage: React.FC = () => {
     <>
       <SEO title="مقارنة القراء — قلب القرآن" description="قارن بين تلاوات القراء المختلفين لنفس الآية." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={Mic2} title="مقارنة القراءات" subtitle="استمع لنفس الآية بأصوات مختلفة" showBack />
 
         <div className="card-surface mb-4">

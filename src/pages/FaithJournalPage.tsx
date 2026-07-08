@@ -73,7 +73,7 @@ const FaithJournalPage: React.FC = () => {
     <>
       <SEO title="يوميات إيمانية — قلب القرآن" description="دوّن لحظاتك الروحية وتأملاتك الإيمانية اليومية." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={BookHeart} title="يوميات إيمانية" subtitle="دوّن لحظاتك الروحية" showBack gradient="gold" />
 
         {/* Stats */}

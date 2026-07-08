@@ -197,7 +197,7 @@ const KidsStoriesPage: React.FC = () => {
 
   return (
     <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader
           icon={BookOpen}
           title="قصص إسلامية للأطفال"

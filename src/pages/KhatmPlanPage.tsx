@@ -91,7 +91,7 @@ const KhatmPlanPage: React.FC = () => {
       <>
       <SEO title="خطة ختم القرآن — 30 / 60 / 90 يوم" description="خطط لختمتك القادمة باختيار المدة المناسبة لك." />
       <div className="page-container page-with-topbar" dir="rtl">
-        <div className="px-4 pt-6 max-w-lg mx-auto">
+        <div className="page-inner">
           <PageHeader icon={Target} title="خطة الختمة" subtitle="نظّم قراءتك للقرآن الكريم" gradient="primary" showBack />
 
           <div className="card-luxury mb-4">
@@ -165,7 +165,7 @@ const KhatmPlanPage: React.FC = () => {
 
   return (
     <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader
           icon={Target}
           title="خطة الختمة"

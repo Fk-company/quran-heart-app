@@ -259,7 +259,7 @@ const AdhkarPage: React.FC = () => {
   // Categories
   return (
     <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         {/* Hero header */}
         <div className="gradient-hero islamic-pattern rounded-2xl p-5 mb-5 text-primary-foreground">
           <div className="flex items-center gap-3 mb-3">

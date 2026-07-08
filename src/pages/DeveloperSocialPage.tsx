@@ -76,7 +76,7 @@ const DeveloperSocialPage: React.FC = () => {
     <>
       <SEO title="تواصل مع المطور فخري عادل" description="تواصل مع مطور التطبيق فخري عادل عبر تليجرام وانستغرام." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
           <button

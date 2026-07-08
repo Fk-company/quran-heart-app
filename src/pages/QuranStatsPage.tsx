@@ -46,7 +46,7 @@ const QuranStatsPage: React.FC = () => {
     <>
       <SEO title="إحصائيات القرآن الكريم — أرقام وحقائق" description="أرقام وحقائق إحصائية عن القرآن الكريم: السور، الآيات، الكلمات، الأجزاء." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader
           icon={BarChart3}
           title="إحصائيات القرآن"

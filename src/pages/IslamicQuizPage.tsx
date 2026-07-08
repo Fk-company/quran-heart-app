@@ -158,7 +158,7 @@ const IslamicQuizPage: React.FC = () => {
       <>
       <SEO title="اختبار إسلامي — اختبر معلوماتك الدينية" description="اختبارات إسلامية متنوعة في القرآن والسيرة والفقه بمستويات صعوبة مختلفة." />
       <div className="page-container page-with-topbar" dir="rtl">
-        <div className="px-4 pt-6 max-w-lg mx-auto">
+        <div className="page-inner">
           <PageHeader icon={Brain} title="اختبار إسلامي" subtitle="آلاف الأسئلة المتجددة في كل جولة" showBack gradient="primary" />
 
           <div className="card-surface p-4 mb-4 flex items-center gap-3">
@@ -250,7 +250,7 @@ const IslamicQuizPage: React.FC = () => {
 
   return (
     <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={Brain} title="اختبار إسلامي" subtitle={`${CATEGORY_LABELS[category]} · ${DIFFICULTY_LABELS[difficulty]}`} showBack gradient="primary" />
         {roundSeed != null && <div className="text-[10px] text-muted-foreground mb-3 text-center">بذرة الجولة: {roundSeed} · الأسئلة محفوظة لهذه الجولة</div>}
 

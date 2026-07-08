@@ -96,7 +96,7 @@ const DailyWirdPage: React.FC = () => {
     <>
       <SEO title="وردي اليومي — قلب القرآن" description="تتبع وردك اليومي من القرآن والأذكار بسلاسة." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader
           icon={Sparkles}
           title="وردي اليومي"

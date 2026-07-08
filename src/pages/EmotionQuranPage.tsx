@@ -71,7 +71,7 @@ const EmotionQuranPage: React.FC = () => {
     <>
       <SEO title="كيف يشعر قلبك؟ — آيات حسب حالتك" description="آيات قرآنية مختارة حسب حالتك النفسية والشعورية." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={Heart} title="كيف يشعر قلبك؟" subtitle="آيات تواسي قلبك" gradient="gold" />
 
         {!selectedEmotion ? (

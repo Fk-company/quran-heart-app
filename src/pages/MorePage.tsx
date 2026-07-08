@@ -216,7 +216,7 @@ const MorePage: React.FC = () => {
   return (
     <div className="page-container page-with-topbar" dir="rtl">
       <SEO title="جميع الأقسام والميزات — قلب القرآن" description="مركز تحكم ذكي: اقتراحات حسب وقت اليوم، المثبتات، آخر استخدام، وكل ميزات التطبيق." />
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader
           icon={MoreHorizontal}
           title="مركز التحكم"
