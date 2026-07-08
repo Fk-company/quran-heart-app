@@ -11,6 +11,7 @@ interface PageHeaderProps {
   onBack?: () => void;
   showBack?: boolean;
   stats?: React.ReactNode;
+  badge?: React.ReactNode;
 }
 
 const gradientClasses: Record<string, string> = {
@@ -36,16 +37,17 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   onBack,
   showBack = false,
   stats,
+  badge,
 }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="page-header-wrapper">
+    <div className="page-header-wrapper animate-slide-up-fade">
       <div className="flex items-center gap-3">
         {showBack && (
           <button
             onClick={onBack || (() => navigate(-1))}
-            className="page-header-back"
+            className="page-header-back press"
             aria-label="رجوع"
           >
             <ArrowRight className="w-4 h-4" />
@@ -55,7 +57,10 @@ const PageHeader: React.FC<PageHeaderProps> = ({
           <Icon className={`w-5 h-5 ${iconColors[gradient]}`} />
         </div>
         <div className="flex-1 min-w-0">
-          <h1 className="page-header-title truncate">{title}</h1>
+          <div className="flex items-center gap-2 min-w-0">
+            <h1 className="page-header-title truncate">{title}</h1>
+            {badge && <div className="shrink-0">{badge}</div>}
+          </div>
           {subtitle && <p className="page-header-subtitle truncate">{subtitle}</p>}
         </div>
         {actions && <div className="flex items-center gap-1.5 flex-shrink-0">{actions}</div>}
