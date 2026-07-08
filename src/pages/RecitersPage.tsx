@@ -214,26 +214,35 @@ const RecitersPage: React.FC = () => {
           icon={Mic}
           title="القراء"
           subtitle={loading ? 'جاري التحميل...' : `${filtered.length} من ${reciters.length} قارئ`}
+          badge={
+            currentTrack ? (
+              <span className="badge-tone badge-tone-primary">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary live-pulse inline-block" />
+                يعمل الآن
+              </span>
+            ) : undefined
+          }
         />
 
         {/* Quick stats */}
-        <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="grid grid-cols-3 gap-2 mb-4 stagger-children">
           <div className="stat-card text-right">
-            <div className="stat-card-icon bg-primary/10"><Mic className="w-4 h-4 text-primary" /></div>
+            <div className="icon-tile !w-9 !h-9 !rounded-xl mb-2"><Mic className="w-4 h-4" /></div>
             <div className="stat-card-value">{reciters.length}</div>
             <div className="stat-card-label">قارئ</div>
           </div>
           <div className="stat-card text-right">
-            <div className="stat-card-icon bg-gold-light"><Heart className="w-4 h-4 text-gold-deep" /></div>
+            <div className="icon-tile icon-tile-gold !w-9 !h-9 !rounded-xl mb-2"><Heart className="w-4 h-4" /></div>
             <div className="stat-card-value">{favorites.reciters.length}</div>
             <div className="stat-card-label">المفضلون</div>
           </div>
           <div className="stat-card text-right">
-            <div className="stat-card-icon bg-emerald-light"><History className="w-4 h-4 text-primary" /></div>
+            <div className="icon-tile icon-tile-emerald !w-9 !h-9 !rounded-xl mb-2"><History className="w-4 h-4" /></div>
             <div className="stat-card-value">{recent.length}</div>
             <div className="stat-card-label">مستمع مؤخراً</div>
           </div>
         </div>
+
 
         <SearchFilterBar
           searchValue={search}
@@ -300,32 +309,37 @@ const RecitersPage: React.FC = () => {
         ) : filtered.length === 0 ? (
           <EmptyState icon={Mic} title="لا يوجد قراء" description="لا توجد نتائج مطابقة" />
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-2 gap-2.5 stagger-children">
             {filtered.map((reciter) => {
               const isReciterPlaying = currentTrack?.reciter === reciter.name && isPlaying;
               const surahNums = getSurahNums(reciter);
               return (
-                <div key={reciter.id} className={`card-surface-hover relative ${isReciterPlaying ? 'border-primary/30' : ''}`}>
+                <div key={reciter.id} className={`action-tile !items-center !text-center press ${isReciterPlaying ? '!border-primary/40' : ''}`}>
                   <button onClick={(e) => { e.stopPropagation(); toggleReciter(reciter.id); }}
-                    className={`fav-btn absolute top-2 left-2 w-7 h-7 ${isReciterFav(reciter.id) ? 'active' : ''}`}>
+                    className={`fav-btn absolute top-2 left-2 w-7 h-7 z-10 ${isReciterFav(reciter.id) ? 'active' : ''}`}
+                    aria-label="مفضلة">
                     <Heart className="w-3.5 h-3.5" fill={isReciterFav(reciter.id) ? 'currentColor' : 'none'} />
                   </button>
-                  <button onClick={() => setExpandedReciter(reciter.id)} className="w-full flex flex-col items-center py-3 gap-1.5">
+                  <button onClick={() => setExpandedReciter(reciter.id)} className="w-full flex flex-col items-center gap-1.5">
                     <div className="relative">
+                      <div
+                        className="absolute -inset-1 rounded-2xl blur-md opacity-60"
+                        style={{ background: isReciterPlaying ? 'hsl(var(--primary) / 0.45)' : 'transparent' }}
+                      />
                       <img src={getReciterImage(reciter)} alt={reciter.name}
-                        className={`w-16 h-16 rounded-2xl border-2 transition-all ${isReciterPlaying ? 'border-primary shadow-emerald' : 'border-border'}`} />
+                        className={`relative w-16 h-16 rounded-2xl border-2 transition-all ${isReciterPlaying ? 'border-primary shadow-emerald' : 'border-border'}`} />
                       {isReciterPlaying && (
                         <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-md">
-                          <Volume2 className="w-3 h-3 text-primary-foreground" />
+                          <Volume2 className="w-3 h-3 text-primary-foreground live-pulse" />
                         </span>
                       )}
                     </div>
                     <span className="text-xs font-bold text-foreground text-center line-clamp-2 font-kufi">{reciter.name}</span>
-                    <span className="stat-badge text-[9px] py-0.5 px-2">{surahNums.length} سورة</span>
+                    <span className="badge-tone badge-tone-primary !text-[10px] !py-0">{surahNums.length} سورة</span>
                   </button>
                   <button onClick={() => handlePlayAll(reciter)}
                     className="absolute bottom-2 left-2 w-7 h-7 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center transition-colors"
-                    title="تشغيل الكل">
+                    aria-label="تشغيل الكل">
                     <ListPlus className="w-3.5 h-3.5 text-primary" />
                   </button>
                 </div>
@@ -333,13 +347,14 @@ const RecitersPage: React.FC = () => {
             })}
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-2 stagger-children">
             {filtered.map((reciter) => {
               const isExpanded = expandedReciter === reciter.id;
               const surahNums = getSurahNums(reciter);
               const isReciterPlaying = currentTrack?.reciter === reciter.name && isPlaying;
               return (
-                <div key={reciter.id} className={`card-surface transition-all duration-200 ${isReciterPlaying ? 'border-primary/30 bg-primary/[0.03]' : ''}`}>
+                <div key={reciter.id} className={`card-elevated transition-all duration-200 ${isReciterPlaying ? '!border-primary/40' : ''}`}>
+
                   <div className="flex items-center gap-3">
                     <img src={getReciterImage(reciter)} alt={reciter.name}
                       className={`w-12 h-12 rounded-2xl border-2 flex-shrink-0 ${isReciterPlaying ? 'border-primary' : 'border-border'}`} />
