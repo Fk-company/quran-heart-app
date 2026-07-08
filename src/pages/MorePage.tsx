@@ -153,37 +153,75 @@ export const MoreSheet: React.FC<MoreSheetProps> = ({ open, onClose }) => {
   );
 };
 
+const allItemsIndex: Record<string, typeof moreCategories[number]['items'][number] & { category: string }> = {};
+moreCategories.forEach((c) => c.items.forEach((i) => { allItemsIndex[i.path] = { ...i, category: c.title }; }));
+
+// Time-aware suggestions
+function getTimeBucket(): { key: 'fajr' | 'duha' | 'asr' | 'night'; label: string; icon: React.ElementType; paths: string[] } {
+  const h = new Date().getHours();
+  if (h >= 4 && h < 10) {
+    return { key: 'fajr', label: 'صباحك مبارك — للفجر والضحى', icon: Sunrise, paths: ['/adhkar', '/daily-iman', '/daily-wird', '/heart-quran'] };
+  }
+  if (h >= 10 && h < 15) {
+    return { key: 'duha', label: 'وقت التدبر والقراءة', icon: BookOpen, paths: ['/quran', '/guided-tadabbur', '/tafsir', '/daily-reflection'] };
+  }
+  if (h >= 15 && h < 19) {
+    return { key: 'asr', label: 'أذكار المساء والسكينة', icon: Star, paths: ['/adhkar', '/sakinah', '/dua', '/emotion-quran'] };
+  }
+  return { key: 'night', label: 'ليلة طيبة — تسبيح وسورة الملك', icon: Moon, paths: ['/tasbih-stats', '/heart-quran', '/heart-ambient', '/daily-khatirah'] };
+}
+
 const MorePage: React.FC = () => {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'list' | 'grid'>(() =>
     (localStorage.getItem('view-mode-more') as 'list' | 'grid') || 'grid'
   );
   const [query, setQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const { recents, pins, trackVisit, togglePin, isPinned, clearRecents } = useMoreUsage();
+  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const go = (path: string) => { trackVisit(path); navigate(path); };
+
+  const suggestion = useMemo(() => getTimeBucket(), []);
+  const suggestedItems = suggestion.paths.map((p) => allItemsIndex[p]).filter(Boolean);
+  const recentItems = recents.map((p) => allItemsIndex[p]).filter(Boolean).slice(0, 6);
+  const pinnedItems = pins.map((p) => allItemsIndex[p]).filter(Boolean);
 
   const filteredCategories = useMemo(() => {
     const q = query.trim();
-    if (!q) return moreCategories;
-    return moreCategories
+    let cats = moreCategories;
+    if (activeCategory) cats = cats.filter((c) => c.title === activeCategory);
+    if (!q) return cats;
+    return cats
       .map((c) => ({
         ...c,
-        items: c.items.filter(
-          (i) => i.label.includes(q) || i.desc?.includes(q)
-        ),
+        items: c.items.filter((i) => i.label.includes(q) || i.desc?.includes(q)),
       }))
       .filter((c) => c.items.length > 0);
-  }, [query]);
+  }, [query, activeCategory]);
 
   const totalMatches = filteredCategories.reduce((n, c) => n + c.items.length, 0);
 
+  const scrollToCategory = (title: string) => {
+    setActiveCategory(null);
+    setQuery('');
+    // wait next tick for filters to reset if any
+    requestAnimationFrame(() => {
+      const el = sectionRefs.current[title];
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
+
   return (
     <div className="page-container page-with-topbar" dir="rtl">
-      <SEO title="جميع الأقسام والميزات — قلب القرآن" description="استكشف كل ميزات التطبيق: القرآن، الأذكار، الأدعية، القبلة، الزكاة، القصص، والاختبارات." />
+      <SEO title="جميع الأقسام والميزات — قلب القرآن" description="مركز تحكم ذكي: اقتراحات حسب وقت اليوم، المثبتات، آخر استخدام، وكل ميزات التطبيق." />
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={MoreHorizontal}
-          title="جميع الأقسام"
-          subtitle={`${allItems.length} خدمة وميزة`}
-          badge={<span className="badge-tone badge-tone-gold">{moreCategories.length} قسم</span>}
+          title="مركز التحكم"
+          subtitle={`${allItems.length} خدمة • ${moreCategories.length} قسم`}
+          badge={<span className="badge-tone badge-tone-gold">ذكي</span>}
           actions={
             <div className="flex gap-1 p-1 bg-secondary rounded-2xl">
               <button onClick={() => { setViewMode('list'); localStorage.setItem('view-mode-more', 'list'); }} className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`} aria-label="قائمة"><List className="w-4 h-4" /></button>
@@ -192,8 +230,41 @@ const MorePage: React.FC = () => {
           }
         />
 
+        {/* Smart suggestion hero — time-aware */}
+        {!query && !activeCategory && (
+          <div className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/15 via-accent/10 to-transparent p-4 mb-4">
+            <div className="absolute -top-8 -left-8 w-32 h-32 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+            <div className="relative">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="icon-tile icon-tile-emerald !w-9 !h-9 !rounded-xl">
+                  <suggestion.icon className="w-4 h-4 text-primary-foreground" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[10px] font-bold text-primary uppercase tracking-widest">اقتراحات ذكية</div>
+                  <div className="text-sm font-extrabold text-foreground font-kufi truncate">{suggestion.label}</div>
+                </div>
+                <Zap className="w-4 h-4 text-accent" />
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                {suggestedItems.map((item) => (
+                  <button
+                    key={item.path}
+                    onClick={() => go(item.path)}
+                    className="group flex flex-col items-center gap-1.5 py-2 rounded-2xl bg-background/60 hover:bg-background border border-border/40 press"
+                  >
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${item.gradient} shadow-emerald`}>
+                      <item.icon className="w-4 h-4 text-primary-foreground" />
+                    </div>
+                    <span className="text-[10px] font-bold text-foreground text-center leading-tight px-1 line-clamp-2">{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Search bar */}
-        <div className="relative mb-4">
+        <div className="relative mb-3">
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
           <input
             value={query}
@@ -203,34 +274,89 @@ const MorePage: React.FC = () => {
             aria-label="بحث في الأقسام"
           />
           {query && (
-            <button
-              onClick={() => setQuery('')}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl flex items-center justify-center hover:bg-muted"
-              aria-label="مسح"
-            >
+            <button onClick={() => setQuery('')} className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl flex items-center justify-center hover:bg-muted" aria-label="مسح">
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
           )}
         </div>
 
-        {/* Stats overview */}
-        <div className="grid grid-cols-3 gap-2 mb-5 stagger-children">
-          <div className="stat-card text-right">
-            <div className="icon-tile !w-9 !h-9 !rounded-xl mb-2"><MoreHorizontal className="w-4 h-4" /></div>
-            <div className="stat-card-value">{moreCategories.length}</div>
-            <div className="stat-card-label">قسم</div>
+        {/* Category chips — quick jump */}
+        {!query && (
+          <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-2 mb-3 -mx-1 px-1">
+            <button
+              onClick={() => setActiveCategory(null)}
+              className={`shrink-0 text-[11px] font-bold px-3 py-1.5 rounded-full border transition ${activeCategory === null ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary/50 text-foreground border-border/40'}`}
+            >
+              الكل
+            </button>
+            {moreCategories.map((c) => (
+              <button
+                key={c.title}
+                onClick={() => {
+                  if (activeCategory === c.title) { setActiveCategory(null); return; }
+                  setActiveCategory(c.title);
+                  requestAnimationFrame(() => sectionRefs.current[c.title]?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+                }}
+                className={`shrink-0 text-[11px] font-bold px-3 py-1.5 rounded-full border transition ${activeCategory === c.title ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary/50 text-foreground border-border/40'}`}
+              >
+                {c.title} <span className="opacity-60">· {c.items.length}</span>
+              </button>
+            ))}
           </div>
-          <div className="stat-card text-right">
-            <div className="icon-tile icon-tile-gold !w-9 !h-9 !rounded-xl mb-2"><Sparkles className="w-4 h-4" /></div>
-            <div className="stat-card-value">{allItems.length}</div>
-            <div className="stat-card-label">خدمة</div>
+        )}
+
+        {/* Pinned */}
+        {!query && !activeCategory && pinnedItems.length > 0 && (
+          <div className="mb-5">
+            <div className="section-header-pro">
+              <h2 className="st-title flex items-center gap-1.5"><Pin className="w-3.5 h-3.5 text-accent" /> المثبّتة</h2>
+              <span className="badge-tone badge-tone-muted">{pinnedItems.length}</span>
+            </div>
+            <div className="grid grid-cols-4 gap-2 stagger-children">
+              {pinnedItems.map((item) => (
+                <div key={item.path} className="relative">
+                  <button onClick={() => go(item.path)} className="w-full flex flex-col items-center py-3 px-1 gap-1.5 rounded-2xl border border-border/40 bg-card hover:bg-secondary/60 press">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${item.gradient} shadow-emerald`}>
+                      <item.icon className="w-4 h-4 text-primary-foreground" />
+                    </div>
+                    <span className="text-[10px] font-bold text-foreground text-center leading-tight line-clamp-2">{item.label}</span>
+                  </button>
+                  <button
+                    onClick={() => togglePin(item.path)}
+                    className="absolute -top-1 -left-1 w-6 h-6 rounded-full bg-background border border-border/60 flex items-center justify-center active:scale-90"
+                    aria-label="إزالة التثبيت"
+                  >
+                    <PinOff className="w-3 h-3 text-muted-foreground" />
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
-          <button onClick={() => navigate('/settings')} className="stat-card text-right">
-            <div className="icon-tile icon-tile-emerald !w-9 !h-9 !rounded-xl mb-2"><Settings className="w-4 h-4" /></div>
-            <div className="stat-card-value text-base mt-1">—</div>
-            <div className="stat-card-label">الإعدادات</div>
-          </button>
-        </div>
+        )}
+
+        {/* Recents */}
+        {!query && !activeCategory && recentItems.length > 0 && (
+          <div className="mb-5">
+            <div className="section-header-pro">
+              <h2 className="st-title flex items-center gap-1.5"><History className="w-3.5 h-3.5 text-primary" /> آخر استخدام</h2>
+              <button onClick={clearRecents} className="text-[11px] font-bold text-muted-foreground hover:text-destructive">مسح</button>
+            </div>
+            <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-1 px-1 pb-1">
+              {recentItems.map((item) => (
+                <button
+                  key={item.path}
+                  onClick={() => go(item.path)}
+                  className="shrink-0 w-24 flex flex-col items-center gap-1.5 py-2.5 px-1 rounded-2xl border border-border/40 bg-card press"
+                >
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${item.gradient} shadow-emerald`}>
+                    <item.icon className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                  <span className="text-[10px] font-bold text-foreground text-center leading-tight line-clamp-2 px-1">{item.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {query && (
           <div className="text-xs text-muted-foreground mb-3">
@@ -251,45 +377,75 @@ const MorePage: React.FC = () => {
           />
         ) : (
           filteredCategories.map((category) => (
-            <div key={category.title} className="mb-6">
+            <div
+              key={category.title}
+              ref={(el) => { sectionRefs.current[category.title] = el; }}
+              className="mb-6 scroll-mt-24"
+            >
               <div className="section-header-pro">
                 <h2 className="st-title">{category.title}</h2>
                 <span className="badge-tone badge-tone-muted">{category.items.length}</span>
               </div>
               {viewMode === 'grid' ? (
                 <div className="grid grid-cols-3 gap-2.5 stagger-children">
-                  {category.items.map((item) => (
-                    <button
-                      key={item.path}
-                      onClick={() => navigate(item.path)}
-                      className="action-tile !items-center !text-center press"
-                    >
-                      <div className={`icon-tile icon-tile-lg mx-auto ${item.gradient} !border-transparent shadow-emerald`}>
-                        <item.icon className="w-5 h-5 text-primary-foreground" />
+                  {category.items.map((item) => {
+                    const pinned = isPinned(item.path);
+                    return (
+                      <div key={item.path} className="relative">
+                        <button
+                          onClick={() => go(item.path)}
+                          className="action-tile !items-center !text-center press w-full"
+                        >
+                          <div className={`icon-tile icon-tile-lg mx-auto ${item.gradient} !border-transparent shadow-emerald`}>
+                            <item.icon className="w-5 h-5 text-primary-foreground" />
+                          </div>
+                          <span className="font-bold text-foreground text-xs leading-tight font-kufi w-full">{item.label}</span>
+                          <span className="text-[10px] text-muted-foreground leading-tight line-clamp-2 w-full">{item.desc}</span>
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); togglePin(item.path); }}
+                          className={`absolute top-1.5 left-1.5 w-6 h-6 rounded-full flex items-center justify-center active:scale-90 transition ${pinned ? 'bg-accent/20 text-accent' : 'bg-secondary/70 text-muted-foreground opacity-0 group-hover:opacity-100 hover:opacity-100'}`}
+                          style={{ opacity: pinned ? 1 : undefined }}
+                          aria-label={pinned ? 'إزالة التثبيت' : 'تثبيت'}
+                          title={pinned ? 'إزالة التثبيت' : 'تثبيت'}
+                        >
+                          {pinned ? <Pin className="w-3 h-3 fill-current" /> : <Pin className="w-3 h-3" />}
+                        </button>
                       </div>
-                      <span className="font-bold text-foreground text-xs leading-tight font-kufi w-full">{item.label}</span>
-                      <span className="text-[10px] text-muted-foreground leading-tight line-clamp-2 w-full">{item.desc}</span>
-                    </button>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="space-y-2 stagger-children">
-                  {category.items.map((item) => (
-                    <button
-                      key={item.path}
-                      onClick={() => navigate(item.path)}
-                      className="list-row press"
-                    >
-                      <div className={`icon-tile flex-shrink-0 ${item.gradient} !border-transparent shadow-emerald`}>
-                        <item.icon className="w-5 h-5 text-primary-foreground" />
-                      </div>
-                      <div className="flex-1 text-right min-w-0">
-                        <div className="list-row-title font-kufi">{item.label}</div>
-                        <div className="list-row-sub">{item.desc}</div>
-                      </div>
-                      <ChevronLeft className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                    </button>
-                  ))}
+                  {category.items.map((item) => {
+                    const pinned = isPinned(item.path);
+                    return (
+                      <button
+                        key={item.path}
+                        onClick={() => go(item.path)}
+                        className="list-row press"
+                      >
+                        <div className={`icon-tile flex-shrink-0 ${item.gradient} !border-transparent shadow-emerald`}>
+                          <item.icon className="w-5 h-5 text-primary-foreground" />
+                        </div>
+                        <div className="flex-1 text-right min-w-0">
+                          <div className="list-row-title font-kufi">{item.label}</div>
+                          <div className="list-row-sub">{item.desc}</div>
+                        </div>
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          onClick={(e) => { e.stopPropagation(); togglePin(item.path); }}
+                          onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); togglePin(item.path); } }}
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center transition ${pinned ? 'bg-accent/15 text-accent' : 'bg-secondary/60 text-muted-foreground'}`}
+                          aria-label={pinned ? 'إزالة التثبيت' : 'تثبيت'}
+                        >
+                          {pinned ? <Pin className="w-4 h-4 fill-current" /> : <Pin className="w-4 h-4" />}
+                        </span>
+                        <ChevronLeft className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
