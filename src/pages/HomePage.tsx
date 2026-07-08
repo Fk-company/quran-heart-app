@@ -722,16 +722,25 @@ const HomePage: React.FC = () => {
           <p className="text-xs text-muted-foreground text-center font-medium">سورة {dailyVerse.surah} — آية {dailyVerse.ayah}</p>
         </button>
 
-        {/* Spiritual shortcuts */}
+        {/* Spiritual shortcuts — horizontal snap rail */}
         <div className="mb-5">
-          <h2 className="section-title">الروح والقلب</h2>
-          <div className="grid grid-cols-4 gap-2 stagger-children">
-            {spiritualLinks.map((link) => (
-              <button key={link.path} onClick={() => navigate(link.path)} className="quick-link-btn press">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 border border-border/50 flex items-center justify-center hover:from-primary/15 hover:to-accent/15 transition-colors">
-                  <link.icon className="w-5 h-5 text-primary" />
+          <div className="section-title-row">
+            <h2 className="section-title mb-0">الروح والقلب</h2>
+            <span className="text-[10px] text-muted-foreground font-bold">{spiritualLinks.length} أداة</span>
+          </div>
+          <div className="flex gap-2.5 overflow-x-auto no-scrollbar snap-x snap-mandatory -mx-4 px-4 pb-1">
+            {spiritualLinks.map((link, i) => (
+              <button
+                key={link.path}
+                onClick={() => navigate(link.path)}
+                className="snap-start shrink-0 w-[104px] relative rounded-2xl p-3 flex flex-col items-center gap-2 border border-border/50 bg-gradient-to-br from-card to-secondary/30 hover:from-primary/5 hover:to-accent/5 transition press overflow-hidden"
+              >
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${i % 2 === 0 ? 'gradient-primary shadow-emerald' : 'gradient-gold shadow-gold'} relative overflow-hidden`}>
+                  <link.icon className="w-5 h-5 text-primary-foreground relative z-10" />
+                  <span className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
                 </div>
-                <span className="text-[10px] font-semibold text-foreground leading-tight text-center">{link.label}</span>
+                <span className="text-[11px] font-extrabold text-foreground leading-tight text-center font-kufi w-full line-clamp-2">{link.label}</span>
+                <span className="absolute top-1.5 left-1.5 w-1.5 h-1.5 rounded-full bg-primary/40" />
               </button>
             ))}
           </div>
