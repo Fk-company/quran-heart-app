@@ -89,7 +89,7 @@ const AdhkarPage: React.FC = () => {
       <>
       <SEO title="الأذكار والتسبيح — أذكار الصباح والمساء" description="مجموعة أذكار الصباح والمساء وأذكار الصلاة مع عداد التسبيح وإحصائيات يومية." />
       <div className="page-container page-with-topbar" dir="rtl">
-        <div className="px-4 pt-4 max-w-lg mx-auto">
+        <div className="page-inner pt-4">
           <div className="flex items-center gap-3 mb-6">
             <button onClick={() => setTasbihMode(false)} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
               <ArrowRight className="w-4 h-4 text-foreground" />
@@ -204,7 +204,7 @@ const AdhkarPage: React.FC = () => {
 
     return (
       <div className="page-container page-with-topbar" dir="rtl">
-        <div className="px-4 pt-4 max-w-lg mx-auto">
+        <div className="page-inner pt-4">
           <div className="flex items-center gap-3 mb-4">
             <button onClick={() => setSelectedCategory(null)} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
               <ArrowRight className="w-4 h-4 text-foreground" />
