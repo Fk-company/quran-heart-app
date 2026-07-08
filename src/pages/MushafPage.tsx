@@ -944,7 +944,7 @@ const MushafPage: React.FC = () => {
             <div className="mushaf-page-foot">
               <span className="mushaf-page-number">{currentPage}</span>
             </div>
-          </div>
+          </MushafOrnateBorder>
         )}
 
         {/* Navigation — RTL-correct: prev on right, next (primary) on left, plus quick page dots */}
