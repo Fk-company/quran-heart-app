@@ -54,7 +54,7 @@ const SurahSummaryPage: React.FC = () => {
     <>
       <SEO title="ملخص السور القرآنية — قلب القرآن" description="ملخصات موجزة لمواضيع وأهداف سور القرآن." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={FileText} title="تلخيص السور" subtitle="محاور كل سورة بإيجاز" showBack />
 
         {loading ? (

@@ -96,7 +96,7 @@ const QuranPage: React.FC = () => {
     <>
       <SEO title="سور القرآن الكريم — قلب القرآن" description="تصفح قائمة سور القرآن الكريم 114 سورة مع البحث والفرز والترتيب وإمكانية القراءة والاستماع." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader
           icon={Book}
           title="المصحف الشريف"

@@ -86,7 +86,7 @@ const GuidedTadabburPage: React.FC = () => {
     <>
       <SEO title="جلسة تدبر موجهة — قلب القرآن" description="جلسة تدبر قرآنية موجهة من 5 إلى 10 دقائق." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={Lightbulb} title="جلسة تدبر موجهة" subtitle={`جلسة ${idx + 1} من ${SESSIONS.length} • ${Math.round(total / 60)} دقائق`} showBack />
 
         <div className="ayah-card mb-4 text-center">

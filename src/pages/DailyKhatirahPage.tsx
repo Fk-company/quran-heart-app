@@ -35,12 +35,13 @@ const DailyKhatirahPage: React.FC = () => {
   };
 
   return (
-    <div className="page-container pb-24" dir="rtl">
+    <div className="page-container page-with-topbar" dir="rtl">
       <SEO
         title="خاطرة اليوم — قلب القرآن"
         description="آية وحديث وذكر ودعاء واسم من أسماء الله مختارة لك كل يوم في بطاقة واحدة."
       />
-      <PageHeader title="خاطرة اليوم" subtitle={today} icon={Sparkles} />
+      <div className="page-inner">
+      <PageHeader title="خاطرة اليوم" subtitle={today} icon={Sparkles} showBack />
 
       <div className="flex items-center justify-between mb-4 mt-2">
         <div className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -90,6 +91,7 @@ const DailyKhatirahPage: React.FC = () => {
             </article>
           );
         })}
+      </div>
       </div>
     </div>
   );

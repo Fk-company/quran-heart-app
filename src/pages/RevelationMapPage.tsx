@@ -26,7 +26,7 @@ const RevelationMapPage: React.FC = () => {
     <>
       <SEO title="خريطة نزول السور — قلب القرآن" description="تعرف على أماكن نزول السور المكية والمدنية." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={Map} title="خريطة نزول السور" subtitle="مكية ومدنية" showBack />
 
         {/* Schematic map (CSS positions, not a real geo map) */}

@@ -89,7 +89,7 @@ const SettingsPage: React.FC = () => {
     <>
       <SEO title="الإعدادات — قلب القرآن" description="تخصيص إعدادات التطبيق: الثيم، الخط، الإشعارات، والصوت." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader
           icon={Settings}
           title="الإعدادات"

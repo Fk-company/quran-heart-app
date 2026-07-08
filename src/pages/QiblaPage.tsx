@@ -326,7 +326,7 @@ const QiblaPage: React.FC = () => {
     <>
       <SEO title="اتجاه القبلة — بوصلة دقيقة نحو الكعبة" description="حدد اتجاه القبلة بدقة عبر بوصلة احترافية مع معايرة الجهاز وحساب الانحراف عن مكة المكرمة." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto pb-8">
+      <div className="page-inner pb-8">
         <PageHeader icon={Compass} title="اتجاه القبلة" subtitle="بوصلة احترافية نحو الكعبة المشرفة" showBack gradient="gold" />
 
         {/* ============ Location Bar ============ */}

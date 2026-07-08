@@ -129,7 +129,7 @@ const ZakatPage: React.FC = () => {
     <>
       <SEO title="حاسبة الزكاة — قلب القرآن" description="احسب زكاة المال والذهب والفضة بسهولة ودقة مع دعم العملات العربية والعالمية." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={Coins} title="حاسبة الزكاة" subtitle="بسيطة ودقيقة — أسعار حيّة" showBack gradient="gold" />
 
         {/* Currency */}

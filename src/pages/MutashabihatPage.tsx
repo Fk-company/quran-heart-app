@@ -101,7 +101,7 @@ const MutashabihatPage: React.FC = () => {
     <>
       <SEO title="المتشابهات في القرآن — قلب القرآن" description="تعرف على الآيات المتشابهة في القرآن الكريم وتمييزها." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={Layers} title="المتشابهات اللفظية" subtitle="ابحث عن آية لتجد كل مواضعها المتشابهة" showBack />
 
         {/* Search input */}

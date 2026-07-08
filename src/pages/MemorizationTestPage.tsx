@@ -109,7 +109,7 @@ const MemorizationTestPage: React.FC = () => {
       <>
       <SEO title="اختبار حفظ القرآن — قلب القرآن" description="اختبر حفظك للقرآن الكريم بأساليب تفاعلية متنوعة." />
       <div className="page-container page-with-topbar" dir="rtl">
-        <div className="px-4 pt-6 max-w-lg mx-auto">
+        <div className="page-inner">
           <PageHeader icon={Brain} title="اختبار الحفظ" subtitle="اختر السورة للبدء" />
 
           <div className="flex gap-2 mb-5">
@@ -146,7 +146,7 @@ const MemorizationTestPage: React.FC = () => {
 
   return (
     <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={Brain} title="اختبار الحفظ" subtitle={surahs.find(s => s.number === selectedSurah)?.name || ''} showBack onBack={() => setSelectedSurah(null)} />
 
         {loadingAyahs ? (

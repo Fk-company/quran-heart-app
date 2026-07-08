@@ -82,7 +82,7 @@ const AiTafsirPage: React.FC = () => {
     <>
       <SEO title="المساعد القرآني — اسأل عن التفسير" description="مساعد ذكي للإجابة عن معاني القرآن وتفسير الآيات." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto flex flex-col" style={{ height: 'calc(100vh - 10rem)' }}>
+      <div className="page-inner flex flex-col" style={{ height: 'calc(100vh - 10rem)' }}>
         <PageHeader icon={Bot} title="المساعد القرآني" subtitle="اسأل عن تفسير أو معنى كلمة" />
 
         {/* Messages */}

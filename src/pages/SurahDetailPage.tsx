@@ -116,7 +116,7 @@ const SurahDetailPage: React.FC = () => {
         label={surah?.name}
         ariaLabel="تقدم قراءة السورة"
       />
-      <div className="px-4 pt-4 max-w-lg mx-auto">
+      <div className="page-inner pt-4">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4 animate-slide-up-fade">
           <button onClick={() => navigate('/quran')} className="page-header-back press" aria-label="رجوع إلى قائمة السور">

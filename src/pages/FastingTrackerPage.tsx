@@ -56,7 +56,7 @@ const FastingTrackerPage: React.FC = () => {
     <>
       <SEO title="متتبع الصيام — صيام النوافل" description="سجّل أيام صيام النوافل وتتبع تقدمك في عبادة الصيام." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader icon={Moon} title="متتبع الصيام" subtitle="سجّل صيام النوافل واحفظ أجرك" showBack gradient="primary" />
 
         <div className="grid grid-cols-3 gap-2 mb-4">

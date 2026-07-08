@@ -181,7 +181,7 @@ const SearchPage: React.FC = () => {
     <>
       <SEO title="البحث في القرآن الكريم — قلب القرآن" description="ابحث في آيات القرآن الكريم بسهولة مع نتائج فورية ودقيقة." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader
           icon={SearchIcon}
           title="البحث المتقدم"

@@ -38,7 +38,7 @@ const HadithPage: React.FC = () => {
     <>
       <SEO title="الأحاديث النبوية الشريفة — قلب القرآن" description="أحاديث نبوية مختارة من الصحاح مع البحث والتصنيف حسب الموضوع." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="px-4 pt-6 max-w-lg mx-auto">
+      <div className="page-inner">
         <PageHeader
           icon={Quote}
           title="الأحاديث النبوية"

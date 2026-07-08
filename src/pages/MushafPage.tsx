@@ -453,7 +453,7 @@ const MushafPage: React.FC = () => {
         label={`صفحة ${currentPage}`}
         ariaLabel="تقدم قراءة المصحف"
       />
-      <div className="px-4 pt-4 max-w-lg mx-auto">
+      <div className="page-inner pt-4">
         {/* Header */}
         <div className="flex items-center gap-2 mb-4">
           <button onClick={() => navigate('/quran')} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">

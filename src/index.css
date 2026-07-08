@@ -423,6 +423,8 @@
   /* ===== Page layout ===== */
   .page-container { @apply pb-32 min-h-screen; }
   .page-with-topbar { @apply pt-14; }
+  /* Unified inner container so every page shares alignment, width and gutters */
+  .page-inner { @apply px-4 pt-6 max-w-lg mx-auto w-full; }
 
   /* ===== Quick links / icon buttons ===== */
   .quick-link-btn {
