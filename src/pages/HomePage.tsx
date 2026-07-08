@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import SEO from '@/components/SEO';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -400,7 +401,7 @@ const HomePage: React.FC = () => {
         )}
 
         {/* Location Picker Sheet */}
-        {showLocationPicker && (
+        {showLocationPicker && createPortal(
           <>
             <div className="sheet-overlay" onClick={() => setShowLocationPicker(false)} />
             <div className="sheet-content" dir="rtl">
@@ -480,7 +481,8 @@ const HomePage: React.FC = () => {
                 </div>
               </div>
             </div>
-          </>
+          </>,
+          document.body
         )}
 
 
