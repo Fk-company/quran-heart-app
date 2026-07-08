@@ -108,6 +108,8 @@ const SurahDetailPage: React.FC = () => {
   };
 
   return (
+    <>
+    <SEO title={`${surah?.name || 'سورة'} — قلب القرآن`} description={`قراءة وتفسير ${surah?.name || ''} مع الاستماع لتلاوات القراء.`} />
     <div className="page-container page-with-topbar" dir="rtl">
       <ReadingProgress
         storageKey={`read_pos_surah_${surahNum}`}
@@ -116,20 +118,27 @@ const SurahDetailPage: React.FC = () => {
       />
       <div className="px-4 pt-4 max-w-lg mx-auto">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <button onClick={() => navigate('/quran')} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center" aria-label="رجوع إلى قائمة السور">
-            <ArrowRight className="w-4 h-4 text-foreground" aria-hidden="true" />
+        <div className="flex items-center gap-3 mb-4 animate-slide-up-fade">
+          <button onClick={() => navigate('/quran')} className="page-header-back press" aria-label="رجوع إلى قائمة السور">
+            <ArrowRight className="w-4 h-4" aria-hidden="true" />
           </button>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold text-foreground">{surah?.name || ''}</h1>
-            <p className="text-xs text-muted-foreground">
-              {surah ? `${surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية'} - ${surah.numberOfAyahs} آيات` : ''}
-            </p>
+          <div className="page-header-icon-box gradient-primary">
+            <span className="font-amiri text-primary-foreground text-lg font-bold">{surahNum}</span>
           </div>
-          <button onClick={() => setViewMode(viewMode === 'ayah' ? 'full' : 'ayah')} className={`w-9 h-9 rounded-full flex items-center justify-center ${viewMode === 'full' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-foreground'}`} title={viewMode === 'ayah' ? 'عرض كامل' : 'عرض آية آية'}>
+          <div className="flex-1 min-w-0">
+            <h1 className="page-header-title truncate font-kufi">{surah?.name || ''}</h1>
+            {surah && (
+              <p className="page-header-subtitle flex items-center gap-1.5">
+                <span className={surah.revelationType === 'Meccan' ? 'text-primary' : 'text-accent'}>{surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}</span>
+                <span className="w-1 h-1 rounded-full bg-border inline-block" />
+                <span>{surah.numberOfAyahs} آيات</span>
+              </p>
+            )}
+          </div>
+          <button onClick={() => setViewMode(viewMode === 'ayah' ? 'full' : 'ayah')} className={`w-9 h-9 rounded-full flex items-center justify-center press transition-colors ${viewMode === 'full' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-foreground'}`} title={viewMode === 'ayah' ? 'عرض كامل' : 'عرض آية آية'}>
             <Layers className="w-4 h-4" />
           </button>
-          <button onClick={() => surah && toggleSurah(surah.number)} className={`fav-btn ${surah && isSurahFav(surah.number) ? 'active' : ''}`}>
+          <button onClick={() => surah && toggleSurah(surah.number)} className={`fav-btn press ${surah && isSurahFav(surah.number) ? 'active' : ''}`}>
             <Heart className="w-5 h-5" fill={surah && isSurahFav(surah.number) ? 'currentColor' : 'none'} />
           </button>
         </div>
