@@ -826,10 +826,11 @@ const MushafPage: React.FC = () => {
                       <React.Fragment key={ayah.number}>
                         {showSurahHeader && (
                           <div className="my-3">
-                            <div className="mushaf-surah-banner">
-                              <span className="name">سورة {ayah.surah.name}</span>
-                              <span className="meta">{ayah.surah.englishName} · رقم {ayah.surah.number}</span>
-                            </div>
+                            <SurahCartouche
+                              name={ayah.surah.name.replace(/^سورة\s*/, '')}
+                              number={ayah.surah.number}
+                              english={ayah.surah.englishName}
+                            />
                             {ayah.surah.number !== 9 && (
                               <div className="mushaf-bismillah">بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ</div>
                             )}
