@@ -17,6 +17,7 @@ import { useReadingTracker } from '@/hooks/useReadingTracker';
 import { useFavorites } from '@/hooks/useFavorites';
 import { getCached, setCached } from '@/lib/dataCache';
 import WisdomCarousel from '@/components/WisdomCarousel';
+import appLogo from '@/assets/app-logo.png';
 
 const prayerIcons: Record<string, React.ElementType> = {
   Fajr: Sunrise, Sunrise: Sun, Dhuhr: CloudSun, Asr: Sun, Maghrib: Sunset, Isha: Moon,
@@ -345,9 +346,8 @@ const HomePage: React.FC = () => {
         {/* Premium Header */}
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl gradient-primary flex items-center justify-center shadow-emerald relative overflow-hidden">
-              <span className="font-amiri text-primary-foreground text-2xl font-bold leading-none">ﷺ</span>
-              <span className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
+            <div className="w-11 h-11 rounded-2xl bg-card/90 border border-border/60 flex items-center justify-center shadow-emerald relative overflow-hidden">
+              <img src={appLogo} alt="قلب القرآن" width={44} height={44} className="w-full h-full object-contain" />
             </div>
             <div>
               <h1 className="text-xl font-bold font-kufi text-gradient-primary leading-tight">قلب القرآن</h1>
