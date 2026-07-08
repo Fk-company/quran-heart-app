@@ -93,6 +93,7 @@ const moreCategories = [
   {
     title: 'عن التطبيق',
     items: [
+      { label: 'حول التطبيق', icon: FileText, path: '/about', desc: 'الرؤية والأقسام وطرق الدعم', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
       { label: 'إعدادات الإشعارات', icon: Bell, path: '/notification-settings', desc: 'الأذان والتذكيرات وأوقاتها', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
       { label: 'سياسة الخصوصية', icon: FileText, path: '/privacy', desc: 'كيف نتعامل مع بياناتك', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
       { label: 'سياسة الاستخدام', icon: FileText, path: '/terms', desc: 'الشروط والأحكام', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
