@@ -908,11 +908,16 @@
   .mushaf-ornate-night .mushaf-cartouche .mc-name { color: hsl(42 85% 82%); }
 
   @media (max-width: 480px) {
-    .mushaf-ornate { padding: 62px 26px 44px; }
-    .mushaf-ornate .mo-side { width: 20px; top: 58px; bottom: 40px; }
-    .mushaf-ornate .mo-crown-wrap { left: 20px; right: 20px; }
-    .mushaf-ornate .mushaf-crown { height: 62px; }
-    .mushaf-ornate .mo-footer-wrap { left: 20px; right: 20px; }
+    .mushaf-ornate { padding: 78px 22px 54px; }
+    .mushaf-ornate .mo-side { width: 16px; top: 74px; bottom: 46px; }
+    .mushaf-ornate .mo-side-left { left: 10px; }
+    .mushaf-ornate .mo-side-right { right: 10px; }
+    .mushaf-ornate .mo-crown-wrap { top: 12px; left: 12px; right: 12px; }
+    .mushaf-ornate .mushaf-crown { height: 60px; }
+    .mushaf-ornate .mo-footer-wrap { left: 12px; right: 12px; bottom: 18px; }
+    .mushaf-ornate .mushaf-footer-orn { height: 22px; }
+    .mushaf-cartouche { max-width: 300px; height: 66px; }
+    .mushaf-cartouche .mc-name { font-size: 18px; }
   }
   /* Brighter dark theme prayer chip */
   .dark .prayer-chip { background: hsl(162 28% 11%); border-color: hsl(162 30% 22%); color: hsl(42 60% 92%); }
