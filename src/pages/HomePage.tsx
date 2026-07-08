@@ -339,8 +339,8 @@ const HomePage: React.FC = () => {
   return (
     <>
       <SEO title="قلب القرآن — مواقيت الصلاة والقرآن والأذكار" description="الصفحة الرئيسية: مواقيت الصلاة، آخر قراءة، أذكار، وصول سريع لسور القرآن والقراء والراديو." />
-      <div className="page-container" dir="rtl">
-      <div className="px-4 pt-6 pb-4 max-w-lg mx-auto">
+      <div className="page-container page-with-topbar" dir="rtl">
+      <div className="page-inner pb-4">
 
         {/* Premium Header */}
         <div className="flex items-center justify-between mb-5">
