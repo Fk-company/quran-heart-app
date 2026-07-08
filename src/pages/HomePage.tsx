@@ -680,48 +680,52 @@ const HomePage: React.FC = () => {
         <WisdomCarousel />
 
         {/* Primary Actions — Bento (1 hero + 3 compact) */}
-        <div className="mb-5">
-          <div className="grid grid-cols-3 gap-2.5 stagger-children">
+        <nav aria-label="اختصارات رئيسية" className="mb-5">
+          <ul role="list" className="grid grid-cols-3 gap-2.5 stagger-children list-none p-0">
             {/* Hero tile — full-width */}
             {(() => {
               const hero = primaryActions[0];
               return (
-                <button
-                  onClick={() => navigate(hero.path)}
-                  className="col-span-3 relative overflow-hidden rounded-3xl p-4 flex items-center gap-3 text-right border border-primary/20 press"
-                  style={{ background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12) 0%, hsl(var(--accent) / 0.10) 50%, transparent 100%)' }}
-                >
-                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${hero.gradient} shadow-emerald relative overflow-hidden shrink-0`}>
-                    <hero.icon className="w-7 h-7 text-primary-foreground relative z-10" />
-                    <span className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[10px] font-bold text-primary uppercase tracking-widest">ابدأ الآن</div>
-                    <div className="text-base font-extrabold text-foreground font-kufi">{hero.label}</div>
-                    <div className="text-[11px] text-muted-foreground mt-0.5">{hero.desc}</div>
-                  </div>
-                  <ChevronLeft className="w-5 h-5 text-primary/60 shrink-0" />
-                  <span className="absolute -top-6 -left-6 w-24 h-24 rounded-full bg-primary/10 blur-2xl pointer-events-none" />
-                </button>
+                <li className="col-span-3">
+                  <button
+                    onClick={() => navigate(hero.path)}
+                    aria-label={`${hero.label} — ${hero.desc}. ابدأ الآن`}
+                    className="w-full relative overflow-hidden rounded-3xl p-4 flex items-center gap-3 text-right border border-primary/25 press bg-gradient-to-br from-primary/12 via-accent/10 to-transparent dark:from-primary/25 dark:via-accent/15 dark:to-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  >
+                    <div aria-hidden="true" className={`w-16 h-16 rounded-2xl flex items-center justify-center ${hero.gradient} shadow-emerald relative overflow-hidden shrink-0`}>
+                      <hero.icon className="w-7 h-7 text-primary-foreground relative z-10" />
+                      <span className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[10px] font-bold text-primary uppercase tracking-widest">ابدأ الآن</div>
+                      <div className="text-base font-extrabold text-foreground font-kufi">{hero.label}</div>
+                      <div className="text-[11px] text-muted-foreground mt-0.5">{hero.desc}</div>
+                    </div>
+                    <ChevronLeft className="w-5 h-5 text-primary shrink-0" aria-hidden="true" />
+                    <span aria-hidden="true" className="absolute -top-6 -left-6 w-24 h-24 rounded-full bg-primary/15 dark:bg-primary/25 blur-2xl pointer-events-none" />
+                  </button>
+                </li>
               );
             })()}
             {/* Compact tiles */}
             {primaryActions.slice(1).map((link) => (
-              <button
-                key={link.path}
-                onClick={() => navigate(link.path)}
-                className="relative rounded-2xl p-3 flex flex-col items-center gap-1.5 border border-border/50 bg-card hover:bg-secondary/40 press overflow-hidden"
-              >
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${link.gradient} shadow-emerald relative overflow-hidden`}>
-                  <link.icon className="w-5 h-5 text-primary-foreground relative z-10" />
-                  <span className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
-                </div>
-                <span className="text-xs font-extrabold text-foreground leading-tight text-center font-kufi">{link.label}</span>
-                <span className="text-[9px] text-muted-foreground leading-none">{link.desc}</span>
-              </button>
+              <li key={link.path}>
+                <button
+                  onClick={() => navigate(link.path)}
+                  aria-label={`${link.label} — ${link.desc}`}
+                  className="w-full h-full relative rounded-2xl p-3 flex flex-col items-center gap-1.5 border border-border/50 bg-card hover:bg-secondary/40 dark:hover:bg-secondary/50 press overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
+                  <div aria-hidden="true" className={`w-11 h-11 rounded-xl flex items-center justify-center ${link.gradient} shadow-emerald relative overflow-hidden`}>
+                    <link.icon className="w-5 h-5 text-primary-foreground relative z-10" />
+                    <span className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
+                  </div>
+                  <span className="text-xs font-extrabold text-foreground leading-tight text-center font-kufi">{link.label}</span>
+                  <span className="text-[9px] text-muted-foreground leading-none">{link.desc}</span>
+                </button>
+              </li>
             ))}
-          </div>
-        </div>
+          </ul>
+        </nav>
 
         {/* Daily Verse — Premium */}
         <button
