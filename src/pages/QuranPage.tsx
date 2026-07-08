@@ -101,34 +101,37 @@ const QuranPage: React.FC = () => {
           icon={Book}
           title="المصحف الشريف"
           subtitle={`${filtered.length} من ${surahs.length} سورة`}
+          badge={<span className="badge-tone badge-tone-gold">{counts.favorites} مفضلة</span>}
         />
 
         {/* Quick stats */}
-        <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="grid grid-cols-3 gap-2 mb-4 stagger-children">
           <div className="stat-card text-right">
-            <div className="stat-card-icon bg-primary/10"><Book className="w-4 h-4 text-primary" /></div>
+            <div className="icon-tile !w-9 !h-9 !rounded-xl mb-2"><Book className="w-4 h-4" /></div>
             <div className="stat-card-value">114</div>
             <div className="stat-card-label">سورة</div>
           </div>
           <div className="stat-card text-right">
-            <div className="stat-card-icon bg-gold-light"><Layers className="w-4 h-4 text-gold-deep" /></div>
+            <div className="icon-tile icon-tile-gold !w-9 !h-9 !rounded-xl mb-2"><Layers className="w-4 h-4" /></div>
             <div className="stat-card-value">30</div>
             <div className="stat-card-label">جزء</div>
           </div>
           <div className="stat-card text-right">
-            <div className="stat-card-icon bg-emerald-light"><BookOpen className="w-4 h-4 text-primary" /></div>
+            <div className="icon-tile icon-tile-emerald !w-9 !h-9 !rounded-xl mb-2"><BookOpen className="w-4 h-4" /></div>
             <div className="stat-card-value">604</div>
             <div className="stat-card-label">صفحة</div>
           </div>
         </div>
 
         {/* Mushaf entry */}
-        <button onClick={() => navigate('/mushaf')} className="card-luxury w-full mb-4 flex items-center gap-3 text-right hover:scale-[1.01] transition-transform">
-          <div className="w-12 h-12 rounded-2xl gradient-gold flex items-center justify-center flex-shrink-0 shadow-gold">
+        <button onClick={() => navigate('/mushaf')} className="card-luxury w-full mb-4 flex items-center gap-3 text-right press lift-hover">
+          <div className="icon-tile icon-tile-lg gradient-gold !border-transparent shadow-gold">
             <BookOpen className="w-5 h-5 text-primary-foreground" />
           </div>
           <div className="flex-1 text-right">
-            <div className="text-[11px] text-accent font-bold uppercase tracking-wider">جديد</div>
+            <div className="text-[11px] text-accent font-bold uppercase tracking-wider flex items-center gap-1">
+              <Star className="w-3 h-3" /> ميزة مميزة
+            </div>
             <div className="text-base font-bold text-foreground font-kufi">المصحف صفحة بصفحة</div>
             <div className="text-xs text-muted-foreground mt-0.5">اقرأ كالمصحف الورقي — 604 صفحة</div>
           </div>
@@ -152,7 +155,7 @@ const QuranPage: React.FC = () => {
                 <ChevronDown className={`w-3 h-3 transition-transform ${showSort ? 'rotate-180' : ''}`} />
               </button>
               {showSort && (
-                <div className="absolute left-0 top-full mt-2 w-56 bg-card border border-border rounded-2xl shadow-lg p-1.5 z-30 animate-fade-in">
+                <div className="absolute left-0 top-full mt-2 w-56 bg-card border border-border rounded-2xl shadow-lg p-1.5 z-30 animate-scale-in">
                   <div className="px-2 py-1 text-[10px] font-bold text-muted-foreground uppercase">الفرز</div>
                   {(Object.keys(sortLabels) as SortKey[]).map(key => (
                     <button key={key} onClick={() => { setSortKey(key); setShowSort(false); }}
@@ -174,47 +177,59 @@ const QuranPage: React.FC = () => {
             icon={SearchX}
             title="لا توجد نتائج"
             description={search ? `لم يتم العثور على سور مطابقة لـ "${search}"` : 'لا توجد سور في هذا التصنيف'}
+            action={
+              search || filter !== 'all' ? (
+                <button onClick={() => { setSearch(''); setFilter('all'); }} className="chip">إعادة تعيين</button>
+              ) : undefined
+            }
           />
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-3 gap-2.5 stagger-children">
             {filtered.map((surah) => (
-              <div key={surah.number} className="card-surface-hover relative flex flex-col items-center py-4 gap-1.5">
-                <button onClick={(e) => { e.stopPropagation(); toggleSurah(surah.number); }} className={`fav-btn absolute top-1.5 left-1.5 w-7 h-7 ${isSurahFav(surah.number) ? 'active' : ''}`}>
+              <div key={surah.number} className="action-tile !items-center !text-center press">
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleSurah(surah.number); }}
+                  className={`fav-btn absolute top-1.5 left-1.5 w-7 h-7 z-10 ${isSurahFav(surah.number) ? 'active' : ''}`}
+                  aria-label={isSurahFav(surah.number) ? 'إزالة من المفضلة' : 'إضافة للمفضلة'}
+                >
                   <Heart className="w-3.5 h-3.5" fill={isSurahFav(surah.number) ? 'currentColor' : 'none'} />
                 </button>
                 <button onClick={() => navigate(`/quran/${surah.number}`)} className="flex flex-col items-center gap-1.5 w-full">
                   <span className="verse-number">{surah.number}</span>
                   <span className="text-xs font-bold text-foreground mt-1 font-kufi">{surah.name}</span>
                   <span className="text-[10px] text-muted-foreground font-medium">{surah.numberOfAyahs} آيات</span>
+                  <span className={`badge-tone ${surah.revelationType === 'Meccan' ? 'badge-tone-primary' : 'badge-tone-gold'} !text-[9px] !py-0`}>
+                    {surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}
+                  </span>
                 </button>
               </div>
             ))}
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-2 stagger-children">
             {filtered.map((surah) => (
-              <div key={surah.number} className="card-surface-hover flex items-center gap-3 text-right">
+              <div key={surah.number} className="list-row press">
                 <button onClick={() => navigate(`/quran/${surah.number}`)} className="flex items-center gap-3 flex-1 min-w-0">
                   <div className="verse-number flex-shrink-0">{surah.number}</div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-bold text-foreground text-sm font-kufi">{surah.name}</div>
+                  <div className="flex-1 min-w-0 text-right">
+                    <div className="list-row-title font-kufi">{surah.name}</div>
                     <div className="text-[11px] text-muted-foreground flex items-center gap-2 mt-0.5">
-                      <span className={surah.revelationType === 'Meccan' ? 'text-primary font-medium' : 'text-accent font-medium'}>
+                      <span className={`badge-tone ${surah.revelationType === 'Meccan' ? 'badge-tone-primary' : 'badge-tone-gold'} !text-[10px] !py-0`}>
                         {surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}
                       </span>
-                      <span className="w-1 h-1 rounded-full bg-border inline-block" />
                       <span>{surah.numberOfAyahs} آيات</span>
                     </div>
                   </div>
                   <span className="font-amiri text-lg text-primary opacity-70">{surah.name}</span>
                 </button>
-                <button onClick={() => toggleSurah(surah.number)} className={`fav-btn ${isSurahFav(surah.number) ? 'active' : ''}`}>
+                <button onClick={() => toggleSurah(surah.number)} className={`fav-btn ${isSurahFav(surah.number) ? 'active' : ''}`} aria-label="مفضلة">
                   <Heart className="w-4 h-4" fill={isSurahFav(surah.number) ? 'currentColor' : 'none'} />
                 </button>
               </div>
             ))}
           </div>
         )}
+
       </div>
     </div>
     </>
