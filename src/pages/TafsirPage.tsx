@@ -98,37 +98,82 @@ const TafsirPage: React.FC = () => {
     );
   }
 
+  const meccanCount = useMemo(() => surahs.filter(s => s.revelationType === 'Meccan').length, [surahs]);
+  const medinanCount = surahs.length - meccanCount;
+
   return (
+    <>
+    <SEO title="التفسير — قلب القرآن" description="تفاسير القرآن الكريم بمصادر متعددة مع إمكانية المقارنة والبحث." />
     <div className="page-container page-with-topbar" dir="rtl">
       <div className="px-4 pt-6 max-w-lg mx-auto">
         <PageHeader
           icon={BookOpen}
           title="التفسير"
           subtitle="تفاسير متعددة مع إمكانية المقارنة"
+          badge={{ text: `${TAFSIR_EDITIONS.length} تفسير`, tone: 'primary' }}
         />
+
+        {/* Stats overview */}
+        <div className="grid grid-cols-3 gap-2 mb-4 stagger-children">
+          <div className="card-elevated flex flex-col items-center py-3">
+            <div className="icon-tile icon-tile-primary mb-1.5"><Library className="w-4 h-4" /></div>
+            <span className="text-lg font-bold text-foreground">{surahs.length || 114}</span>
+            <span className="text-[10px] text-muted-foreground">سورة</span>
+          </div>
+          <div className="card-elevated flex flex-col items-center py-3">
+            <div className="icon-tile icon-tile-accent mb-1.5"><Sparkles className="w-4 h-4" /></div>
+            <span className="text-lg font-bold text-foreground">{meccanCount || '-'}</span>
+            <span className="text-[10px] text-muted-foreground">مكية</span>
+          </div>
+          <div className="card-elevated flex flex-col items-center py-3">
+            <div className="icon-tile icon-tile-primary mb-1.5"><Layers className="w-4 h-4" /></div>
+            <span className="text-lg font-bold text-foreground">{medinanCount || '-'}</span>
+            <span className="text-[10px] text-muted-foreground">مدنية</span>
+          </div>
+        </div>
 
         <div className="relative mb-4">
           <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="ابحث عن سورة..." className="search-input pr-10" />
+          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="ابحث عن سورة بالاسم أو الرقم..." className="search-input pr-10 pl-9" />
+          {search && (
+            <button onClick={() => setSearch('')} className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-secondary flex items-center justify-center" aria-label="مسح">
+              <X className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
+          )}
         </div>
 
         {loading ? (
           <div className="space-y-2">{Array.from({ length: 10 }).map((_, i) => <div key={i} className="skeleton-pulse h-16 w-full" />)}</div>
+        ) : filtered.length === 0 ? (
+          <EmptyState
+            icon={SearchX}
+            title="لا توجد نتائج"
+            description={`لم نجد سورة تطابق "${search}"`}
+            action={{ label: 'مسح البحث', onClick: () => setSearch('') }}
+          />
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-2 stagger-children">
             {filtered.map(surah => (
-              <button key={surah.number} onClick={() => loadTafsir(surah.number)} className="card-surface-hover w-full flex items-center gap-3 text-right">
+              <button key={surah.number} onClick={() => loadTafsir(surah.number)} className="card-surface-hover w-full flex items-center gap-3 text-right press">
                 <div className="verse-number flex-shrink-0">{surah.number}</div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-foreground text-sm">{surah.name}</div>
-                  <div className="text-[11px] text-muted-foreground">{surah.numberOfAyahs} آيات</div>
+                  <div className="font-semibold text-foreground text-sm font-kufi">{surah.name}</div>
+                  <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                    <span className={surah.revelationType === 'Meccan' ? 'text-primary' : 'text-accent'}>
+                      {surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية'}
+                    </span>
+                    <span className="w-1 h-1 rounded-full bg-border" />
+                    <span>{surah.numberOfAyahs} آيات</span>
+                  </div>
                 </div>
+                <BookOpen className="w-4 h-4 text-muted-foreground" />
               </button>
             ))}
           </div>
         )}
       </div>
     </div>
+    </>
   );
 };
 
