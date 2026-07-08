@@ -827,7 +827,7 @@ const MushafPage: React.FC = () => {
                         {showSurahHeader && (
                           <div className="my-3">
                             <SurahCartouche
-                              name={ayah.surah.name.replace(/^سورة\s*/, '')}
+                              name={ayah.surah.name.replace(/[\u064B-\u0652\u0670]/g, '').replace(/^\s*سورة\s*/, '').trim()}
                               number={ayah.surah.number}
                               english={ayah.surah.englishName}
                             />
