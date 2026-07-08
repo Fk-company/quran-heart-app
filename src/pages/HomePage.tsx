@@ -574,23 +574,69 @@ const HomePage: React.FC = () => {
           </div>
         )}
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-2 mb-5">
-          <button onClick={() => navigate('/reading-stats')} className="stat-card text-right">
-            <div className="stat-card-icon bg-primary/10"><Flame className="w-4 h-4 text-primary" /></div>
-            <div className="stat-card-value">{streak}</div>
-            <div className="stat-card-label">يوم متتالي</div>
-          </button>
-          <button onClick={() => navigate('/quran-stats')} className="stat-card text-right">
-            <div className="stat-card-icon bg-gold-light"><Trophy className="w-4 h-4 text-gold-deep" /></div>
-            <div className="stat-card-value">{totalAyahsRead}</div>
-            <div className="stat-card-label">آية مقروءة</div>
-          </button>
-          <button onClick={() => navigate('/favorites')} className="stat-card text-right">
-            <div className="stat-card-icon bg-destructive/10"><Heart className="w-4 h-4 text-destructive" /></div>
-            <div className="stat-card-value">{favCount}</div>
-            <div className="stat-card-label">المفضلة</div>
-          </button>
+        {/* Premium Stats Bar — unified card with divided cells */}
+        <div className="relative mb-5 rounded-3xl overflow-hidden border border-border/50 shadow-sm">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-accent/5 to-transparent" />
+          <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-primary/8 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-12 -right-8 w-40 h-40 rounded-full bg-accent/8 blur-3xl pointer-events-none" />
+          <div className="relative grid grid-cols-3 divide-x divide-x-reverse divide-border/40">
+            {/* Streak with mini progress ring */}
+            <button onClick={() => navigate('/reading-stats')} className="p-3.5 text-right active:scale-[0.97] transition group">
+              <div className="flex items-center gap-2.5">
+                <div className="relative w-11 h-11 shrink-0">
+                  <svg className="w-11 h-11 -rotate-90" viewBox="0 0 44 44" aria-hidden>
+                    <circle cx="22" cy="22" r="18" fill="none" stroke="hsl(var(--primary) / 0.12)" strokeWidth="3.5" />
+                    <circle
+                      cx="22" cy="22" r="18" fill="none"
+                      stroke="hsl(var(--primary))" strokeWidth="3.5" strokeLinecap="round"
+                      strokeDasharray={2 * Math.PI * 18}
+                      strokeDashoffset={2 * Math.PI * 18 * (1 - Math.min(streak / 30, 1))}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Flame className="w-4 h-4 text-primary" />
+                  </div>
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xl font-extrabold text-foreground font-kufi tabular-nums leading-none">{streak}</div>
+                  <div className="text-[10px] text-muted-foreground font-bold mt-1 leading-none">يوم متتالٍ</div>
+                  <div className="text-[9px] text-primary/70 font-bold mt-1">من 30</div>
+                </div>
+              </div>
+            </button>
+
+            {/* Ayahs read */}
+            <button onClick={() => navigate('/quran-stats')} className="p-3.5 text-right active:scale-[0.97] transition">
+              <div className="flex items-center gap-2.5">
+                <div className="w-11 h-11 rounded-2xl gradient-gold flex items-center justify-center shadow-gold shrink-0">
+                  <Trophy className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xl font-extrabold text-foreground font-kufi tabular-nums leading-none truncate">
+                    {totalAyahsRead > 999 ? `${(totalAyahsRead / 1000).toFixed(1)}K` : totalAyahsRead}
+                  </div>
+                  <div className="text-[10px] text-muted-foreground font-bold mt-1 leading-none">آية مقروءة</div>
+                  <div className="text-[9px] text-accent font-bold mt-1 flex items-center gap-0.5">
+                    <TrendingUp className="w-2.5 h-2.5" /> نموّ
+                  </div>
+                </div>
+              </div>
+            </button>
+
+            {/* Favorites */}
+            <button onClick={() => navigate('/favorites')} className="p-3.5 text-right active:scale-[0.97] transition">
+              <div className="flex items-center gap-2.5">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-destructive/15 to-destructive/5 border border-destructive/20 flex items-center justify-center shrink-0">
+                  <Heart className="w-5 h-5 text-destructive fill-destructive/30" />
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xl font-extrabold text-foreground font-kufi tabular-nums leading-none">{favCount}</div>
+                  <div className="text-[10px] text-muted-foreground font-bold mt-1 leading-none">مفضّلة</div>
+                  <div className="text-[9px] text-destructive/70 font-bold mt-1">محفوظات</div>
+                </div>
+              </div>
+            </button>
+          </div>
         </div>
 
         {/* Continue reading */}
