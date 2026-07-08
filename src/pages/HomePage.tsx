@@ -660,17 +660,48 @@ const HomePage: React.FC = () => {
         {/* Wisdom Carousel — auto-rotating cards (dhikr / ayah / hadith / names / dua) */}
         <WisdomCarousel />
 
-        {/* Primary Actions — Big icons */}
-        <div className="grid grid-cols-4 gap-2 mb-5 stagger-children">
-          {primaryActions.map((link) => (
-            <button key={link.path} onClick={() => navigate(link.path)} className="quick-link-btn press">
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${link.gradient} shadow-emerald relative overflow-hidden`}>
-                <link.icon className="w-6 h-6 text-primary-foreground relative z-10" />
-                <span className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
-              </div>
-              <span className="text-xs font-bold text-foreground leading-tight text-center">{link.label}</span>
-            </button>
-          ))}
+        {/* Primary Actions — Bento (1 hero + 3 compact) */}
+        <div className="mb-5">
+          <div className="grid grid-cols-3 gap-2.5 stagger-children">
+            {/* Hero tile — full-width */}
+            {(() => {
+              const hero = primaryActions[0];
+              return (
+                <button
+                  onClick={() => navigate(hero.path)}
+                  className="col-span-3 relative overflow-hidden rounded-3xl p-4 flex items-center gap-3 text-right border border-primary/20 press"
+                  style={{ background: 'linear-gradient(135deg, hsl(var(--primary) / 0.12) 0%, hsl(var(--accent) / 0.10) 50%, transparent 100%)' }}
+                >
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center ${hero.gradient} shadow-emerald relative overflow-hidden shrink-0`}>
+                    <hero.icon className="w-7 h-7 text-primary-foreground relative z-10" />
+                    <span className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[10px] font-bold text-primary uppercase tracking-widest">ابدأ الآن</div>
+                    <div className="text-base font-extrabold text-foreground font-kufi">{hero.label}</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">{hero.desc}</div>
+                  </div>
+                  <ChevronLeft className="w-5 h-5 text-primary/60 shrink-0" />
+                  <span className="absolute -top-6 -left-6 w-24 h-24 rounded-full bg-primary/10 blur-2xl pointer-events-none" />
+                </button>
+              );
+            })()}
+            {/* Compact tiles */}
+            {primaryActions.slice(1).map((link) => (
+              <button
+                key={link.path}
+                onClick={() => navigate(link.path)}
+                className="relative rounded-2xl p-3 flex flex-col items-center gap-1.5 border border-border/50 bg-card hover:bg-secondary/40 press overflow-hidden"
+              >
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${link.gradient} shadow-emerald relative overflow-hidden`}>
+                  <link.icon className="w-5 h-5 text-primary-foreground relative z-10" />
+                  <span className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
+                </div>
+                <span className="text-xs font-extrabold text-foreground leading-tight text-center font-kufi">{link.label}</span>
+                <span className="text-[9px] text-muted-foreground leading-none">{link.desc}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Daily Verse — Premium */}
