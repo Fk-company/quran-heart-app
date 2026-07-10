@@ -17,7 +17,7 @@ import { useReadingTracker } from '@/hooks/useReadingTracker';
 import { useFavorites } from '@/hooks/useFavorites';
 import { getCached, setCached } from '@/lib/dataCache';
 import WisdomCarousel from '@/components/WisdomCarousel';
-import appLogo from '@/assets/app-logo.png';
+import AppLogo from '@/components/AppLogo';
 
 const prayerIcons: Record<string, React.ElementType> = {
   Fajr: Sunrise, Sunrise: Sun, Dhuhr: CloudSun, Asr: Sun, Maghrib: Sunset, Isha: Moon,
