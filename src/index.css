@@ -1065,6 +1065,19 @@
   }
   .shadow-emerald { box-shadow: var(--shadow-emerald); }
   .shadow-gold { box-shadow: var(--shadow-gold); }
+
+  /* Unified app logo treatment. Dark mode: boost brightness + warm tint
+     so the mark reads clearly against dark surfaces without looking washed out. */
+  .app-logo-img {
+    transition: filter 300ms ease;
+  }
+  .dark .app-logo-img {
+    filter:
+      brightness(1.35)
+      contrast(1.05)
+      drop-shadow(0 0 6px hsl(var(--primary) / 0.35))
+      drop-shadow(0 2px 4px hsl(0 0% 0% / 0.4));
+  }
 }
 
 /* ===== Wisdom Carousel ===== */
