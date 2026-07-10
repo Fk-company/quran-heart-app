@@ -145,6 +145,26 @@ const AyahByAyahControls: React.FC<{
         )}
       </div>
 
+      {/* Playback speed */}
+      <div className={`flex items-center justify-between mt-2 pt-2 border-t ${nightMode ? 'border-amber-700/20' : 'border-border'}`}>
+        <span className={`text-[10px] font-semibold ${muted}`}>سرعة القراءة</span>
+        <div className="flex items-center gap-1">
+          {[0.75, 1, 1.25, 1.5].map(r => (
+            <button
+              key={r}
+              onClick={() => player.changePlaybackRate(r)}
+              className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-colors ${
+                player.playbackRate === r
+                  ? nightMode ? 'bg-amber-500/20 text-amber-300' : 'bg-primary/15 text-primary'
+                  : nightMode ? 'bg-amber-900/15 text-amber-400/60' : 'bg-secondary text-muted-foreground'
+              }`}
+            >
+              {r}×
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Reciter selector */}
       <div className="flex items-center gap-1.5 mt-2 overflow-x-auto pb-1">
         {player.availableReciters.map(r => (
