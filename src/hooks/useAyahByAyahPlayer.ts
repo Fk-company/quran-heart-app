@@ -80,11 +80,18 @@ export function useAyahByAyahPlayer() {
 
     const reciter = RECITERS[reciterId] || RECITERS.alafasy;
     audio.src = `https://cdn.islamic.network/quran/audio/128/${reciter.identifier}/${ayah.number}.mp3`;
+    audio.playbackRate = rateRef.current;
     audio.play().catch(() => {
       setIsAyahPlaying(false);
       setPlayingAyahNumber(null);
     });
   }, [reciterId]);
+
+  const changePlaybackRate = useCallback((rate: number) => {
+    rateRef.current = rate;
+    setPlaybackRate(rate);
+    if (audioRef.current) audioRef.current.playbackRate = rate;
+  }, []);
 
   const startPlayback = useCallback((ayahs: AyahAudio[], startFromIndex = 0) => {
     queueRef.current = ayahs;
