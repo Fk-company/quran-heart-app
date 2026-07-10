@@ -1066,18 +1066,37 @@
   .shadow-emerald { box-shadow: var(--shadow-emerald); }
   .shadow-gold { box-shadow: var(--shadow-gold); }
 
-  /* Unified app logo treatment. Dark mode: boost brightness + warm tint
-     so the mark reads clearly against dark surfaces without looking washed out. */
+  /* Unified app logo treatment. Dark mode: strong brightness + warm gold halo
+     so the mark reads crisply against dark surfaces. */
   .app-logo-img {
     transition: filter 300ms ease;
   }
   .dark .app-logo-img {
     filter:
-      brightness(1.35)
-      contrast(1.05)
-      drop-shadow(0 0 6px hsl(var(--primary) / 0.35))
-      drop-shadow(0 2px 4px hsl(0 0% 0% / 0.4));
+      brightness(1.6)
+      contrast(1.15)
+      saturate(1.25)
+      drop-shadow(0 0 8px hsl(45 85% 60% / 0.55))
+      drop-shadow(0 0 2px hsl(45 90% 70% / 0.7))
+      drop-shadow(0 2px 6px hsl(0 0% 0% / 0.5));
   }
+
+  /* Container of the app logo — brighter, gold-tinted surface in dark mode */
+  .app-logo-frame {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    transition: background 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+  }
+  .dark .app-logo-frame {
+    background: linear-gradient(135deg,
+      hsl(45 40% 20% / 0.6),
+      hsl(45 55% 30% / 0.35));
+    border-color: hsl(45 70% 55% / 0.45);
+    box-shadow:
+      inset 0 0 0 1px hsl(45 80% 60% / 0.15),
+      0 4px 14px hsl(45 60% 30% / 0.35);
+  }
+}
 }
 
 /* ===== Wisdom Carousel ===== */
