@@ -54,13 +54,14 @@ const AyahTafsirModal: React.FC<AyahTafsirModalProps> = ({ ayah, nightMode, onCl
   const accentBg = nightMode ? 'bg-amber-500/10' : 'bg-primary/5';
 
   return (
-    <div className="fixed inset-0 z-[80] flex items-end justify-center" dir="rtl" onClick={onClose}>
+    <div className="fixed inset-0 z-[80]" dir="rtl" onClick={onClose}>
       <div className="absolute inset-0 bg-foreground/50 backdrop-blur-sm" />
       <div
-        className={`relative w-full max-w-lg ${bg} rounded-t-3xl border-t ${border} max-h-[80vh] overflow-hidden animate-fade-in flex flex-col`}
+        className={`absolute left-1/2 -translate-x-1/2 w-full max-w-lg ${bg} rounded-t-3xl border-t ${border} overflow-hidden flex flex-col`}
         style={{
           animation: 'sheet-up 0.3s cubic-bezier(0.32, 0.72, 0, 1)',
-          marginBottom: 'calc(var(--nav-height) + env(safe-area-inset-bottom, 0px))',
+          bottom: 'calc(var(--nav-height) + env(safe-area-inset-bottom, 0px))',
+          top: 'max(10vh, 3rem)',
         }}
         onClick={e => e.stopPropagation()}
       >
