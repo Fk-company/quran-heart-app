@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Moon, Sun, Settings, Search, ChevronRight } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
-import appLogo from '@/assets/app-logo.png';
+import AppLogo from '@/components/AppLogo';
 
 const TopBar: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
@@ -61,15 +61,8 @@ const TopBar: React.FC = () => {
               className="absolute -inset-1 rounded-2xl opacity-50 blur-md group-hover:opacity-80 transition-opacity"
               style={{ background: 'linear-gradient(135deg, hsl(var(--primary)/0.6), hsl(var(--accent)/0.5))' }}
             />
-            <div className="relative w-9 h-9 rounded-2xl flex items-center justify-center overflow-hidden bg-card/90 border border-border/60 shadow-sm">
-              <img
-                src={appLogo}
-                alt="قلب القرآن"
-                width={36}
-                height={36}
-                loading="lazy"
-                className="w-full h-full object-contain"
-              />
+            <div className="relative w-9 h-9 rounded-2xl flex items-center justify-center overflow-hidden bg-card/90 border border-border/60 dark:border-primary/30 shadow-sm">
+              <AppLogo size={36} rounded="rounded-2xl" />
             </div>
           </div>
           <div className="text-right leading-tight">

@@ -145,6 +145,26 @@ const AyahByAyahControls: React.FC<{
         )}
       </div>
 
+      {/* Playback speed */}
+      <div className={`flex items-center justify-between mt-2 pt-2 border-t ${nightMode ? 'border-amber-700/20' : 'border-border'}`}>
+        <span className={`text-[10px] font-semibold ${muted}`}>سرعة القراءة</span>
+        <div className="flex items-center gap-1">
+          {[0.75, 1, 1.25, 1.5].map(r => (
+            <button
+              key={r}
+              onClick={() => player.changePlaybackRate(r)}
+              className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-colors ${
+                player.playbackRate === r
+                  ? nightMode ? 'bg-amber-500/20 text-amber-300' : 'bg-primary/15 text-primary'
+                  : nightMode ? 'bg-amber-900/15 text-amber-400/60' : 'bg-secondary text-muted-foreground'
+              }`}
+            >
+              {r}×
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Reciter selector */}
       <div className="flex items-center gap-1.5 mt-2 overflow-x-auto pb-1">
         {player.availableReciters.map(r => (
@@ -718,19 +738,43 @@ const MushafPage: React.FC = () => {
 
           {showToolbar && (
             <div className="mt-3 pt-3 border-t border-border space-y-3 animate-fade-in">
-              {/* Font size */}
-              <div className="flex items-center gap-2">
-                <Type className={`w-3.5 h-3.5 ${nightMode ? 'text-amber-300' : 'text-primary'}`} />
-                <span className={`text-[11px] font-semibold flex-1 ${nightMode ? 'text-amber-100' : 'text-foreground'}`}>حجم الخط</span>
-                <button onClick={() => updateSetting('mushafFontSize', Math.max(16, settings.mushafFontSize - 2))}
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${nightMode ? 'bg-amber-900/20 text-amber-300' : 'bg-secondary text-foreground'}`}>
-                  <Minus className="w-3.5 h-3.5" />
-                </button>
-                <span className={`text-xs font-bold min-w-[3rem] text-center ${nightMode ? 'text-amber-300' : 'text-primary'}`}>{settings.mushafFontSize}px</span>
-                <button onClick={() => updateSetting('mushafFontSize', Math.min(40, settings.mushafFontSize + 2))}
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${nightMode ? 'bg-amber-900/20 text-amber-300' : 'bg-secondary text-foreground'}`}>
-                  <Plus className="w-3.5 h-3.5" />
-                </button>
+              {/* Font size presets */}
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <Type className={`w-3.5 h-3.5 ${nightMode ? 'text-amber-300' : 'text-primary'}`} />
+                  <span className={`text-[11px] font-semibold flex-1 ${nightMode ? 'text-amber-100' : 'text-foreground'}`}>حجم الخط</span>
+                  <span className={`text-[10px] font-bold ${nightMode ? 'text-amber-300' : 'text-primary'}`}>{settings.mushafFontSize}px</span>
+                </div>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {[
+                    { label: 'صغير', v: 20 },
+                    { label: 'متوسط', v: 24 },
+                    { label: 'كبير', v: 30 },
+                    { label: 'ضخم', v: 36 },
+                  ].map(p => (
+                    <button
+                      key={p.v}
+                      onClick={() => updateSetting('mushafFontSize', p.v)}
+                      className={`py-1.5 rounded-lg text-[10px] font-bold transition-all ${
+                        settings.mushafFontSize === p.v
+                          ? nightMode ? 'bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/40' : 'bg-primary/15 text-primary ring-1 ring-primary/30'
+                          : nightMode ? 'bg-amber-900/15 text-amber-400/70' : 'bg-secondary text-foreground'
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  <button onClick={() => updateSetting('mushafFontSize', Math.max(16, settings.mushafFontSize - 2))}
+                    className={`flex-1 h-8 rounded-lg flex items-center justify-center ${nightMode ? 'bg-amber-900/20 text-amber-300' : 'bg-secondary text-foreground'}`}>
+                    <Minus className="w-3.5 h-3.5" />
+                  </button>
+                  <button onClick={() => updateSetting('mushafFontSize', Math.min(48, settings.mushafFontSize + 2))}
+                    className={`flex-1 h-8 rounded-lg flex items-center justify-center ${nightMode ? 'bg-amber-900/20 text-amber-300' : 'bg-secondary text-foreground'}`}>
+                    <Plus className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
 
               {/* Line height */}
@@ -769,6 +813,23 @@ const MushafPage: React.FC = () => {
                   {smoothing ? 'نعومة مفعّلة' : 'نعومة العرض'}
                 </button>
               </div>
+
+              {/* Reset defaults */}
+              <button
+                onClick={() => {
+                  updateSetting('mushafFontSize', 24);
+                  setLineHeight(2.8);
+                  setSmoothing(true);
+                }}
+                className={`w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-[11px] font-bold border transition-colors ${
+                  nightMode
+                    ? 'border-amber-700/30 text-amber-300 hover:bg-amber-900/20'
+                    : 'border-border text-foreground hover:bg-secondary'
+                }`}
+              >
+                <Settings2 className="w-3.5 h-3.5" />
+                إعادة تعيين الإعدادات
+              </button>
             </div>
           )}
         </div>

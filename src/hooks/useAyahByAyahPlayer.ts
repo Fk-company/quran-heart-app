@@ -23,10 +23,12 @@ export function useAyahByAyahPlayer() {
   const [reciterId, setReciterId] = useState('alafasy');
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [playbackRate, setPlaybackRate] = useState(1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const queueRef = useRef<AyahAudio[]>([]);
   const indexRef = useRef(0);
   const onAyahEndRef = useRef<(() => boolean) | null>(null);
+  const rateRef = useRef(1);
 
   useEffect(() => {
     const audio = new Audio();
@@ -78,11 +80,18 @@ export function useAyahByAyahPlayer() {
 
     const reciter = RECITERS[reciterId] || RECITERS.alafasy;
     audio.src = `https://cdn.islamic.network/quran/audio/128/${reciter.identifier}/${ayah.number}.mp3`;
+    audio.playbackRate = rateRef.current;
     audio.play().catch(() => {
       setIsAyahPlaying(false);
       setPlayingAyahNumber(null);
     });
   }, [reciterId]);
+
+  const changePlaybackRate = useCallback((rate: number) => {
+    rateRef.current = rate;
+    setPlaybackRate(rate);
+    if (audioRef.current) audioRef.current.playbackRate = rate;
+  }, []);
 
   const startPlayback = useCallback((ayahs: AyahAudio[], startFromIndex = 0) => {
     queueRef.current = ayahs;
@@ -164,6 +173,7 @@ export function useAyahByAyahPlayer() {
     progress,
     duration,
     reciterId,
+    playbackRate,
     availableReciters,
     startPlayback,
     playFromAyah,
@@ -173,6 +183,7 @@ export function useAyahByAyahPlayer() {
     skipNext,
     skipPrev,
     changeReciter,
+    changePlaybackRate,
     replayCurrentAyah,
     setOnAyahEnd,
   };
