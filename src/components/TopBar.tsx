@@ -61,7 +61,7 @@ const TopBar: React.FC = () => {
               className="absolute -inset-1 rounded-2xl opacity-50 blur-md group-hover:opacity-80 transition-opacity"
               style={{ background: 'linear-gradient(135deg, hsl(var(--primary)/0.6), hsl(var(--accent)/0.5))' }}
             />
-            <div className="relative w-9 h-9 rounded-2xl flex items-center justify-center overflow-hidden bg-card/90 border border-border/60 dark:border-primary/30 shadow-sm">
+            <div className="app-logo-frame relative w-9 h-9 rounded-2xl flex items-center justify-center overflow-hidden shadow-sm">
               <AppLogo size={36} rounded="rounded-2xl" />
             </div>
           </div>
