@@ -65,7 +65,7 @@ const AyahTafsirModal: React.FC<AyahTafsirModalProps> = ({ ayah, nightMode, onCl
     <div className="fixed inset-0 z-[80]" dir="rtl" onClick={onClose}>
       <div className="absolute inset-0 bg-foreground/50 backdrop-blur-sm" />
       <div
-        className={`absolute left-1/2 -translate-x-1/2 w-full max-w-lg ${bg} rounded-t-3xl border-t ${border} overflow-hidden flex flex-col`}
+        className={`absolute left-1/2 -translate-x-1/2 w-full max-w-lg ${bg} rounded-t-3xl border-t ${border} overflow-hidden flex flex-col shadow-2xl`}
         style={{
           animation: 'sheet-up 0.3s cubic-bezier(0.32, 0.72, 0, 1)',
           bottom: 'calc(var(--nav-height) + env(safe-area-inset-bottom, 0px))',
@@ -73,11 +73,32 @@ const AyahTafsirModal: React.FC<AyahTafsirModalProps> = ({ ayah, nightMode, onCl
         }}
         onClick={e => e.stopPropagation()}
       >
-        <div className={`w-10 h-1 rounded-full mx-auto mt-3 mb-1 ${nightMode ? 'bg-amber-700/40' : 'bg-border'}`} />
+        {/* Tappable drag handle also acts as close hint */}
+        <button
+          onClick={onClose}
+          aria-label="إغلاق"
+          className="w-full flex justify-center pt-2.5 pb-1.5 active:opacity-70"
+        >
+          <span className={`w-12 h-1.5 rounded-full ${nightMode ? 'bg-amber-500/50' : 'bg-border'}`} />
+        </button>
+
+        {/* Prominent floating close button */}
+        <button
+          onClick={onClose}
+          aria-label="إغلاق نافذة التفسير"
+          title="إغلاق"
+          className={`absolute top-3 left-3 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg border transition-all active:scale-90 hover:scale-105 ${
+            nightMode
+              ? 'bg-amber-500/25 border-amber-500/50 text-amber-100 hover:bg-amber-500/40'
+              : 'bg-primary text-primary-foreground border-primary/40 hover:bg-primary/90'
+          }`}
+        >
+          <X className="w-5 h-5" strokeWidth={2.5} />
+        </button>
 
         {/* Header */}
         <div className={`flex items-center justify-between px-5 py-3 border-b ${border}`}>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pl-12">
             <BookOpen className={`w-4 h-4 ${accentColor}`} />
             <span className={`text-sm font-bold ${textColor}`}>التفسير الميسر</span>
           </div>
@@ -95,9 +116,6 @@ const AyahTafsirModal: React.FC<AyahTafsirModalProps> = ({ ayah, nightMode, onCl
             </button>
             <button onClick={handleCopy} className={`w-8 h-8 rounded-full flex items-center justify-center ${accentBg}`} aria-label="نسخ">
               {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className={`w-3.5 h-3.5 ${accentColor}`} />}
-            </button>
-            <button onClick={onClose} className={`w-8 h-8 rounded-full flex items-center justify-center ${accentBg}`} aria-label="إغلاق">
-              <X className={`w-3.5 h-3.5 ${mutedColor}`} />
             </button>
           </div>
         </div>
