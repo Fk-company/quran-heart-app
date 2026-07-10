@@ -109,7 +109,7 @@ const DeveloperSocialPage: React.FC = () => {
             <motion.img
               src={appLogo}
               alt="لوكو قلب القرآن"
-              className="w-24 h-24 rounded-3xl mb-4 drop-shadow-lg"
+              className="app-logo-img w-24 h-24 rounded-3xl mb-4 drop-shadow-lg"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.15, duration: 0.5 }}
