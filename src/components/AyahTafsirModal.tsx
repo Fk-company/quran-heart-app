@@ -27,6 +27,14 @@ const AyahTafsirModal: React.FC<AyahTafsirModalProps> = ({ ayah, nightMode, onCl
       .finally(() => setLoading(false));
   }, [ayah]);
 
+  // ESC key closes
+  useEffect(() => {
+    if (!ayah) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [ayah, onClose]);
+
   if (!ayah) return null;
 
   const handleCopy = () => {
