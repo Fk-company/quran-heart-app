@@ -173,6 +173,7 @@ export function useAyahByAyahPlayer() {
     progress,
     duration,
     reciterId,
+    playbackRate,
     availableReciters,
     startPlayback,
     playFromAyah,
@@ -182,6 +183,7 @@ export function useAyahByAyahPlayer() {
     skipNext,
     skipPrev,
     changeReciter,
+    changePlaybackRate,
     replayCurrentAyah,
     setOnAyahEnd,
   };
