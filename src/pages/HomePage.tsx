@@ -346,7 +346,7 @@ const HomePage: React.FC = () => {
         {/* Premium Header */}
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-card/90 border border-border/60 flex items-center justify-center shadow-emerald relative overflow-hidden dark:border-primary/30">
+            <div className="app-logo-frame w-11 h-11 rounded-2xl flex items-center justify-center shadow-emerald relative overflow-hidden">
               <AppLogo size={44} rounded="rounded-2xl" />
             </div>
             <div>
