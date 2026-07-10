@@ -23,10 +23,12 @@ export function useAyahByAyahPlayer() {
   const [reciterId, setReciterId] = useState('alafasy');
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [playbackRate, setPlaybackRate] = useState(1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const queueRef = useRef<AyahAudio[]>([]);
   const indexRef = useRef(0);
   const onAyahEndRef = useRef<(() => boolean) | null>(null);
+  const rateRef = useRef(1);
 
   useEffect(() => {
     const audio = new Audio();
