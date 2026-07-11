@@ -135,12 +135,12 @@ const BottomNav: React.FC = () => {
                       />
                     )}
                     <Icon
-                      className={`relative w-5 h-5 transition-all duration-300 ${active ? 'text-primary scale-110' : 'text-muted-foreground'}`}
-                      strokeWidth={active ? 2.4 : 1.8}
+                      className={`relative w-5 h-5 transition-all duration-300 ${active ? 'text-primary scale-110' : 'text-muted-foreground dark:text-foreground/70'}`}
+                      strokeWidth={active ? 2.4 : 1.9}
                     />
                   </div>
                   <span
-                    className={`transition-colors duration-200 ${active ? 'text-primary font-bold' : 'text-muted-foreground font-medium'}`}
+                    className={`transition-colors duration-200 ${active ? 'text-primary font-bold' : 'text-muted-foreground dark:text-foreground/75 font-medium'}`}
                   >
                     {item.label}
                   </span>
