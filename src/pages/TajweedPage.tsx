@@ -16,9 +16,19 @@ const loadYouTubeApi = (): Promise<any> => {
   if (ytApiPromise) return ytApiPromise;
   ytApiPromise = new Promise((resolve, reject) => {
     const prev = w.onYouTubeIframeAPIReady;
+    let settled = false;
+    const finish = (ok: boolean, err?: Error) => {
+      if (settled) return;
+      settled = true;
+      if (ok) resolve(w.YT);
+      else {
+        ytApiPromise = null; // allow retry after failure
+        reject(err || new Error('yt-api-failed'));
+      }
+    };
     w.onYouTubeIframeAPIReady = () => {
       try { prev && prev(); } catch { /* noop */ }
-      resolve(w.YT);
+      finish(!!(w.YT && w.YT.Player));
     };
     const existing = document.querySelector('script[data-yt-iframe-api]') as HTMLScriptElement | null;
     if (!existing) {
@@ -26,14 +36,39 @@ const loadYouTubeApi = (): Promise<any> => {
       s.src = 'https://www.youtube.com/iframe_api';
       s.async = true;
       s.setAttribute('data-yt-iframe-api', '1');
-      s.onerror = () => reject(new Error('yt-api-load-failed'));
+      s.onerror = () => finish(false, new Error('yt-api-load-failed'));
       document.head.appendChild(s);
     }
     setTimeout(() => {
-      if (!w.YT || !w.YT.Player) reject(new Error('yt-api-timeout'));
+      if (!(w.YT && w.YT.Player)) finish(false, new Error('yt-api-timeout'));
     }, 8000);
   });
   return ytApiPromise;
+};
+
+type PlayerErrorKind = 'network' | 'blocked' | 'unavailable' | 'unknown';
+
+const errorMessages: Record<PlayerErrorKind, { title: string; hint: string; icon: React.ComponentType<{ className?: string }> }> = {
+  network: {
+    title: 'تعذّر الاتصال بيوتيوب',
+    hint: 'تحقّق من اتصال الإنترنت ثم أعد المحاولة.',
+    icon: WifiOff,
+  },
+  blocked: {
+    title: 'المتصفح يمنع تشغيل الفيديو داخل التطبيق',
+    hint: 'قد يكون بسبب مانع إعلانات أو إعدادات خصوصية. يمكنك فتحه على يوتيوب مباشرة.',
+    icon: ShieldAlert,
+  },
+  unavailable: {
+    title: 'هذا الفيديو غير متاح للتشغيل هنا',
+    hint: 'صاحب الفيديو قد يمنع التضمين. جرّب فتحه على يوتيوب.',
+    icon: AlertCircle,
+  },
+  unknown: {
+    title: 'تعذّر تشغيل الفيديو',
+    hint: 'حدث خطأ غير متوقّع. أعد المحاولة أو افتح النتائج على يوتيوب.',
+    icon: AlertCircle,
+  },
 };
 
 interface YouTubePlayerModalProps {
