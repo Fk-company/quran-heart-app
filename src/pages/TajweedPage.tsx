@@ -49,58 +49,55 @@ interface Lesson {
   ruleIds: string[];
 }
 
-interface VideoLesson {
+interface PracticeLab {
   id: string;
   title: string;
   desc: string;
-  query: string;
-  channel: string;
+  focus: string;
+  drill: string;
+  listen: string;
+  repeat: string;
+  ruleIds: string[];
+  minutes: number;
   category: 'مقدمة' | 'أحكام النون' | 'أحكام الميم' | 'المدود' | 'مخارج وصفات' | 'تطبيق';
 }
 
-const VIDEO_LESSONS: VideoLesson[] = [
-  { id: 'v1', title: 'مقدمة في علم التجويد', desc: 'تعريف التجويد وأهميته وأحكامه', query: 'أيمن سويد مقدمة في علم التجويد', channel: 'أيمن سويد', category: 'مقدمة' },
-  { id: 'v2', title: 'الاستعاذة والبسملة', desc: 'أحكام البدء بالتلاوة وآدابها', query: 'أيمن سويد الاستعاذة والبسملة', channel: 'أيمن سويد', category: 'مقدمة' },
-  { id: 'v3', title: 'أحكام النون الساكنة والتنوين', desc: 'الإظهار، الإدغام، الإقلاب، الإخفاء', query: 'أيمن سويد أحكام النون الساكنة والتنوين', channel: 'أيمن سويد', category: 'أحكام النون' },
-  { id: 'v4', title: 'الإخفاء الحقيقي', desc: 'شرح 15 حرفاً وكيفية النطق بها', query: 'أيمن سويد الإخفاء الحقيقي', channel: 'أيمن سويد', category: 'أحكام النون' },
-  { id: 'v5', title: 'أحكام الميم الساكنة', desc: 'الإدغام والإخفاء والإظهار الشفوي', query: 'أيمن سويد أحكام الميم الساكنة', channel: 'أيمن سويد', category: 'أحكام الميم' },
-  { id: 'v6', title: 'المد الطبيعي وأنواع المدود', desc: 'مقادير المدود ومواضعها', query: 'أيمن سويد المد الطبيعي أنواع المدود', channel: 'أيمن سويد', category: 'المدود' },
-  { id: 'v7', title: 'المد المتصل والمنفصل', desc: 'الفرق بينهما ومقدار كل منهما', query: 'أيمن سويد المد المتصل والمنفصل', channel: 'أيمن سويد', category: 'المدود' },
-  { id: 'v8', title: 'المد اللازم بأقسامه', desc: 'كلمي وحرفي، مثقل ومخفف', query: 'أيمن سويد المد اللازم', channel: 'أيمن سويد', category: 'المدود' },
-  { id: 'v9', title: 'مخارج الحروف', desc: 'الجوف، الحلق، اللسان، الشفتان، الخيشوم', query: 'أيمن سويد مخارج الحروف', channel: 'أيمن سويد', category: 'مخارج وصفات' },
-  { id: 'v10', title: 'صفات الحروف', desc: 'الصفات التي لها ضد وما لا ضد لها', query: 'أيمن سويد صفات الحروف', channel: 'أيمن سويد', category: 'مخارج وصفات' },
-  { id: 'v11', title: 'القلقلة صغرى وكبرى', desc: 'حروف قطب جد وطريقة نطقها', query: 'أيمن سويد القلقلة', channel: 'أيمن سويد', category: 'أحكام النون' },
-  { id: 'v12', title: 'اللام الشمسية والقمرية', desc: 'قواعد النطق بلام "أل" التعريف', query: 'أيمن سويد اللام الشمسية والقمرية', channel: 'أيمن سويد', category: 'أحكام النون' },
-  { id: 'v13', title: 'أحكام الراء', desc: 'تفخيم وترقيق الراء بجميع حالاتها', query: 'أيمن سويد أحكام الراء', channel: 'أيمن سويد', category: 'مخارج وصفات' },
-  { id: 'v14', title: 'أحكام الوقف والابتداء', desc: 'أنواع الوقف وعلامات المصحف', query: 'أيمن سويد الوقف والابتداء', channel: 'أيمن سويد', category: 'تطبيق' },
-  { id: 'v15', title: 'تطبيق عملي على سورة الفاتحة', desc: 'قراءة مجودة مع شرح الأحكام', query: 'أيمن سويد تطبيق سورة الفاتحة تجويد', channel: 'أيمن سويد', category: 'تطبيق' },
+const PRACTICE_LABS: PracticeLab[] = [
+  { id: 'p1', title: 'ميزان الترتيل', desc: 'اضبط سرعة القراءة قبل الدخول في الأحكام.', focus: 'اقرأ ببطء، ثم اجعل كل كلمة واضحة بلا مطّ زائد.', drill: 'اقرأ: بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ثلاث مرات؛ الأولى ببطء، الثانية باعتدال، الثالثة مع تدبر المعنى.', listen: 'راقب مخارج الباء والميم والراء، ولا تبدأ بسرعة عالية.', repeat: 'أعد التدريب حتى تستطيع القراءة بنفس واحد هادئ.', ruleIds: ['madd-tabii', 'lam-shamsi'], minutes: 4, category: 'مقدمة' },
+  { id: 'p2', title: 'ورشة الاستعاذة والبسملة', desc: 'تدرّب على بدايات التلاوة بأربع حالات عملية.', focus: 'ابدأ بصوت ثابت، وافصل بين الاستعاذة والبسملة عند الحاجة.', drill: 'جرّب: أعوذ بالله من الشيطان الرجيم، ثم البسملة، ثم أول الفاتحة مع وقف قصير بين كل مقطع.', listen: 'انتبه لعدم ابتلاع الهمزات أو مدّها فوق الحاجة.', repeat: 'سجّل صوتك خارج التطبيق وقارن وضوح البداية والنهاية.', ruleIds: ['madd-tabii'], minutes: 5, category: 'مقدمة' },
+  { id: 'p3', title: 'مختبر النون الساكنة', desc: 'تمييز سريع بين الإظهار والإدغام والإقلاب والإخفاء.', focus: 'اسأل نفسك: ما الحرف الذي جاء بعد النون أو التنوين؟', drill: 'صنّف الأمثلة: مَنْ آمَنَ، مِنْ رَبِّهِمْ، مِنْ بَعْدِ، أَنْتُمْ.', listen: 'ابحث عن الغنة: تظهر في الإدغام بغنة والإقلاب والإخفاء، وتقل في الإظهار.', repeat: 'أعد التصنيف دون النظر للأسماء حتى تثبت القاعدة.', ruleIds: ['idhhar', 'idgham', 'iqlab', 'ikhfa'], minutes: 7, category: 'أحكام النون' },
+  { id: 'p4', title: 'غنة الإخفاء', desc: 'تدريب عملي على جعل الصوت بين الإظهار والإدغام.', focus: 'لا تُظهر النون كاملة، ولا تُدغمها في الحرف التالي.', drill: 'اقرأ: مِنْ قَبْلُ، أَنْتُمْ، يُنْفِقُونَ مع إبقاء الغنة مقدار حركتين.', listen: 'اجعل اللسان قريباً من مخرج الحرف التالي دون إلصاق كامل.', repeat: 'كرر كل مثال خمس مرات بسرعة واحدة.', ruleIds: ['ikhfa'], minutes: 6, category: 'أحكام النون' },
+  { id: 'p5', title: 'الميم تحت المجهر', desc: 'ثلاث حالات للميم الساكنة في تمرين واحد.', focus: 'الميم قبل ميم: إدغام، قبل باء: إخفاء، وما عدا ذلك: إظهار.', drill: 'اقرأ: لَهُمْ مَا، تَرْمِيهِمْ بِحِجَارَةٍ، أَلَمْ تَرَ، ثم سمّ الحكم بعد كل مثال.', listen: 'حافظ على انطباق الشفتين في الميم دون مبالغة.', repeat: 'اختر مثالاً من المصحف لكل حكم واكتبه في ملاحظاتك.', ruleIds: ['mim-idgham', 'mim-ikhfa', 'mim-idhhar'], minutes: 6, category: 'أحكام الميم' },
+  { id: 'p6', title: 'عداد المدود', desc: 'حوّل مقدار المد إلى عدّ واضح بالحركات.', focus: 'المد الطبيعي حركتان، والمتصل والمنفصل غالباً أربع أو خمس، واللازم ست.', drill: 'اقرأ: قَالَ، جَاءَ، بِمَا أُنْزِلَ، الضَّالِّينَ وعدّ الحركات بإصبعك.', listen: 'لا تجعل كل المدود بالطول نفسه؛ فرّق بين الطبيعي واللازم.', repeat: 'أعد الأمثلة مع عدّ صامت حتى لا يتكلف الصوت.', ruleIds: ['madd-tabii', 'madd-muttasil', 'madd-munfasil', 'madd-lazim'], minutes: 8, category: 'المدود' },
+  { id: 'p7', title: 'رادار المخارج', desc: 'خريطة نطق مصغّرة للحلق واللسان والشفتين.', focus: 'حدّد مكان خروج الحرف قبل الحكم عليه.', drill: 'انطق: ء هـ ع ح غ خ، ثم ق ك، ثم ب م ف، ولاحظ انتقال الصوت بين المناطق.', listen: 'إذا تشابه حرفان، أبطئ القراءة وركّز على موضع اللسان.', repeat: 'اختر ثلاثة أحرف صعبة وكرر كل حرف مع حركة الفتح والكسر والضم.', ruleIds: ['qalqala', 'ra-tafkhim'], minutes: 9, category: 'مخارج وصفات' },
+  { id: 'p8', title: 'تمرين الفاتحة التطبيقي', desc: 'تطبيق شامل للأحكام المتكررة في سورة الفاتحة.', focus: 'اجمع بين المد، اللام، الراء، والوقف الصحيح.', drill: 'اقرأ الفاتحة آية آية، وبعد كل آية حدّد حكماً واحداً ظهر في قراءتك.', listen: 'عند الضَّالِّينَ: مد لازم ست حركات مع تشديد اللام.', repeat: 'اختم التدريب بقراءة كاملة دون توقف إلا عند رؤوس الآيات.', ruleIds: ['madd-lazim', 'lam-shamsi', 'lam-qamari', 'ra-tafkhim'], minutes: 10, category: 'تطبيق' },
 ];
 
-const VIDEO_CATEGORIES = ['الكل', 'مقدمة', 'أحكام النون', 'أحكام الميم', 'المدود', 'مخارج وصفات', 'تطبيق'] as const;
-
-const ytSearchUrl = (q: string) => `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
+const PRACTICE_CATEGORIES = ['الكل', 'مقدمة', 'أحكام النون', 'أحكام الميم', 'المدود', 'مخارج وصفات', 'تطبيق'] as const;
 
 const VideosSection: React.FC = () => {
-  const [vCat, setVCat] = useState<(typeof VIDEO_CATEGORIES)[number]>('الكل');
-  const [active, setActive] = useState<VideoLesson | null>(null);
+  const [vCat, setVCat] = useState<(typeof PRACTICE_CATEGORIES)[number]>('الكل');
+  const [activeId, setActiveId] = useState(PRACTICE_LABS[0].id);
   const list = useMemo(
-    () => (vCat === 'الكل' ? VIDEO_LESSONS : VIDEO_LESSONS.filter((v) => v.category === vCat)),
+    () => (vCat === 'الكل' ? PRACTICE_LABS : PRACTICE_LABS.filter((v) => v.category === vCat)),
     [vCat],
   );
+  const active = list.find((v) => v.id === activeId) || list[0];
 
   return (
     <div className="space-y-3">
-      <div className="rounded-2xl bg-primary/5 border border-primary/20 p-3">
+      <div className="rounded-2xl bg-primary/5 border border-primary/20 p-3 flex gap-2">
+        <Target className="w-4 h-4 text-primary shrink-0 mt-1" />
         <p className="text-[11px] leading-6 text-foreground/80">
-          دروس تعليمية مختارة تُشغَّل داخل التطبيق عبر YouTube IFrame API. اضغط على أي درس ليبدأ التشغيل في نافذة منبثقة.
+          استُبدلت الفيديوهات بمختبر تجويد يعمل داخل التطبيق: شرح مختصر، تدريب نطقي، نقاط استماع، وتكرار منظّم دون اعتماد على يوتيوب.
         </p>
       </div>
 
       <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-        {VIDEO_CATEGORIES.map((c) => (
+        {PRACTICE_CATEGORIES.map((c) => (
           <button
             key={c}
-            onClick={() => setVCat(c)}
+            onClick={() => { setVCat(c); setActiveId((c === 'الكل' ? PRACTICE_LABS : PRACTICE_LABS.filter((v) => v.category === c))[0]?.id || PRACTICE_LABS[0].id); }}
             className={`shrink-0 text-xs font-bold px-3 py-1.5 rounded-full border transition ${
               vCat === c ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary/60 border-border/50 text-muted-foreground'
             }`}
@@ -110,37 +107,78 @@ const VideosSection: React.FC = () => {
         ))}
       </div>
 
+      {active && (
+        <article className="rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 to-accent/10 p-4 space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <div className="text-[10px] font-extrabold text-primary tracking-widest mb-1">مختبر تفاعلي</div>
+              <h3 className="text-base font-extrabold text-foreground">{active.title}</h3>
+              <p className="text-[12px] leading-6 text-muted-foreground mt-1">{active.desc}</p>
+            </div>
+            <div className="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-background/70 border border-border/40">
+              <Timer className="w-3 h-3" /> {active.minutes} د
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-2">
+            {[
+              { label: 'التركيز', text: active.focus, icon: Target },
+              { label: 'التدريب', text: active.drill, icon: ListChecks },
+              { label: 'استمع لنطقك', text: active.listen, icon: Volume2 },
+              { label: 'التكرار', text: active.repeat, icon: Waves },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.label} className="rounded-xl bg-background/70 border border-border/40 p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Icon className="w-3.5 h-3.5 text-accent" />
+                    <div className="text-[11px] font-extrabold text-accent">{item.label}</div>
+                  </div>
+                  <p className="text-[12px] leading-6 text-foreground/85">{item.text}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="flex flex-wrap gap-1.5">
+            {active.ruleIds.map((rid) => {
+              const rule = RULES.find((x) => x.id === rid);
+              if (!rule) return null;
+              return (
+                <span key={rid} className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                  {rule.name}
+                </span>
+              );
+            })}
+          </div>
+        </article>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {list.map((v) => (
           <button
             key={v.id}
-            onClick={() => setActive(v)}
-            className="text-right rounded-xl border border-border/50 bg-card overflow-hidden transition hover:border-primary/60 active:scale-[0.99] flex items-stretch"
+            onClick={() => setActiveId(v.id)}
+            className={`text-right rounded-xl border bg-card overflow-hidden transition hover:border-primary/60 active:scale-[0.99] flex items-stretch ${active?.id === v.id ? 'border-primary/60' : 'border-border/50'}`}
           >
-            <div className="relative w-24 shrink-0 bg-gradient-to-br from-red-500/90 to-red-700 flex items-center justify-center">
-              <div className="w-10 h-10 rounded-full bg-white/95 flex items-center justify-center shadow">
-                <Play className="w-5 h-5 text-red-600 fill-red-600" />
+            <div className="relative w-24 shrink-0 bg-primary/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-background/90 border border-primary/20 flex items-center justify-center shadow-sm">
+                <Target className="w-5 h-5 text-primary" />
               </div>
-              <div className="absolute top-1 right-1 bg-black/60 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+              <div className="absolute top-1 right-1 bg-background/80 border border-border/30 text-foreground text-[9px] font-bold px-1.5 py-0.5 rounded">
                 {v.category}
               </div>
             </div>
             <div className="p-2.5 flex-1 min-w-0">
               <div className="text-[12px] font-extrabold line-clamp-2 leading-5">{v.title}</div>
               <div className="text-[10px] text-muted-foreground mt-1 line-clamp-2 leading-4">{v.desc}</div>
-              <div className="text-[10px] text-red-500 font-bold mt-1 inline-flex items-center gap-1">
-                <Play className="w-3 h-3 fill-current" /> تشغيل داخل التطبيق
+              <div className="text-[10px] text-primary font-bold mt-1 inline-flex items-center gap-1">
+                <ListChecks className="w-3 h-3" /> افتح التدريب
               </div>
             </div>
           </button>
         ))}
       </div>
-
-      <YouTubePlayerModal
-        query={active?.query || null}
-        title={active?.title}
-        onClose={() => setActive(null)}
-      />
     </div>
   );
 };
