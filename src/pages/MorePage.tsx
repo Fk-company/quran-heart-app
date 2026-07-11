@@ -6,7 +6,7 @@ import {
   X, Feather, Book, Grid3X3, List, ChevronLeft, TrendingUp, Baby, Sparkles, Mic,
   Brain, Smile, Lightbulb, Bot, Settings, CalendarDays, Target, Send, Globe,
   Trophy, Mic2, Map as MapIcon, Layers, Waves, Sunrise, FileText, Compass, Coins, Moon, BookHeart, MapPin, Bell, Car, SearchX,
-  Clock, Pin, PinOff, Zap, History
+  Clock, Pin, PinOff, Zap, History, Scroll, BookOpenCheck, GraduationCap, Library, Atom
 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import EmptyState from '@/components/EmptyState';
@@ -38,6 +38,8 @@ const moreCategories = [
       { label: 'خلفية قلبية', icon: Waves, path: '/heart-ambient', desc: 'أصوات وتلاوة للتركيز', color: 'bg-sky-500/10 text-sky-500', gradient: 'gradient-gold' },
       { label: 'رسالة الصباح', icon: Sunrise, path: '/daily-iman', desc: 'آية وتفسير كل يوم', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-primary' },
       { label: 'خاطرة اليوم', icon: Sparkles, path: '/daily-khatirah', desc: 'مختارات يومية متجددة', color: 'bg-primary/10 text-primary', gradient: 'gradient-gold' },
+      { label: 'تحديات يومية', icon: Trophy, path: '/daily-challenges', desc: 'خطوات صغيرة نحو الجنة', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-gold' },
+      { label: 'اقتباسات قرآنية', icon: Quote, path: '/quran-quotes', desc: 'بطاقات للمشاركة والتذكير', color: 'bg-accent/10 text-accent', gradient: 'gradient-primary' },
     ]
   },
   {
@@ -59,6 +61,11 @@ const moreCategories = [
       { label: 'المتشابهات', icon: Layers, path: '/mutashabihat', desc: 'تمييز الآيات المتشابهة', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
       { label: 'التحدي الأسبوعي', icon: Trophy, path: '/weekly-challenge', desc: 'تحديات وشارات إنجاز', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-primary' },
       { label: 'اختبار إسلامي', icon: Brain, path: '/islamic-quiz', desc: 'اختبر معلوماتك الدينية', color: 'bg-purple-500/10 text-purple-500', gradient: 'gradient-gold' },
+      { label: 'مسارات التعلّم', icon: GraduationCap, path: '/learn', desc: 'مسارات منظمة: تجويد وحفظ وتفسير', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
+      { label: 'قصص القرآن', icon: Scroll, path: '/quran-stories', desc: 'قصص وعبر من كتاب الله', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-gold' },
+      { label: 'أسباب النزول', icon: BookOpenCheck, path: '/asbab-al-nuzul', desc: 'مواقف نزلت فيها الآيات', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
+      { label: 'مصطلحات إسلامية', icon: Library, path: '/islamic-terms', desc: 'معجم مبسّط للمفاهيم الشرعية', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
+      { label: 'الإعجاز العلمي', icon: Atom, path: '/quran-miracles', desc: 'حقائق سبق القرآن إليها العلم', color: 'bg-sky-500/10 text-sky-500', gradient: 'gradient-primary' },
     ]
   },
   {
