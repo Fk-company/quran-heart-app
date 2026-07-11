@@ -1,243 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Mic, Search, Play, Pause, GraduationCap, ChevronLeft, Headphones, Book, Compass, Brain, CheckCircle2, Circle, Star, RotateCcw, Link2, Youtube, ExternalLink, X, AlertCircle, RefreshCw, WifiOff, ShieldAlert } from 'lucide-react';
+import { BookOpen, Mic, Search, Play, Pause, GraduationCap, ChevronLeft, Headphones, Book, Compass, Brain, CheckCircle2, Circle, Star, RotateCcw, Link2, Target, Timer, ListChecks, Waves, Volume2 } from 'lucide-react';
 import SEO from '@/components/SEO';
 import PageHeader from '@/components/PageHeader';
 import { useTajweedProgress } from '@/hooks/useTajweedProgress';
 import { toast } from 'sonner';
 import ReadingProgress from '@/components/ReadingProgress';
-
-// ============ YouTube IFrame API loader ============
-let ytApiPromise: Promise<any> | null = null;
-const loadYouTubeApi = (): Promise<any> => {
-  if (typeof window === 'undefined') return Promise.reject(new Error('no-window'));
-  const w = window as any;
-  if (w.YT && w.YT.Player) return Promise.resolve(w.YT);
-  if (ytApiPromise) return ytApiPromise;
-  ytApiPromise = new Promise((resolve, reject) => {
-    const prev = w.onYouTubeIframeAPIReady;
-    let settled = false;
-    const finish = (ok: boolean, err?: Error) => {
-      if (settled) return;
-      settled = true;
-      if (ok) resolve(w.YT);
-      else {
-        ytApiPromise = null; // allow retry after failure
-        reject(err || new Error('yt-api-failed'));
-      }
-    };
-    w.onYouTubeIframeAPIReady = () => {
-      try { prev && prev(); } catch { /* noop */ }
-      finish(!!(w.YT && w.YT.Player));
-    };
-    const existing = document.querySelector('script[data-yt-iframe-api]') as HTMLScriptElement | null;
-    if (!existing) {
-      const s = document.createElement('script');
-      s.src = 'https://www.youtube.com/iframe_api';
-      s.async = true;
-      s.setAttribute('data-yt-iframe-api', '1');
-      s.onerror = () => finish(false, new Error('yt-api-load-failed'));
-      document.head.appendChild(s);
-    }
-    setTimeout(() => {
-      if (!(w.YT && w.YT.Player)) finish(false, new Error('yt-api-timeout'));
-    }, 8000);
-  });
-  return ytApiPromise;
-};
-
-type PlayerErrorKind = 'network' | 'blocked' | 'unavailable' | 'unknown';
-
-const errorMessages: Record<PlayerErrorKind, { title: string; hint: string; icon: React.ComponentType<{ className?: string }> }> = {
-  network: {
-    title: 'تعذّر الاتصال بيوتيوب',
-    hint: 'تحقّق من اتصال الإنترنت ثم أعد المحاولة.',
-    icon: WifiOff,
-  },
-  blocked: {
-    title: 'المتصفح يمنع تشغيل الفيديو داخل التطبيق',
-    hint: 'قد يكون بسبب مانع إعلانات أو إعدادات خصوصية. يمكنك فتحه على يوتيوب مباشرة.',
-    icon: ShieldAlert,
-  },
-  unavailable: {
-    title: 'هذا الفيديو غير متاح للتشغيل هنا',
-    hint: 'صاحب الفيديو قد يمنع التضمين. جرّب فتحه على يوتيوب.',
-    icon: AlertCircle,
-  },
-  unknown: {
-    title: 'تعذّر تشغيل الفيديو',
-    hint: 'حدث خطأ غير متوقّع. أعد المحاولة أو افتح النتائج على يوتيوب.',
-    icon: AlertCircle,
-  },
-};
-
-interface YouTubePlayerModalProps {
-  query: string | null;
-  title?: string;
-  onClose: () => void;
-}
-
-const YouTubePlayerModal: React.FC<YouTubePlayerModalProps> = ({ query, title, onClose }) => {
-  const hostRef = useRef<HTMLDivElement | null>(null);
-  const playerRef = useRef<any>(null);
-  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
-  const [errorKind, setErrorKind] = useState<PlayerErrorKind>('unknown');
-  const [attempt, setAttempt] = useState(0);
-  const timeoutRef = useRef<number | null>(null);
-
-  const fail = (kind: PlayerErrorKind) => {
-    setErrorKind(kind);
-    setStatus('error');
-  };
-
-  useEffect(() => {
-    if (!query) return;
-    let cancelled = false;
-    setStatus('loading');
-
-    // If IFrame API doesn't finish loading in reasonable time, assume blocked
-    if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-    timeoutRef.current = window.setTimeout(() => {
-      if (!cancelled && status !== 'ready') {
-        fail(navigator.onLine ? 'blocked' : 'network');
-      }
-    }, 10000) as unknown as number;
-
-    loadYouTubeApi()
-      .then((YT) => {
-        if (cancelled || !hostRef.current) return;
-        hostRef.current.innerHTML = '<div id="yt-player-mount" style="width:100%;height:100%"></div>';
-        try {
-          playerRef.current = new YT.Player('yt-player-mount', {
-            width: '100%',
-            height: '100%',
-            playerVars: { rel: 0, modestbranding: 1, playsinline: 1, hl: 'ar' },
-            events: {
-              onReady: (e: any) => {
-                if (cancelled) return;
-                try {
-                  e.target.loadPlaylist({ listType: 'search', list: query });
-                  if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-                  setStatus('ready');
-                } catch {
-                  fail('unavailable');
-                }
-              },
-              onError: (e: any) => {
-                // YT error codes: 2 invalid param, 5 HTML5 issue, 100 not found, 101/150 not embeddable
-                const code = e?.data;
-                if (code === 101 || code === 150) fail('unavailable');
-                else if (code === 100) fail('unavailable');
-                else if (code === 5) fail('blocked');
-                else fail('unknown');
-              },
-            },
-          });
-        } catch {
-          fail('blocked');
-        }
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        const msg = String(err?.message || '');
-        if (msg.includes('load-failed')) fail(navigator.onLine ? 'blocked' : 'network');
-        else if (msg.includes('timeout')) fail('blocked');
-        else fail('unknown');
-      });
-
-    return () => {
-      cancelled = true;
-      if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
-      try { playerRef.current?.destroy?.(); } catch { /* noop */ }
-      playerRef.current = null;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, attempt]);
-
-  if (!query) return null;
-
-  const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
-  const err = errorMessages[errorKind];
-  const ErrIcon = err.icon;
-
-  const retry = () => {
-    setStatus('loading');
-    setAttempt((a) => a + 1);
-  };
-
-  return (
-    <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3" onClick={onClose}>
-      <div
-        className="w-full max-w-2xl bg-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-        dir="rtl"
-      >
-        <div className="flex items-center justify-between gap-2 p-3 border-b border-border/40">
-          <div className="min-w-0">
-            <div className="text-[11px] font-bold text-muted-foreground">درس مرئي</div>
-            <div className="text-sm font-extrabold truncate">{title || query}</div>
-          </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-secondary/70 flex items-center justify-center shrink-0"
-            aria-label="إغلاق"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        <div className="relative bg-black" style={{ aspectRatio: '16/9' }}>
-          <div ref={hostRef} className="absolute inset-0" />
-          {status === 'loading' && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-white/80 text-xs">
-              <div className="w-7 h-7 border-2 border-white/60 border-t-transparent rounded-full animate-spin" />
-              <div className="text-[11px] font-bold">جارٍ تحميل المشغّل...</div>
-            </div>
-          )}
-          {status === 'error' && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-5 text-center text-white bg-gradient-to-br from-black via-red-950/40 to-black">
-              <div className="w-12 h-12 rounded-full bg-red-500/20 border border-red-400/40 flex items-center justify-center">
-                <ErrIcon className="w-6 h-6 text-red-300" />
-              </div>
-              <div className="space-y-1">
-                <div className="text-sm font-extrabold">{err.title}</div>
-                <div className="text-[11px] text-white/70 leading-5 max-w-sm mx-auto">{err.hint}</div>
-              </div>
-              <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
-                <button
-                  onClick={retry}
-                  className="inline-flex items-center gap-1.5 text-[11px] font-extrabold bg-white/95 text-black px-3 py-1.5 rounded-full hover:bg-white transition"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" /> إعادة المحاولة
-                </button>
-                <a
-                  href={searchUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1.5 text-[11px] font-extrabold bg-red-600 text-white px-3 py-1.5 rounded-full hover:bg-red-500 transition"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" /> فتح على يوتيوب
-                </a>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="p-2.5 flex items-center justify-between gap-2">
-          <div className="text-[10px] text-muted-foreground">تشغيل عبر YouTube IFrame API</div>
-          <a
-            href={searchUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="text-[10px] font-bold text-red-500 inline-flex items-center gap-1"
-          >
-            <ExternalLink className="w-3 h-3" /> مزيد من النتائج
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 
 interface Rule {
@@ -281,58 +49,55 @@ interface Lesson {
   ruleIds: string[];
 }
 
-interface VideoLesson {
+interface PracticeLab {
   id: string;
   title: string;
   desc: string;
-  query: string;
-  channel: string;
+  focus: string;
+  drill: string;
+  listen: string;
+  repeat: string;
+  ruleIds: string[];
+  minutes: number;
   category: 'مقدمة' | 'أحكام النون' | 'أحكام الميم' | 'المدود' | 'مخارج وصفات' | 'تطبيق';
 }
 
-const VIDEO_LESSONS: VideoLesson[] = [
-  { id: 'v1', title: 'مقدمة في علم التجويد', desc: 'تعريف التجويد وأهميته وأحكامه', query: 'أيمن سويد مقدمة في علم التجويد', channel: 'أيمن سويد', category: 'مقدمة' },
-  { id: 'v2', title: 'الاستعاذة والبسملة', desc: 'أحكام البدء بالتلاوة وآدابها', query: 'أيمن سويد الاستعاذة والبسملة', channel: 'أيمن سويد', category: 'مقدمة' },
-  { id: 'v3', title: 'أحكام النون الساكنة والتنوين', desc: 'الإظهار، الإدغام، الإقلاب، الإخفاء', query: 'أيمن سويد أحكام النون الساكنة والتنوين', channel: 'أيمن سويد', category: 'أحكام النون' },
-  { id: 'v4', title: 'الإخفاء الحقيقي', desc: 'شرح 15 حرفاً وكيفية النطق بها', query: 'أيمن سويد الإخفاء الحقيقي', channel: 'أيمن سويد', category: 'أحكام النون' },
-  { id: 'v5', title: 'أحكام الميم الساكنة', desc: 'الإدغام والإخفاء والإظهار الشفوي', query: 'أيمن سويد أحكام الميم الساكنة', channel: 'أيمن سويد', category: 'أحكام الميم' },
-  { id: 'v6', title: 'المد الطبيعي وأنواع المدود', desc: 'مقادير المدود ومواضعها', query: 'أيمن سويد المد الطبيعي أنواع المدود', channel: 'أيمن سويد', category: 'المدود' },
-  { id: 'v7', title: 'المد المتصل والمنفصل', desc: 'الفرق بينهما ومقدار كل منهما', query: 'أيمن سويد المد المتصل والمنفصل', channel: 'أيمن سويد', category: 'المدود' },
-  { id: 'v8', title: 'المد اللازم بأقسامه', desc: 'كلمي وحرفي، مثقل ومخفف', query: 'أيمن سويد المد اللازم', channel: 'أيمن سويد', category: 'المدود' },
-  { id: 'v9', title: 'مخارج الحروف', desc: 'الجوف، الحلق، اللسان، الشفتان، الخيشوم', query: 'أيمن سويد مخارج الحروف', channel: 'أيمن سويد', category: 'مخارج وصفات' },
-  { id: 'v10', title: 'صفات الحروف', desc: 'الصفات التي لها ضد وما لا ضد لها', query: 'أيمن سويد صفات الحروف', channel: 'أيمن سويد', category: 'مخارج وصفات' },
-  { id: 'v11', title: 'القلقلة صغرى وكبرى', desc: 'حروف قطب جد وطريقة نطقها', query: 'أيمن سويد القلقلة', channel: 'أيمن سويد', category: 'أحكام النون' },
-  { id: 'v12', title: 'اللام الشمسية والقمرية', desc: 'قواعد النطق بلام "أل" التعريف', query: 'أيمن سويد اللام الشمسية والقمرية', channel: 'أيمن سويد', category: 'أحكام النون' },
-  { id: 'v13', title: 'أحكام الراء', desc: 'تفخيم وترقيق الراء بجميع حالاتها', query: 'أيمن سويد أحكام الراء', channel: 'أيمن سويد', category: 'مخارج وصفات' },
-  { id: 'v14', title: 'أحكام الوقف والابتداء', desc: 'أنواع الوقف وعلامات المصحف', query: 'أيمن سويد الوقف والابتداء', channel: 'أيمن سويد', category: 'تطبيق' },
-  { id: 'v15', title: 'تطبيق عملي على سورة الفاتحة', desc: 'قراءة مجودة مع شرح الأحكام', query: 'أيمن سويد تطبيق سورة الفاتحة تجويد', channel: 'أيمن سويد', category: 'تطبيق' },
+const PRACTICE_LABS: PracticeLab[] = [
+  { id: 'p1', title: 'ميزان الترتيل', desc: 'اضبط سرعة القراءة قبل الدخول في الأحكام.', focus: 'اقرأ ببطء، ثم اجعل كل كلمة واضحة بلا مطّ زائد.', drill: 'اقرأ: بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ثلاث مرات؛ الأولى ببطء، الثانية باعتدال، الثالثة مع تدبر المعنى.', listen: 'راقب مخارج الباء والميم والراء، ولا تبدأ بسرعة عالية.', repeat: 'أعد التدريب حتى تستطيع القراءة بنفس واحد هادئ.', ruleIds: ['madd-tabii', 'lam-shamsi'], minutes: 4, category: 'مقدمة' },
+  { id: 'p2', title: 'ورشة الاستعاذة والبسملة', desc: 'تدرّب على بدايات التلاوة بأربع حالات عملية.', focus: 'ابدأ بصوت ثابت، وافصل بين الاستعاذة والبسملة عند الحاجة.', drill: 'جرّب: أعوذ بالله من الشيطان الرجيم، ثم البسملة، ثم أول الفاتحة مع وقف قصير بين كل مقطع.', listen: 'انتبه لعدم ابتلاع الهمزات أو مدّها فوق الحاجة.', repeat: 'سجّل صوتك خارج التطبيق وقارن وضوح البداية والنهاية.', ruleIds: ['madd-tabii'], minutes: 5, category: 'مقدمة' },
+  { id: 'p3', title: 'مختبر النون الساكنة', desc: 'تمييز سريع بين الإظهار والإدغام والإقلاب والإخفاء.', focus: 'اسأل نفسك: ما الحرف الذي جاء بعد النون أو التنوين؟', drill: 'صنّف الأمثلة: مَنْ آمَنَ، مِنْ رَبِّهِمْ، مِنْ بَعْدِ، أَنْتُمْ.', listen: 'ابحث عن الغنة: تظهر في الإدغام بغنة والإقلاب والإخفاء، وتقل في الإظهار.', repeat: 'أعد التصنيف دون النظر للأسماء حتى تثبت القاعدة.', ruleIds: ['idhhar', 'idgham', 'iqlab', 'ikhfa'], minutes: 7, category: 'أحكام النون' },
+  { id: 'p4', title: 'غنة الإخفاء', desc: 'تدريب عملي على جعل الصوت بين الإظهار والإدغام.', focus: 'لا تُظهر النون كاملة، ولا تُدغمها في الحرف التالي.', drill: 'اقرأ: مِنْ قَبْلُ، أَنْتُمْ، يُنْفِقُونَ مع إبقاء الغنة مقدار حركتين.', listen: 'اجعل اللسان قريباً من مخرج الحرف التالي دون إلصاق كامل.', repeat: 'كرر كل مثال خمس مرات بسرعة واحدة.', ruleIds: ['ikhfa'], minutes: 6, category: 'أحكام النون' },
+  { id: 'p5', title: 'الميم تحت المجهر', desc: 'ثلاث حالات للميم الساكنة في تمرين واحد.', focus: 'الميم قبل ميم: إدغام، قبل باء: إخفاء، وما عدا ذلك: إظهار.', drill: 'اقرأ: لَهُمْ مَا، تَرْمِيهِمْ بِحِجَارَةٍ، أَلَمْ تَرَ، ثم سمّ الحكم بعد كل مثال.', listen: 'حافظ على انطباق الشفتين في الميم دون مبالغة.', repeat: 'اختر مثالاً من المصحف لكل حكم واكتبه في ملاحظاتك.', ruleIds: ['mim-idgham', 'mim-ikhfa', 'mim-idhhar'], minutes: 6, category: 'أحكام الميم' },
+  { id: 'p6', title: 'عداد المدود', desc: 'حوّل مقدار المد إلى عدّ واضح بالحركات.', focus: 'المد الطبيعي حركتان، والمتصل والمنفصل غالباً أربع أو خمس، واللازم ست.', drill: 'اقرأ: قَالَ، جَاءَ، بِمَا أُنْزِلَ، الضَّالِّينَ وعدّ الحركات بإصبعك.', listen: 'لا تجعل كل المدود بالطول نفسه؛ فرّق بين الطبيعي واللازم.', repeat: 'أعد الأمثلة مع عدّ صامت حتى لا يتكلف الصوت.', ruleIds: ['madd-tabii', 'madd-muttasil', 'madd-munfasil', 'madd-lazim'], minutes: 8, category: 'المدود' },
+  { id: 'p7', title: 'رادار المخارج', desc: 'خريطة نطق مصغّرة للحلق واللسان والشفتين.', focus: 'حدّد مكان خروج الحرف قبل الحكم عليه.', drill: 'انطق: ء هـ ع ح غ خ، ثم ق ك، ثم ب م ف، ولاحظ انتقال الصوت بين المناطق.', listen: 'إذا تشابه حرفان، أبطئ القراءة وركّز على موضع اللسان.', repeat: 'اختر ثلاثة أحرف صعبة وكرر كل حرف مع حركة الفتح والكسر والضم.', ruleIds: ['qalqala', 'ra-tafkhim'], minutes: 9, category: 'مخارج وصفات' },
+  { id: 'p8', title: 'تمرين الفاتحة التطبيقي', desc: 'تطبيق شامل للأحكام المتكررة في سورة الفاتحة.', focus: 'اجمع بين المد، اللام، الراء، والوقف الصحيح.', drill: 'اقرأ الفاتحة آية آية، وبعد كل آية حدّد حكماً واحداً ظهر في قراءتك.', listen: 'عند الضَّالِّينَ: مد لازم ست حركات مع تشديد اللام.', repeat: 'اختم التدريب بقراءة كاملة دون توقف إلا عند رؤوس الآيات.', ruleIds: ['madd-lazim', 'lam-shamsi', 'lam-qamari', 'ra-tafkhim'], minutes: 10, category: 'تطبيق' },
 ];
 
-const VIDEO_CATEGORIES = ['الكل', 'مقدمة', 'أحكام النون', 'أحكام الميم', 'المدود', 'مخارج وصفات', 'تطبيق'] as const;
-
-const ytSearchUrl = (q: string) => `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
+const PRACTICE_CATEGORIES = ['الكل', 'مقدمة', 'أحكام النون', 'أحكام الميم', 'المدود', 'مخارج وصفات', 'تطبيق'] as const;
 
 const VideosSection: React.FC = () => {
-  const [vCat, setVCat] = useState<(typeof VIDEO_CATEGORIES)[number]>('الكل');
-  const [active, setActive] = useState<VideoLesson | null>(null);
+  const [vCat, setVCat] = useState<(typeof PRACTICE_CATEGORIES)[number]>('الكل');
+  const [activeId, setActiveId] = useState(PRACTICE_LABS[0].id);
   const list = useMemo(
-    () => (vCat === 'الكل' ? VIDEO_LESSONS : VIDEO_LESSONS.filter((v) => v.category === vCat)),
+    () => (vCat === 'الكل' ? PRACTICE_LABS : PRACTICE_LABS.filter((v) => v.category === vCat)),
     [vCat],
   );
+  const active = list.find((v) => v.id === activeId) || list[0];
 
   return (
     <div className="space-y-3">
-      <div className="rounded-2xl bg-primary/5 border border-primary/20 p-3">
+      <div className="rounded-2xl bg-primary/5 border border-primary/20 p-3 flex gap-2">
+        <Target className="w-4 h-4 text-primary shrink-0 mt-1" />
         <p className="text-[11px] leading-6 text-foreground/80">
-          دروس تعليمية مختارة تُشغَّل داخل التطبيق عبر YouTube IFrame API. اضغط على أي درس ليبدأ التشغيل في نافذة منبثقة.
+          استُبدلت الفيديوهات بمختبر تجويد يعمل داخل التطبيق: شرح مختصر، تدريب نطقي، نقاط استماع، وتكرار منظّم دون اعتماد على يوتيوب.
         </p>
       </div>
 
       <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-        {VIDEO_CATEGORIES.map((c) => (
+        {PRACTICE_CATEGORIES.map((c) => (
           <button
             key={c}
-            onClick={() => setVCat(c)}
+            onClick={() => { setVCat(c); setActiveId((c === 'الكل' ? PRACTICE_LABS : PRACTICE_LABS.filter((v) => v.category === c))[0]?.id || PRACTICE_LABS[0].id); }}
             className={`shrink-0 text-xs font-bold px-3 py-1.5 rounded-full border transition ${
               vCat === c ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary/60 border-border/50 text-muted-foreground'
             }`}
@@ -342,37 +107,78 @@ const VideosSection: React.FC = () => {
         ))}
       </div>
 
+      {active && (
+        <article className="rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 to-accent/10 p-4 space-y-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <div className="text-[10px] font-extrabold text-primary tracking-widest mb-1">مختبر تفاعلي</div>
+              <h3 className="text-base font-extrabold text-foreground">{active.title}</h3>
+              <p className="text-[12px] leading-6 text-muted-foreground mt-1">{active.desc}</p>
+            </div>
+            <div className="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full bg-background/70 border border-border/40">
+              <Timer className="w-3 h-3" /> {active.minutes} د
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-2">
+            {[
+              { label: 'التركيز', text: active.focus, icon: Target },
+              { label: 'التدريب', text: active.drill, icon: ListChecks },
+              { label: 'استمع لنطقك', text: active.listen, icon: Volume2 },
+              { label: 'التكرار', text: active.repeat, icon: Waves },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.label} className="rounded-xl bg-background/70 border border-border/40 p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Icon className="w-3.5 h-3.5 text-accent" />
+                    <div className="text-[11px] font-extrabold text-accent">{item.label}</div>
+                  </div>
+                  <p className="text-[12px] leading-6 text-foreground/85">{item.text}</p>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="flex flex-wrap gap-1.5">
+            {active.ruleIds.map((rid) => {
+              const rule = RULES.find((x) => x.id === rid);
+              if (!rule) return null;
+              return (
+                <span key={rid} className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                  {rule.name}
+                </span>
+              );
+            })}
+          </div>
+        </article>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {list.map((v) => (
           <button
             key={v.id}
-            onClick={() => setActive(v)}
-            className="text-right rounded-xl border border-border/50 bg-card overflow-hidden transition hover:border-primary/60 active:scale-[0.99] flex items-stretch"
+            onClick={() => setActiveId(v.id)}
+            className={`text-right rounded-xl border bg-card overflow-hidden transition hover:border-primary/60 active:scale-[0.99] flex items-stretch ${active?.id === v.id ? 'border-primary/60' : 'border-border/50'}`}
           >
-            <div className="relative w-24 shrink-0 bg-gradient-to-br from-red-500/90 to-red-700 flex items-center justify-center">
-              <div className="w-10 h-10 rounded-full bg-white/95 flex items-center justify-center shadow">
-                <Play className="w-5 h-5 text-red-600 fill-red-600" />
+            <div className="relative w-24 shrink-0 bg-primary/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-background/90 border border-primary/20 flex items-center justify-center shadow-sm">
+                <Target className="w-5 h-5 text-primary" />
               </div>
-              <div className="absolute top-1 right-1 bg-black/60 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+              <div className="absolute top-1 right-1 bg-background/80 border border-border/30 text-foreground text-[9px] font-bold px-1.5 py-0.5 rounded">
                 {v.category}
               </div>
             </div>
             <div className="p-2.5 flex-1 min-w-0">
               <div className="text-[12px] font-extrabold line-clamp-2 leading-5">{v.title}</div>
               <div className="text-[10px] text-muted-foreground mt-1 line-clamp-2 leading-4">{v.desc}</div>
-              <div className="text-[10px] text-red-500 font-bold mt-1 inline-flex items-center gap-1">
-                <Play className="w-3 h-3 fill-current" /> تشغيل داخل التطبيق
+              <div className="text-[10px] text-primary font-bold mt-1 inline-flex items-center gap-1">
+                <ListChecks className="w-3 h-3" /> افتح التدريب
               </div>
             </div>
           </button>
         ))}
       </div>
-
-      <YouTubePlayerModal
-        query={active?.query || null}
-        title={active?.title}
-        onClose={() => setActive(null)}
-      />
     </div>
   );
 };
@@ -605,7 +411,7 @@ const TajweedPage: React.FC = () => {
           {[
             { id: 'rules' as const, label: 'الأحكام', icon: BookOpen },
             { id: 'lessons' as const, label: 'دروس', icon: GraduationCap },
-            { id: 'videos' as const, label: 'فيديوهات', icon: Youtube },
+            { id: 'videos' as const, label: 'مختبر', icon: Target },
           ].map((t) => {
             const Icon = t.icon;
             return (
