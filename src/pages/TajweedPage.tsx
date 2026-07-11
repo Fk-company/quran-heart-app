@@ -272,10 +272,11 @@ const TajweedPage: React.FC = () => {
 
       <div className="px-4 mt-3 space-y-3">
         {/* Tabs */}
-        <div className="grid grid-cols-2 gap-1 p-1 bg-secondary/60 rounded-2xl">
+        <div className="grid grid-cols-3 gap-1 p-1 bg-secondary/60 rounded-2xl">
           {[
             { id: 'rules' as const, label: 'الأحكام', icon: BookOpen },
-            { id: 'lessons' as const, label: 'دروس قصيرة', icon: GraduationCap },
+            { id: 'lessons' as const, label: 'دروس', icon: GraduationCap },
+            { id: 'videos' as const, label: 'فيديوهات', icon: Youtube },
           ].map((t) => {
             const Icon = t.icon;
             return (
