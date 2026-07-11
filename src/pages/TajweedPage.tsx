@@ -411,7 +411,7 @@ const TajweedPage: React.FC = () => {
           {[
             { id: 'rules' as const, label: 'الأحكام', icon: BookOpen },
             { id: 'lessons' as const, label: 'دروس', icon: GraduationCap },
-            { id: 'videos' as const, label: 'فيديوهات', icon: Youtube },
+            { id: 'videos' as const, label: 'مختبر', icon: Target },
           ].map((t) => {
             const Icon = t.icon;
             return (
