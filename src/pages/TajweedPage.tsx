@@ -1,11 +1,152 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Mic, Search, Play, Pause, GraduationCap, ChevronLeft, Headphones, Book, Compass, Brain, CheckCircle2, Circle, Star, RotateCcw, Link2, Youtube, ExternalLink } from 'lucide-react';
+import { BookOpen, Mic, Search, Play, Pause, GraduationCap, ChevronLeft, Headphones, Book, Compass, Brain, CheckCircle2, Circle, Star, RotateCcw, Link2, Youtube, ExternalLink, X, AlertCircle } from 'lucide-react';
 import SEO from '@/components/SEO';
 import PageHeader from '@/components/PageHeader';
 import { useTajweedProgress } from '@/hooks/useTajweedProgress';
 import { toast } from 'sonner';
 import ReadingProgress from '@/components/ReadingProgress';
+
+// ============ YouTube IFrame API loader ============
+let ytApiPromise: Promise<any> | null = null;
+const loadYouTubeApi = (): Promise<any> => {
+  if (typeof window === 'undefined') return Promise.reject(new Error('no-window'));
+  const w = window as any;
+  if (w.YT && w.YT.Player) return Promise.resolve(w.YT);
+  if (ytApiPromise) return ytApiPromise;
+  ytApiPromise = new Promise((resolve, reject) => {
+    const prev = w.onYouTubeIframeAPIReady;
+    w.onYouTubeIframeAPIReady = () => {
+      try { prev && prev(); } catch { /* noop */ }
+      resolve(w.YT);
+    };
+    const existing = document.querySelector('script[data-yt-iframe-api]') as HTMLScriptElement | null;
+    if (!existing) {
+      const s = document.createElement('script');
+      s.src = 'https://www.youtube.com/iframe_api';
+      s.async = true;
+      s.setAttribute('data-yt-iframe-api', '1');
+      s.onerror = () => reject(new Error('yt-api-load-failed'));
+      document.head.appendChild(s);
+    }
+    setTimeout(() => {
+      if (!w.YT || !w.YT.Player) reject(new Error('yt-api-timeout'));
+    }, 8000);
+  });
+  return ytApiPromise;
+};
+
+interface YouTubePlayerModalProps {
+  query: string | null;
+  title?: string;
+  onClose: () => void;
+}
+
+const YouTubePlayerModal: React.FC<YouTubePlayerModalProps> = ({ query, title, onClose }) => {
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const playerRef = useRef<any>(null);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+
+  useEffect(() => {
+    if (!query) return;
+    let cancelled = false;
+    setStatus('loading');
+
+    loadYouTubeApi()
+      .then((YT) => {
+        if (cancelled || !hostRef.current) return;
+        // clear old iframe
+        hostRef.current.innerHTML = '<div id="yt-player-mount" style="width:100%;height:100%"></div>';
+        playerRef.current = new YT.Player('yt-player-mount', {
+          width: '100%',
+          height: '100%',
+          playerVars: { rel: 0, modestbranding: 1, playsinline: 1, hl: 'ar' },
+          events: {
+            onReady: (e: any) => {
+              if (cancelled) return;
+              try {
+                e.target.loadPlaylist({ listType: 'search', list: query });
+                setStatus('ready');
+              } catch {
+                setStatus('error');
+              }
+            },
+            onError: () => setStatus('error'),
+          },
+        });
+      })
+      .catch(() => !cancelled && setStatus('error'));
+
+    return () => {
+      cancelled = true;
+      try { playerRef.current?.destroy?.(); } catch { /* noop */ }
+      playerRef.current = null;
+    };
+  }, [query]);
+
+  if (!query) return null;
+
+  const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+
+  return (
+    <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3" onClick={onClose}>
+      <div
+        className="w-full max-w-2xl bg-card rounded-2xl overflow-hidden border border-border/40 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+        dir="rtl"
+      >
+        <div className="flex items-center justify-between gap-2 p-3 border-b border-border/40">
+          <div className="min-w-0">
+            <div className="text-[11px] font-bold text-muted-foreground">درس مرئي</div>
+            <div className="text-sm font-extrabold truncate">{title || query}</div>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-secondary/70 flex items-center justify-center shrink-0"
+            aria-label="إغلاق"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="relative bg-black" style={{ aspectRatio: '16/9' }}>
+          <div ref={hostRef} className="absolute inset-0" />
+          {status === 'loading' && (
+            <div className="absolute inset-0 flex items-center justify-center text-white/80 text-xs">
+              <div className="w-6 h-6 border-2 border-white/60 border-t-transparent rounded-full animate-spin" />
+            </div>
+          )}
+          {status === 'error' && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 text-center text-white">
+              <AlertCircle className="w-6 h-6 text-red-400" />
+              <div className="text-xs font-bold">تعذّر تشغيل الفيديو داخل التطبيق</div>
+              <a
+                href={searchUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] font-extrabold bg-red-600 text-white px-3 py-1.5 rounded-full"
+              >
+                <ExternalLink className="w-3 h-3" /> فتح على يوتيوب
+              </a>
+            </div>
+          )}
+        </div>
+
+        <div className="p-2.5 flex items-center justify-between gap-2">
+          <div className="text-[10px] text-muted-foreground">تشغيل عبر YouTube IFrame API</div>
+          <a
+            href={searchUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="text-[10px] font-bold text-red-500 inline-flex items-center gap-1"
+          >
+            <ExternalLink className="w-3 h-3" /> مزيد من النتائج
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 
 interface Rule {
