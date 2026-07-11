@@ -96,7 +96,10 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
           {surahNums.length === 0 ? (
             <div className="text-center py-10 text-sm text-muted-foreground">لا توجد سور متاحة لهذا القارئ</div>
           ) : (
-            <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-7 gap-1.5">
+            <div
+              className="grid gap-1.5"
+              style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))' }}
+            >
               {surahNums.map((num) => {
                 const s = surahs.find((su) => su.number === num);
                 const trackId = `${reciter.id}-${num}`;
