@@ -264,5 +264,3 @@ const AyahTafsirModal: React.FC<AyahTafsirModalProps> = ({ ayah, nightMode, onCl
 };
 
 export default AyahTafsirModal;
-
-export default AyahTafsirModal;
