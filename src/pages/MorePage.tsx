@@ -38,6 +38,8 @@ const moreCategories = [
       { label: 'خلفية قلبية', icon: Waves, path: '/heart-ambient', desc: 'أصوات وتلاوة للتركيز', color: 'bg-sky-500/10 text-sky-500', gradient: 'gradient-gold' },
       { label: 'رسالة الصباح', icon: Sunrise, path: '/daily-iman', desc: 'آية وتفسير كل يوم', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-primary' },
       { label: 'خاطرة اليوم', icon: Sparkles, path: '/daily-khatirah', desc: 'مختارات يومية متجددة', color: 'bg-primary/10 text-primary', gradient: 'gradient-gold' },
+      { label: 'تحديات يومية', icon: Trophy, path: '/daily-challenges', desc: 'خطوات صغيرة نحو الجنة', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-gold' },
+      { label: 'اقتباسات قرآنية', icon: Quote, path: '/quran-quotes', desc: 'بطاقات للمشاركة والتذكير', color: 'bg-accent/10 text-accent', gradient: 'gradient-primary' },
     ]
   },
   {
