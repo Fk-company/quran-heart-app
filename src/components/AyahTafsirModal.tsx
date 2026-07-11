@@ -132,7 +132,7 @@ const AyahTafsirModal: React.FC<AyahTafsirModalProps> = ({ ayah, nightMode, onCl
         className={`absolute left-1/2 -translate-x-1/2 w-full max-w-lg ${bg} rounded-t-3xl border-t ${border} overflow-hidden flex flex-col shadow-2xl will-change-transform`}
         style={{
           bottom: 'calc(var(--nav-height) + env(safe-area-inset-bottom, 0px))',
-          top: 'max(10vh, 3rem)',
+          maxHeight: 'calc(90vh - var(--nav-height))',
           transform: closing ? 'translate(-50%, 100%)' : 'translate(-50%, 0)',
           opacity: closing ? 0 : 1,
           transition: `transform ${CLOSE_MS}ms cubic-bezier(0.32, 0.72, 0, 1), opacity ${CLOSE_MS}ms ease-out`,
@@ -145,33 +145,40 @@ const AyahTafsirModal: React.FC<AyahTafsirModalProps> = ({ ayah, nightMode, onCl
           onClick={requestClose}
           aria-label="إغلاق"
           tabIndex={-1}
-          className="w-full flex justify-center pt-2.5 pb-1.5 active:opacity-70"
+          className="w-full flex justify-center pt-2 pb-1 active:opacity-70 flex-shrink-0"
         >
-          <span className={`w-12 h-1.5 rounded-full ${nightMode ? 'bg-amber-500/50' : 'bg-border'}`} />
+          <span className={`w-10 h-1.5 rounded-full ${nightMode ? 'bg-amber-500/50' : 'bg-border'}`} />
         </button>
 
-        {/* Prominent floating close button */}
-        <button
-          ref={closeBtnRef}
-          onClick={requestClose}
-          aria-label="إغلاق نافذة التفسير"
-          title="إغلاق"
-          className={`absolute top-3 left-3 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg border transition-all active:scale-90 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 ${
-            nightMode
-              ? 'bg-amber-500/25 border-amber-500/50 text-amber-100 hover:bg-amber-500/40'
-              : 'bg-primary text-primary-foreground border-primary/40 hover:bg-primary/90'
-          }`}
-        >
-          <X className="w-5 h-5" strokeWidth={2.5} />
-        </button>
+        {/* Header row: close + title/location + actions */}
+        <div className={`flex items-center gap-2 px-3 pt-1 pb-3 border-b ${border} flex-shrink-0`}>
+          <button
+            ref={closeBtnRef}
+            onClick={requestClose}
+            aria-label="إغلاق نافذة التفسير"
+            title="إغلاق"
+            className={`w-9 h-9 rounded-full flex items-center justify-center shadow-md border transition-all active:scale-90 hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 flex-shrink-0 ${
+              nightMode
+                ? 'bg-amber-500/25 border-amber-500/50 text-amber-100 hover:bg-amber-500/40'
+                : 'bg-primary text-primary-foreground border-primary/40 hover:bg-primary/90'
+            }`}
+          >
+            <X className="w-4 h-4" strokeWidth={2.5} />
+          </button>
 
-        {/* Header */}
-        <div className={`flex items-center justify-between px-5 py-3 border-b ${border}`}>
-          <div className="flex items-center gap-2 pl-12">
-            <BookOpen className={`w-4 h-4 ${accentColor}`} aria-hidden="true" />
-            <h2 id={titleId} className={`text-sm font-bold ${textColor}`}>التفسير الميسر</h2>
+          <div className="flex-1 min-w-0 flex items-center gap-2">
+            <BookOpen className={`w-4 h-4 flex-shrink-0 ${accentColor}`} aria-hidden="true" />
+            <div className="min-w-0">
+              <h2 id={titleId} className={`text-sm font-bold leading-tight truncate ${textColor}`}>
+                التفسير الميسر
+              </h2>
+              <p className={`text-[11px] font-semibold truncate ${accentColor}`}>
+                {ayah.surah.name} · آية {ayah.numberInSurah}
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-1">
+
+          <div className="flex items-center gap-1 flex-shrink-0">
             <button
               onClick={() => shareAyahAsImage({ text: ayah.text, surahName: ayah.surah.name, ayahNumber: ayah.numberInSurah })}
               className={`w-8 h-8 rounded-full flex items-center justify-center ${accentBg} focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/70`}
@@ -197,27 +204,67 @@ const AyahTafsirModal: React.FC<AyahTafsirModalProps> = ({ ayah, nightMode, onCl
           </div>
         </div>
 
-        <div className="overflow-y-auto px-5 py-4 flex-1" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 32px)' }}>
+        {/* Scrollable content — no forced bottom padding; sheet auto-sizes to content */}
+        <div
+          className="overflow-y-auto overscroll-contain px-5 py-4"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}
+        >
+          {/* Ayah text */}
           <div
-            className={`text-center mb-3 px-3 py-1.5 rounded-full ${accentBg} inline-flex items-center gap-2 mx-auto`}
-            style={{ display: 'flex', justifyContent: 'center' }}
+            className={`relative rounded-2xl p-4 mb-3 border ${
+              nightMode ? 'bg-amber-900/10 border-amber-700/20' : 'bg-primary/[0.04] border-primary/15'
+            }`}
           >
-            <span className={`text-xs font-semibold ${accentColor}`}>{ayah.surah.name} - آية {ayah.numberInSurah}</span>
-          </div>
-
-          <div className={`rounded-2xl p-4 mb-4 border ${nightMode ? 'bg-amber-900/10 border-amber-700/15' : 'bg-primary/3 border-primary/10'}`}>
-            <p className={`font-amiri text-xl leading-[2.4] text-center ${nightMode ? 'text-amber-200' : 'text-foreground'}`}>
+            <span
+              className={`absolute -top-2 right-4 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                nightMode ? 'bg-amber-500/30 text-amber-100' : 'bg-primary text-primary-foreground'
+              }`}
+            >
+              الآية
+            </span>
+            <p
+              className={`font-amiri text-[22px] leading-[2.2] text-center ${
+                nightMode ? 'text-amber-200' : 'text-foreground'
+              }`}
+            >
               {ayah.text}
             </p>
           </div>
 
-          <div>
-            <h3 className={`text-xs font-bold mb-2 ${accentColor}`}>التفسير الميسر</h3>
+          {/* Tafsir */}
+          <div
+            className={`relative rounded-2xl p-4 border ${
+              nightMode ? 'bg-amber-500/5 border-amber-700/15' : 'bg-secondary/40 border-border/40'
+            }`}
+          >
+            <span
+              className={`absolute -top-2 right-4 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                nightMode ? 'bg-amber-500/30 text-amber-100' : 'bg-accent text-accent-foreground'
+              }`}
+            >
+              التفسير
+            </span>
             {loading ? (
-              <div className="flex items-center justify-center py-8" aria-live="polite">
+              <div className="flex items-center justify-center py-6" aria-live="polite">
                 <Loader2 className={`w-5 h-5 animate-spin ${accentColor}`} />
               </div>
             ) : (
+              <p
+                className={`text-[15px] leading-[2] whitespace-pre-line ${textColor}`}
+                aria-live="polite"
+              >
+                {tafsir}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AyahTafsirModal;
+
               <p className={`text-[15px] leading-[2] whitespace-pre-line ${textColor}`} aria-live="polite">{tafsir}</p>
             )}
           </div>
