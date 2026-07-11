@@ -153,7 +153,7 @@ const TajweedPage: React.FC = () => {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [cat, setCat] = useState<typeof CATEGORIES[number]>('الكل');
-  const [tab, setTab] = useState<'rules' | 'lessons'>('rules');
+  const [tab, setTab] = useState<'rules' | 'lessons' | 'videos'>('rules');
   const [expandedLesson, setExpandedLesson] = useState<string | null>(LESSONS[0].id);
   const [levelFilter, setLevelFilter] = useState<'all' | 'beginner' | 'intermediate' | 'advanced'>('all');
   const [reciter, setReciter] = useState<string>(() => localStorage.getItem('tajweed_reciter') || 'ar.alafasy');
