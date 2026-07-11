@@ -92,15 +92,15 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
             </button>
           </div>
         </div>
-        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}>
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 py-2" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}>
           {surahNums.length === 0 ? (
             <div className="text-center py-10 text-sm text-muted-foreground">لا توجد سور متاحة لهذا القارئ</div>
           ) : (
             <div
-              className="grid gap-1"
+              className="grid gap-1.5"
               style={{
-                gridTemplateColumns: 'repeat(auto-fill, minmax(78px, 1fr))',
-                gridAutoRows: '1fr',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(74px, 1fr))',
+                gridAutoRows: '68px',
               }}
             >
               {surahNums.map((num) => {
@@ -111,16 +111,16 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
                   <button
                     key={num}
                     onClick={() => onPlay(num)}
-                    className={`group relative flex flex-col items-center justify-center gap-0.5 pt-4 pb-1.5 px-1 rounded-xl border transition-all text-center overflow-hidden h-full min-h-[74px] ${
+                    className={`group relative flex h-full min-h-0 flex-col items-center justify-center gap-0.5 rounded-xl border px-1 py-1.5 text-center transition-all overflow-hidden ${
                       isThisPlaying
                         ? 'bg-primary/10 border-primary/40 shadow-[0_4px_14px_-6px_hsl(var(--primary)/0.5)]'
-                        : 'bg-card border-border/50 hover:border-primary/30 hover:bg-secondary/60 active:scale-[0.97]'
+                        : 'bg-secondary/30 border-border/60 hover:border-primary/30 hover:bg-secondary/70 active:scale-[0.97]'
                     }`}
                     aria-label={`${s?.name || `سورة ${num}`} - ${isThisPlaying ? 'إيقاف' : 'تشغيل'}`}
                   >
                     {/* Small corner number badge */}
                     <span
-                      className={`absolute top-0.5 right-0.5 text-[9px] font-bold leading-none px-1 py-0.5 rounded-md ${
+                        className={`absolute top-1 right-1 text-[9px] font-bold leading-none px-1 py-0.5 rounded-md ${
                         isThisPlaying
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-muted text-muted-foreground group-hover:bg-primary/15 group-hover:text-primary'
@@ -130,7 +130,7 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
                     </span>
                     {/* Play indicator */}
                     <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
+                      className={`w-5.5 h-5.5 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
                         isThisPlaying
                           ? 'bg-primary text-primary-foreground shadow-md'
                           : 'bg-primary/10 text-primary group-hover:bg-primary/20 group-hover:scale-110'
