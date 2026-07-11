@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Mic, Search, Play, Pause, GraduationCap, ChevronLeft, Headphones, Book, Compass, Brain, CheckCircle2, Circle, Star, RotateCcw, Link2, Youtube, ExternalLink, X, AlertCircle } from 'lucide-react';
+import { BookOpen, Mic, Search, Play, Pause, GraduationCap, ChevronLeft, Headphones, Book, Compass, Brain, CheckCircle2, Circle, Star, RotateCcw, Link2, Youtube, ExternalLink, X, AlertCircle, RefreshCw, WifiOff, ShieldAlert } from 'lucide-react';
 import SEO from '@/components/SEO';
 import PageHeader from '@/components/PageHeader';
 import { useTajweedProgress } from '@/hooks/useTajweedProgress';
@@ -16,9 +16,19 @@ const loadYouTubeApi = (): Promise<any> => {
   if (ytApiPromise) return ytApiPromise;
   ytApiPromise = new Promise((resolve, reject) => {
     const prev = w.onYouTubeIframeAPIReady;
+    let settled = false;
+    const finish = (ok: boolean, err?: Error) => {
+      if (settled) return;
+      settled = true;
+      if (ok) resolve(w.YT);
+      else {
+        ytApiPromise = null; // allow retry after failure
+        reject(err || new Error('yt-api-failed'));
+      }
+    };
     w.onYouTubeIframeAPIReady = () => {
       try { prev && prev(); } catch { /* noop */ }
-      resolve(w.YT);
+      finish(!!(w.YT && w.YT.Player));
     };
     const existing = document.querySelector('script[data-yt-iframe-api]') as HTMLScriptElement | null;
     if (!existing) {
@@ -26,14 +36,39 @@ const loadYouTubeApi = (): Promise<any> => {
       s.src = 'https://www.youtube.com/iframe_api';
       s.async = true;
       s.setAttribute('data-yt-iframe-api', '1');
-      s.onerror = () => reject(new Error('yt-api-load-failed'));
+      s.onerror = () => finish(false, new Error('yt-api-load-failed'));
       document.head.appendChild(s);
     }
     setTimeout(() => {
-      if (!w.YT || !w.YT.Player) reject(new Error('yt-api-timeout'));
+      if (!(w.YT && w.YT.Player)) finish(false, new Error('yt-api-timeout'));
     }, 8000);
   });
   return ytApiPromise;
+};
+
+type PlayerErrorKind = 'network' | 'blocked' | 'unavailable' | 'unknown';
+
+const errorMessages: Record<PlayerErrorKind, { title: string; hint: string; icon: React.ComponentType<{ className?: string }> }> = {
+  network: {
+    title: 'تعذّر الاتصال بيوتيوب',
+    hint: 'تحقّق من اتصال الإنترنت ثم أعد المحاولة.',
+    icon: WifiOff,
+  },
+  blocked: {
+    title: 'المتصفح يمنع تشغيل الفيديو داخل التطبيق',
+    hint: 'قد يكون بسبب مانع إعلانات أو إعدادات خصوصية. يمكنك فتحه على يوتيوب مباشرة.',
+    icon: ShieldAlert,
+  },
+  unavailable: {
+    title: 'هذا الفيديو غير متاح للتشغيل هنا',
+    hint: 'صاحب الفيديو قد يمنع التضمين. جرّب فتحه على يوتيوب.',
+    icon: AlertCircle,
+  },
+  unknown: {
+    title: 'تعذّر تشغيل الفيديو',
+    hint: 'حدث خطأ غير متوقّع. أعد المحاولة أو افتح النتائج على يوتيوب.',
+    icon: AlertCircle,
+  },
 };
 
 interface YouTubePlayerModalProps {
@@ -46,47 +81,89 @@ const YouTubePlayerModal: React.FC<YouTubePlayerModalProps> = ({ query, title, o
   const hostRef = useRef<HTMLDivElement | null>(null);
   const playerRef = useRef<any>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [errorKind, setErrorKind] = useState<PlayerErrorKind>('unknown');
+  const [attempt, setAttempt] = useState(0);
+  const timeoutRef = useRef<number | null>(null);
+
+  const fail = (kind: PlayerErrorKind) => {
+    setErrorKind(kind);
+    setStatus('error');
+  };
 
   useEffect(() => {
     if (!query) return;
     let cancelled = false;
     setStatus('loading');
 
+    // If IFrame API doesn't finish loading in reasonable time, assume blocked
+    if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+    timeoutRef.current = window.setTimeout(() => {
+      if (!cancelled && status !== 'ready') {
+        fail(navigator.onLine ? 'blocked' : 'network');
+      }
+    }, 10000) as unknown as number;
+
     loadYouTubeApi()
       .then((YT) => {
         if (cancelled || !hostRef.current) return;
-        // clear old iframe
         hostRef.current.innerHTML = '<div id="yt-player-mount" style="width:100%;height:100%"></div>';
-        playerRef.current = new YT.Player('yt-player-mount', {
-          width: '100%',
-          height: '100%',
-          playerVars: { rel: 0, modestbranding: 1, playsinline: 1, hl: 'ar' },
-          events: {
-            onReady: (e: any) => {
-              if (cancelled) return;
-              try {
-                e.target.loadPlaylist({ listType: 'search', list: query });
-                setStatus('ready');
-              } catch {
-                setStatus('error');
-              }
+        try {
+          playerRef.current = new YT.Player('yt-player-mount', {
+            width: '100%',
+            height: '100%',
+            playerVars: { rel: 0, modestbranding: 1, playsinline: 1, hl: 'ar' },
+            events: {
+              onReady: (e: any) => {
+                if (cancelled) return;
+                try {
+                  e.target.loadPlaylist({ listType: 'search', list: query });
+                  if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+                  setStatus('ready');
+                } catch {
+                  fail('unavailable');
+                }
+              },
+              onError: (e: any) => {
+                // YT error codes: 2 invalid param, 5 HTML5 issue, 100 not found, 101/150 not embeddable
+                const code = e?.data;
+                if (code === 101 || code === 150) fail('unavailable');
+                else if (code === 100) fail('unavailable');
+                else if (code === 5) fail('blocked');
+                else fail('unknown');
+              },
             },
-            onError: () => setStatus('error'),
-          },
-        });
+          });
+        } catch {
+          fail('blocked');
+        }
       })
-      .catch(() => !cancelled && setStatus('error'));
+      .catch((err) => {
+        if (cancelled) return;
+        const msg = String(err?.message || '');
+        if (msg.includes('load-failed')) fail(navigator.onLine ? 'blocked' : 'network');
+        else if (msg.includes('timeout')) fail('blocked');
+        else fail('unknown');
+      });
 
     return () => {
       cancelled = true;
+      if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
       try { playerRef.current?.destroy?.(); } catch { /* noop */ }
       playerRef.current = null;
     };
-  }, [query]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, attempt]);
 
   if (!query) return null;
 
   const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+  const err = errorMessages[errorKind];
+  const ErrIcon = err.icon;
+
+  const retry = () => {
+    setStatus('loading');
+    setAttempt((a) => a + 1);
+  };
 
   return (
     <div className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-3" onClick={onClose}>
@@ -112,22 +189,36 @@ const YouTubePlayerModal: React.FC<YouTubePlayerModalProps> = ({ query, title, o
         <div className="relative bg-black" style={{ aspectRatio: '16/9' }}>
           <div ref={hostRef} className="absolute inset-0" />
           {status === 'loading' && (
-            <div className="absolute inset-0 flex items-center justify-center text-white/80 text-xs">
-              <div className="w-6 h-6 border-2 border-white/60 border-t-transparent rounded-full animate-spin" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-white/80 text-xs">
+              <div className="w-7 h-7 border-2 border-white/60 border-t-transparent rounded-full animate-spin" />
+              <div className="text-[11px] font-bold">جارٍ تحميل المشغّل...</div>
             </div>
           )}
           {status === 'error' && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 text-center text-white">
-              <AlertCircle className="w-6 h-6 text-red-400" />
-              <div className="text-xs font-bold">تعذّر تشغيل الفيديو داخل التطبيق</div>
-              <a
-                href={searchUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1 text-[11px] font-extrabold bg-red-600 text-white px-3 py-1.5 rounded-full"
-              >
-                <ExternalLink className="w-3 h-3" /> فتح على يوتيوب
-              </a>
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-5 text-center text-white bg-gradient-to-br from-black via-red-950/40 to-black">
+              <div className="w-12 h-12 rounded-full bg-red-500/20 border border-red-400/40 flex items-center justify-center">
+                <ErrIcon className="w-6 h-6 text-red-300" />
+              </div>
+              <div className="space-y-1">
+                <div className="text-sm font-extrabold">{err.title}</div>
+                <div className="text-[11px] text-white/70 leading-5 max-w-sm mx-auto">{err.hint}</div>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-2 mt-1">
+                <button
+                  onClick={retry}
+                  className="inline-flex items-center gap-1.5 text-[11px] font-extrabold bg-white/95 text-black px-3 py-1.5 rounded-full hover:bg-white transition"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" /> إعادة المحاولة
+                </button>
+                <a
+                  href={searchUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 text-[11px] font-extrabold bg-red-600 text-white px-3 py-1.5 rounded-full hover:bg-red-500 transition"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" /> فتح على يوتيوب
+                </a>
+              </div>
             </div>
           )}
         </div>
