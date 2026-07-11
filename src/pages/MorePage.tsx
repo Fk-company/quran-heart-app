@@ -59,6 +59,11 @@ const moreCategories = [
       { label: 'المتشابهات', icon: Layers, path: '/mutashabihat', desc: 'تمييز الآيات المتشابهة', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
       { label: 'التحدي الأسبوعي', icon: Trophy, path: '/weekly-challenge', desc: 'تحديات وشارات إنجاز', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-primary' },
       { label: 'اختبار إسلامي', icon: Brain, path: '/islamic-quiz', desc: 'اختبر معلوماتك الدينية', color: 'bg-purple-500/10 text-purple-500', gradient: 'gradient-gold' },
+      { label: 'مسارات التعلّم', icon: GraduationCap, path: '/learn', desc: 'مسارات منظمة: تجويد وحفظ وتفسير', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
+      { label: 'قصص القرآن', icon: Scroll, path: '/quran-stories', desc: 'قصص وعبر من كتاب الله', color: 'bg-amber-500/10 text-amber-500', gradient: 'gradient-gold' },
+      { label: 'أسباب النزول', icon: BookOpenCheck, path: '/asbab-al-nuzul', desc: 'مواقف نزلت فيها الآيات', color: 'bg-primary/10 text-primary', gradient: 'gradient-primary' },
+      { label: 'مصطلحات إسلامية', icon: Library, path: '/islamic-terms', desc: 'معجم مبسّط للمفاهيم الشرعية', color: 'bg-accent/10 text-accent', gradient: 'gradient-gold' },
+      { label: 'الإعجاز العلمي', icon: Atom, path: '/quran-miracles', desc: 'حقائق سبق القرآن إليها العلم', color: 'bg-sky-500/10 text-sky-500', gradient: 'gradient-primary' },
     ]
   },
   {
