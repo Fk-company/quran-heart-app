@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import SEO from '@/components/SEO';
 import { fetchReciters, fetchSurahs, type Reciter, type Surah } from '@/lib/api';
 import { useAudioPlayer, type AudioTrack } from '@/contexts/AudioContext';
@@ -50,9 +50,10 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
   currentTrackId, isPlaying, hasActiveTrack,
   onPlay, onPlayAll, onClose,
 }) => {
-  const bottomOffset = hasActiveTrack
-    ? 'calc(var(--nav-height) + 4.5rem + env(safe-area-inset-bottom, 0px))'
-    : 'calc(var(--nav-height) + env(safe-area-inset-bottom, 0px))';
+  // Always reserve MiniPlayer space so the sheet never jumps when playback starts/stops.
+  // Using a stable offset prevents the ayah list from being covered or reflowed on state change.
+  void hasActiveTrack;
+  const bottomOffset = 'calc(var(--nav-height) + var(--player-height) + env(safe-area-inset-bottom, 0px) + 0.5rem)';
   return (
     <>
       <div className="sheet-overlay" onClick={onClose} />
@@ -143,6 +144,51 @@ const RecitersPage: React.FC = () => {
   const { play, pause, currentTrack, isPlaying } = useAudioPlayer();
   const { toggleReciter, isReciterFav, favorites } = useFavorites();
 
+  // ---- Scroll position persistence ----
+  const SCROLL_KEY = 'reciters_scroll_y';
+  const savedScrollRef = useRef<number>(0);
+
+  // Restore scroll on mount (once data is available)
+  useEffect(() => {
+    if (loading) return;
+    const raw = sessionStorage.getItem(SCROLL_KEY);
+    const y = raw ? parseInt(raw, 10) : NaN;
+    if (!Number.isNaN(y) && y > 0) {
+      // Two rAFs so images/layout settle first
+      requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(0, y)));
+    }
+  }, [loading]);
+
+  // Persist scroll continuously (throttled)
+  useEffect(() => {
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        savedScrollRef.current = window.scrollY;
+        sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
+        raf = 0;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // Wraps an action so scroll position is restored after React re-renders
+  const preserveScroll = useCallback(<A extends any[]>(fn: (...args: A) => void) => {
+    return (...args: A) => {
+      const y = window.scrollY;
+      savedScrollRef.current = y;
+      fn(...args);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (Math.abs(window.scrollY - y) > 2) window.scrollTo(0, y);
+      }));
+    };
+  }, []);
+
   useEffect(() => { localStorage.setItem('reciters-view', viewMode); }, [viewMode]);
   useEffect(() => { localStorage.setItem(SORT_KEY, sortKey); }, [sortKey]);
 
@@ -190,7 +236,7 @@ const RecitersPage: React.FC = () => {
     });
   };
 
-  const handlePlay = (reciter: Reciter, surahNum: number) => {
+  const handlePlay = preserveScroll((reciter: Reciter, surahNum: number) => {
     const queue = buildQueue(reciter);
     const track = queue.find(t => t.id === `${reciter.id}-${surahNum}`);
     if (!track) return;
@@ -202,15 +248,17 @@ const RecitersPage: React.FC = () => {
     play(track, queue);
     pushRecent(reciter.id);
     setRecent(getRecent());
-  };
+  });
 
-  const handlePlayAll = (reciter: Reciter) => {
+  const handlePlayAll = preserveScroll((reciter: Reciter) => {
     const queue = buildQueue(reciter);
     if (queue.length === 0) return;
     play(queue[0], queue);
     pushRecent(reciter.id);
     setRecent(getRecent());
-  };
+  });
+
+  const closeExpanded = preserveScroll(() => setExpandedReciter(null));
 
   const getReciterImage = (_r: Reciter) => appLogo;
 
@@ -313,7 +361,7 @@ const RecitersPage: React.FC = () => {
               hasActiveTrack={!!currentTrack}
               onPlay={(num) => handlePlay(reciter, num)}
               onPlayAll={() => handlePlayAll(reciter)}
-              onClose={() => setExpandedReciter(null)}
+              onClose={closeExpanded}
             />
           );
         })()}
