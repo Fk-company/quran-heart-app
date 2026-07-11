@@ -144,6 +144,51 @@ const RecitersPage: React.FC = () => {
   const { play, pause, currentTrack, isPlaying } = useAudioPlayer();
   const { toggleReciter, isReciterFav, favorites } = useFavorites();
 
+  // ---- Scroll position persistence ----
+  const SCROLL_KEY = 'reciters_scroll_y';
+  const savedScrollRef = useRef<number>(0);
+
+  // Restore scroll on mount (once data is available)
+  useEffect(() => {
+    if (loading) return;
+    const raw = sessionStorage.getItem(SCROLL_KEY);
+    const y = raw ? parseInt(raw, 10) : NaN;
+    if (!Number.isNaN(y) && y > 0) {
+      // Two rAFs so images/layout settle first
+      requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(0, y)));
+    }
+  }, [loading]);
+
+  // Persist scroll continuously (throttled)
+  useEffect(() => {
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        savedScrollRef.current = window.scrollY;
+        sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
+        raf = 0;
+      });
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  // Wraps an action so scroll position is restored after React re-renders
+  const preserveScroll = useCallback(<A extends any[]>(fn: (...args: A) => void) => {
+    return (...args: A) => {
+      const y = window.scrollY;
+      savedScrollRef.current = y;
+      fn(...args);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (Math.abs(window.scrollY - y) > 2) window.scrollTo(0, y);
+      }));
+    };
+  }, []);
+
   useEffect(() => { localStorage.setItem('reciters-view', viewMode); }, [viewMode]);
   useEffect(() => { localStorage.setItem(SORT_KEY, sortKey); }, [sortKey]);
 
