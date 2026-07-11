@@ -96,7 +96,7 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
           {surahNums.length === 0 ? (
             <div className="text-center py-10 text-sm text-muted-foreground">لا توجد سور متاحة لهذا القارئ</div>
           ) : (
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5">
               {surahNums.map((num) => {
                 const s = surahs.find((su) => su.number === num);
                 const trackId = `${reciter.id}-${num}`;
@@ -105,16 +105,39 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
                   <button
                     key={num}
                     onClick={() => onPlay(num)}
-                    className={`flex items-center gap-2 p-3 rounded-xl transition-colors text-right ${isThisPlaying ? 'bg-primary/10 border border-primary/30 shadow-sm' : 'bg-secondary/50 hover:bg-secondary border border-transparent'}`}
+                    className={`group relative flex flex-col items-center justify-center gap-1 py-2 px-1.5 rounded-xl border transition-all text-center overflow-hidden ${
+                      isThisPlaying
+                        ? 'bg-primary/10 border-primary/40 shadow-[0_4px_14px_-6px_hsl(var(--primary)/0.5)]'
+                        : 'bg-card border-border/50 hover:border-primary/30 hover:bg-secondary/60 active:scale-[0.97]'
+                    }`}
+                    aria-label={`${s?.name || `سورة ${num}`} - ${isThisPlaying ? 'إيقاف' : 'تشغيل'}`}
                   >
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isThisPlaying ? 'bg-primary' : 'bg-primary/10'}`}>
-                      {isThisPlaying
-                        ? <Pause className="w-3.5 h-3.5 text-primary-foreground" />
-                        : <Play className="w-3.5 h-3.5 text-primary ml-0.5" />}
+                    {/* Small corner number badge */}
+                    <span
+                      className={`absolute top-1 right-1 text-[9px] font-bold leading-none px-1.5 py-0.5 rounded-md ${
+                        isThisPlaying
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-muted-foreground group-hover:bg-primary/15 group-hover:text-primary'
+                      }`}
+                    >
+                      {num}
+                    </span>
+                    {/* Play indicator */}
+                    <div
+                      className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
+                        isThisPlaying
+                          ? 'bg-primary text-primary-foreground shadow-md'
+                          : 'bg-primary/10 text-primary group-hover:bg-primary/20 group-hover:scale-110'
+                      }`}
+                    >
+                      {isThisPlaying ? <Pause className="w-3 h-3" fill="currentColor" /> : <Play className="w-3 h-3 ml-0.5" fill="currentColor" />}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className={`text-xs truncate font-semibold ${isThisPlaying ? 'text-primary' : 'text-foreground'} font-kufi`}>{s?.name || `سورة ${num}`}</div>
-                      <div className="text-[10px] text-muted-foreground">رقم {num}</div>
+                    <div
+                      className={`text-[11px] font-bold leading-tight line-clamp-1 font-kufi mt-0.5 w-full ${
+                        isThisPlaying ? 'text-primary' : 'text-foreground'
+                      }`}
+                    >
+                      {s?.name?.replace(/^سُورَةُ\s*/, '') || `سورة ${num}`}
                     </div>
                   </button>
                 );
