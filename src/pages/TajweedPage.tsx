@@ -587,6 +587,9 @@ const TajweedPage: React.FC = () => {
           </div>
         )}
 
+        {tab === 'videos' && <VideosSection />}
+
+
         {/* Related topics */}
         <div className="rounded-2xl border border-border/50 bg-card p-4">
           <div className="text-xs font-extrabold text-foreground mb-2">مواضيع مرتبطة</div>
