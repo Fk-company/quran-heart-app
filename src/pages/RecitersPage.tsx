@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import SEO from '@/components/SEO';
 import { fetchReciters, fetchSurahs, type Reciter, type Surah } from '@/lib/api';
 import { useAudioPlayer, type AudioTrack } from '@/contexts/AudioContext';
@@ -54,7 +55,9 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
   // Using a stable offset prevents the ayah list from being covered or reflowed on state change.
   void hasActiveTrack;
   const bottomOffset = 'calc(var(--nav-height) + var(--player-height) + env(safe-area-inset-bottom, 0px) + 0.5rem)';
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <>
       <div className="sheet-overlay" onClick={onClose} />
       <div
@@ -152,7 +155,8 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
           )}
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 };
 
