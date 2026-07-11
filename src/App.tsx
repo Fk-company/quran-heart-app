@@ -135,6 +135,13 @@ const AnimatedRoutes = () => {
           <Route path="/privacy" element={<PageTransition><PrivacyPage /></PageTransition>} />
           <Route path="/terms" element={<PageTransition><TermsPage /></PageTransition>} />
           <Route path="/tajweed" element={<PageTransition><TajweedPage /></PageTransition>} />
+          <Route path="/quran-stories" element={<PageTransition><QuranStoriesPage /></PageTransition>} />
+          <Route path="/asbab-al-nuzul" element={<PageTransition><AsbabAlNuzulPage /></PageTransition>} />
+          <Route path="/daily-challenges" element={<PageTransition><DailyChallengesPage /></PageTransition>} />
+          <Route path="/quran-quotes" element={<PageTransition><QuranQuotesPage /></PageTransition>} />
+          <Route path="/learn" element={<PageTransition><LearnPathsPage /></PageTransition>} />
+          <Route path="/islamic-terms" element={<PageTransition><IslamicTermsPage /></PageTransition>} />
+          <Route path="/quran-miracles" element={<PageTransition><QuranScienceMiraclesPage /></PageTransition>} />
           <Route path="/focus-mode" element={<FocusModePage />} />
           <Route path="/about" element={<PageTransition><AboutPage /></PageTransition>} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
