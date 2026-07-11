@@ -165,9 +165,9 @@ const BottomNav: React.FC = () => {
               aria-label="المزيد"
             >
               <div className="nav-icon-box">
-                <MoreHorizontal className="w-5 h-5 text-muted-foreground transition-colors duration-200" strokeWidth={1.8} />
+                <MoreHorizontal className="w-5 h-5 text-muted-foreground dark:text-foreground/70 transition-colors duration-200" strokeWidth={1.9} />
               </div>
-              <span className="text-muted-foreground font-medium">المزيد</span>
+              <span className="text-muted-foreground dark:text-foreground/75 font-medium">المزيد</span>
             </button>
           </div>
         </LayoutGroup>
