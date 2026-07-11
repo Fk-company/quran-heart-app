@@ -223,6 +223,7 @@ const ytSearchUrl = (q: string) => `https://www.youtube.com/results?search_query
 
 const VideosSection: React.FC = () => {
   const [vCat, setVCat] = useState<(typeof VIDEO_CATEGORIES)[number]>('الكل');
+  const [active, setActive] = useState<VideoLesson | null>(null);
   const list = useMemo(
     () => (vCat === 'الكل' ? VIDEO_LESSONS : VIDEO_LESSONS.filter((v) => v.category === vCat)),
     [vCat],
@@ -232,7 +233,7 @@ const VideosSection: React.FC = () => {
     <div className="space-y-3">
       <div className="rounded-2xl bg-primary/5 border border-primary/20 p-3">
         <p className="text-[11px] leading-6 text-foreground/80">
-          دروس تعليمية مختارة من قنوات موثوقة. اضغط على أي درس ليفتح لك نتائج البحث المطابقة على يوتيوب لاختيار الفيديو المناسب.
+          دروس تعليمية مختارة تُشغَّل داخل التطبيق عبر YouTube IFrame API. اضغط على أي درس ليبدأ التشغيل في نافذة منبثقة.
         </p>
       </div>
 
@@ -252,11 +253,9 @@ const VideosSection: React.FC = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {list.map((v) => (
-          <a
+          <button
             key={v.id}
-            href={ytSearchUrl(v.query)}
-            target="_blank"
-            rel="noreferrer"
+            onClick={() => setActive(v)}
             className="text-right rounded-xl border border-border/50 bg-card overflow-hidden transition hover:border-primary/60 active:scale-[0.99] flex items-stretch"
           >
             <div className="relative w-24 shrink-0 bg-gradient-to-br from-red-500/90 to-red-700 flex items-center justify-center">
@@ -271,12 +270,18 @@ const VideosSection: React.FC = () => {
               <div className="text-[12px] font-extrabold line-clamp-2 leading-5">{v.title}</div>
               <div className="text-[10px] text-muted-foreground mt-1 line-clamp-2 leading-4">{v.desc}</div>
               <div className="text-[10px] text-red-500 font-bold mt-1 inline-flex items-center gap-1">
-                <ExternalLink className="w-3 h-3" /> فتح على يوتيوب
+                <Play className="w-3 h-3 fill-current" /> تشغيل داخل التطبيق
               </div>
             </div>
-          </a>
+          </button>
         ))}
       </div>
+
+      <YouTubePlayerModal
+        query={active?.query || null}
+        title={active?.title}
+        onClose={() => setActive(null)}
+      />
     </div>
   );
 };
