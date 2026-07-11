@@ -236,7 +236,7 @@ const RecitersPage: React.FC = () => {
     });
   };
 
-  const handlePlay = (reciter: Reciter, surahNum: number) => {
+  const handlePlay = preserveScroll((reciter: Reciter, surahNum: number) => {
     const queue = buildQueue(reciter);
     const track = queue.find(t => t.id === `${reciter.id}-${surahNum}`);
     if (!track) return;
@@ -248,15 +248,17 @@ const RecitersPage: React.FC = () => {
     play(track, queue);
     pushRecent(reciter.id);
     setRecent(getRecent());
-  };
+  });
 
-  const handlePlayAll = (reciter: Reciter) => {
+  const handlePlayAll = preserveScroll((reciter: Reciter) => {
     const queue = buildQueue(reciter);
     if (queue.length === 0) return;
     play(queue[0], queue);
     pushRecent(reciter.id);
     setRecent(getRecent());
-  };
+  });
+
+  const closeExpanded = preserveScroll(() => setExpandedReciter(null));
 
   const getReciterImage = (_r: Reciter) => appLogo;
 
