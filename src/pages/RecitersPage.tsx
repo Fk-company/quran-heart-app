@@ -49,19 +49,28 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
   reciter, surahs, surahNums, reciterImage,
   currentTrackId, isPlaying, hasActiveTrack,
   onPlay, onPlayAll, onClose,
-}) => (
-  <>
-    <div className="sheet-overlay" onClick={onClose} />
-    <div
-      className="sheet-content"
-      dir="rtl"
-      // Reserve room for the MiniPlayer at all times so the layout never
-      // reflows when playback starts/stops while the sheet is open.
-      style={{ paddingBottom: hasActiveTrack ? '9rem' : '6rem' }}
-    >
-      <div className="sheet-handle" />
-      <div className="px-5 pb-6 pt-2 max-h-[70vh] overflow-y-auto overscroll-contain">
-        <div className="flex items-center justify-between mb-4 sticky top-0 bg-card/95 backdrop-blur-md -mx-5 px-5 py-2 z-10 border-b border-border/40">
+}) => {
+  const bottomOffset = hasActiveTrack
+    ? 'calc(var(--nav-height) + 4.5rem + env(safe-area-inset-bottom, 0px))'
+    : 'calc(var(--nav-height) + env(safe-area-inset-bottom, 0px))';
+  return (
+    <>
+      <div className="sheet-overlay" onClick={onClose} />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={`سور القارئ ${reciter.name}`}
+        dir="rtl"
+        className="fixed left-0 right-0 z-[72] bg-card rounded-t-3xl border-t border-border shadow-2xl flex flex-col overflow-hidden animate-[sheet-up_0.32s_cubic-bezier(0.32,0.72,0,1)]"
+        style={{
+          bottom: bottomOffset,
+          top: 'max(15vh, 4rem)',
+          maxWidth: '640px',
+          margin: '0 auto',
+        }}
+      >
+        <div className="sheet-handle flex-shrink-0" />
+        <div className="flex items-center justify-between px-5 py-3 border-b border-border/50 flex-shrink-0 bg-card">
           <div className="flex items-center gap-3 min-w-0">
             <img src={reciterImage} alt={reciter.name} loading="lazy" className="app-logo-img w-12 h-12 rounded-2xl flex-shrink-0" />
             <div className="min-w-0">
@@ -82,34 +91,40 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-2">
-          {surahNums.map((num) => {
-            const s = surahs.find((su) => su.number === num);
-            const trackId = `${reciter.id}-${num}`;
-            const isThisPlaying = currentTrackId === trackId && isPlaying;
-            return (
-              <button
-                key={num}
-                onClick={() => onPlay(num)}
-                className={`flex items-center gap-2 p-3 rounded-xl transition-colors text-right ${isThisPlaying ? 'bg-primary/10 border border-primary/30 shadow-sm' : 'bg-secondary/50 hover:bg-secondary border border-transparent'}`}
-              >
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isThisPlaying ? 'bg-primary' : 'bg-primary/10'}`}>
-                  {isThisPlaying
-                    ? <Pause className="w-3.5 h-3.5 text-primary-foreground" />
-                    : <Play className="w-3.5 h-3.5 text-primary ml-0.5" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className={`text-xs truncate font-semibold ${isThisPlaying ? 'text-primary' : 'text-foreground'} font-kufi`}>{s?.name || `سورة ${num}`}</div>
-                  <div className="text-[10px] text-muted-foreground">رقم {num}</div>
-                </div>
-              </button>
-            );
-          })}
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}>
+          {surahNums.length === 0 ? (
+            <div className="text-center py-10 text-sm text-muted-foreground">لا توجد سور متاحة لهذا القارئ</div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2">
+              {surahNums.map((num) => {
+                const s = surahs.find((su) => su.number === num);
+                const trackId = `${reciter.id}-${num}`;
+                const isThisPlaying = currentTrackId === trackId && isPlaying;
+                return (
+                  <button
+                    key={num}
+                    onClick={() => onPlay(num)}
+                    className={`flex items-center gap-2 p-3 rounded-xl transition-colors text-right ${isThisPlaying ? 'bg-primary/10 border border-primary/30 shadow-sm' : 'bg-secondary/50 hover:bg-secondary border border-transparent'}`}
+                  >
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isThisPlaying ? 'bg-primary' : 'bg-primary/10'}`}>
+                      {isThisPlaying
+                        ? <Pause className="w-3.5 h-3.5 text-primary-foreground" />
+                        : <Play className="w-3.5 h-3.5 text-primary ml-0.5" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className={`text-xs truncate font-semibold ${isThisPlaying ? 'text-primary' : 'text-foreground'} font-kufi`}>{s?.name || `سورة ${num}`}</div>
+                      <div className="text-[10px] text-muted-foreground">رقم {num}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
-    </div>
-  </>
-);
+    </>
+  );
+};
 
 const RecitersPage: React.FC = () => {
 
