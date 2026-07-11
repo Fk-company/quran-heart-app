@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import SEO from '@/components/SEO';
 import { fetchReciters, fetchSurahs, type Reciter, type Surah } from '@/lib/api';
 import { useAudioPlayer, type AudioTrack } from '@/contexts/AudioContext';
