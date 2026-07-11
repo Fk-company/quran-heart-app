@@ -50,9 +50,10 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
   currentTrackId, isPlaying, hasActiveTrack,
   onPlay, onPlayAll, onClose,
 }) => {
-  const bottomOffset = hasActiveTrack
-    ? 'calc(var(--nav-height) + 4.5rem + env(safe-area-inset-bottom, 0px))'
-    : 'calc(var(--nav-height) + env(safe-area-inset-bottom, 0px))';
+  // Always reserve MiniPlayer space so the sheet never jumps when playback starts/stops.
+  // Using a stable offset prevents the ayah list from being covered or reflowed on state change.
+  void hasActiveTrack;
+  const bottomOffset = 'calc(var(--nav-height) + var(--player-height) + env(safe-area-inset-bottom, 0px) + 0.5rem)';
   return (
     <>
       <div className="sheet-overlay" onClick={onClose} />
