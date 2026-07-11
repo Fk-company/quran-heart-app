@@ -97,8 +97,11 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
             <div className="text-center py-10 text-sm text-muted-foreground">لا توجد سور متاحة لهذا القارئ</div>
           ) : (
             <div
-              className="grid gap-1.5"
-              style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))' }}
+              className="grid gap-1"
+              style={{
+                gridTemplateColumns: 'repeat(auto-fill, minmax(78px, 1fr))',
+                gridAutoRows: '1fr',
+              }}
             >
               {surahNums.map((num) => {
                 const s = surahs.find((su) => su.number === num);
@@ -108,7 +111,7 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
                   <button
                     key={num}
                     onClick={() => onPlay(num)}
-                    className={`group relative flex flex-col items-center justify-center gap-1 py-2 px-1.5 rounded-xl border transition-all text-center overflow-hidden ${
+                    className={`group relative flex flex-col items-center justify-center gap-0.5 pt-4 pb-1.5 px-1 rounded-xl border transition-all text-center overflow-hidden h-full min-h-[74px] ${
                       isThisPlaying
                         ? 'bg-primary/10 border-primary/40 shadow-[0_4px_14px_-6px_hsl(var(--primary)/0.5)]'
                         : 'bg-card border-border/50 hover:border-primary/30 hover:bg-secondary/60 active:scale-[0.97]'
@@ -117,7 +120,7 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
                   >
                     {/* Small corner number badge */}
                     <span
-                      className={`absolute top-1 right-1 text-[9px] font-bold leading-none px-1.5 py-0.5 rounded-md ${
+                      className={`absolute top-0.5 right-0.5 text-[9px] font-bold leading-none px-1 py-0.5 rounded-md ${
                         isThisPlaying
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-muted text-muted-foreground group-hover:bg-primary/15 group-hover:text-primary'
@@ -127,16 +130,16 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
                     </span>
                     {/* Play indicator */}
                     <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
+                      className={`w-6 h-6 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
                         isThisPlaying
                           ? 'bg-primary text-primary-foreground shadow-md'
                           : 'bg-primary/10 text-primary group-hover:bg-primary/20 group-hover:scale-110'
                       }`}
                     >
-                      {isThisPlaying ? <Pause className="w-3 h-3" fill="currentColor" /> : <Play className="w-3 h-3 ml-0.5" fill="currentColor" />}
+                      {isThisPlaying ? <Pause className="w-2.5 h-2.5" fill="currentColor" /> : <Play className="w-2.5 h-2.5 ml-0.5" fill="currentColor" />}
                     </div>
                     <div
-                      className={`text-[11px] font-bold leading-tight line-clamp-1 font-kufi mt-0.5 w-full ${
+                      className={`text-[10.5px] font-bold leading-tight line-clamp-1 font-kufi w-full px-0.5 ${
                         isThisPlaying ? 'text-primary' : 'text-foreground'
                       }`}
                     >
