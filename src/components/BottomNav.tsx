@@ -82,20 +82,29 @@ const BottomNav: React.FC = () => {
     <>
       <MoreSheet open={moreOpen} onClose={() => setMoreOpen(false)} />
       <nav
-        className="fixed bottom-0 left-0 right-0 z-40 safe-bottom"
+        aria-label="التنقل السفلي"
+        className="fixed bottom-0 left-0 right-0 z-40 safe-bottom dark:shadow-[0_-10px_36px_-10px_rgba(0,0,0,0.7)]"
         style={{
           background: 'hsl(var(--glass-strong))',
           backdropFilter: 'blur(28px) saturate(200%)',
           WebkitBackdropFilter: 'blur(28px) saturate(200%)',
-          borderTop: '1px solid hsl(var(--border) / 0.5)',
-          boxShadow: '0 -8px 28px -8px hsl(var(--primary) / 0.12)',
+          borderTop: '1px solid hsl(var(--border) / 0.6)',
+          boxShadow: '0 -8px 28px -8px hsl(var(--primary) / 0.14)',
         }}
       >
+        {/* dark-mode contrast overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none hidden dark:block"
+          style={{
+            background:
+              'linear-gradient(180deg, hsl(var(--primary) / 0.06) 0%, transparent 45%, hsl(0 0% 0% / 0.35) 100%)',
+          }}
+        />
         <div
           className="absolute top-0 left-0 right-0 h-[1.5px] pointer-events-none"
           style={{
             background:
-              'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.35) 30%, hsl(var(--accent) / 0.55) 50%, hsl(var(--primary) / 0.35) 70%, transparent)',
+              'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.45) 30%, hsl(var(--accent) / 0.7) 50%, hsl(var(--primary) / 0.45) 70%, transparent)',
           }}
         />
         <LayoutGroup id="bottom-nav">
@@ -126,12 +135,12 @@ const BottomNav: React.FC = () => {
                       />
                     )}
                     <Icon
-                      className={`relative w-5 h-5 transition-all duration-300 ${active ? 'text-primary scale-110' : 'text-muted-foreground'}`}
-                      strokeWidth={active ? 2.4 : 1.8}
+                      className={`relative w-5 h-5 transition-all duration-300 ${active ? 'text-primary scale-110' : 'text-muted-foreground dark:text-foreground/70'}`}
+                      strokeWidth={active ? 2.4 : 1.9}
                     />
                   </div>
                   <span
-                    className={`transition-colors duration-200 ${active ? 'text-primary font-bold' : 'text-muted-foreground font-medium'}`}
+                    className={`transition-colors duration-200 ${active ? 'text-primary font-bold' : 'text-muted-foreground dark:text-foreground/75 font-medium'}`}
                   >
                     {item.label}
                   </span>
@@ -156,9 +165,9 @@ const BottomNav: React.FC = () => {
               aria-label="المزيد"
             >
               <div className="nav-icon-box">
-                <MoreHorizontal className="w-5 h-5 text-muted-foreground transition-colors duration-200" strokeWidth={1.8} />
+                <MoreHorizontal className="w-5 h-5 text-muted-foreground dark:text-foreground/70 transition-colors duration-200" strokeWidth={1.9} />
               </div>
-              <span className="text-muted-foreground font-medium">المزيد</span>
+              <span className="text-muted-foreground dark:text-foreground/75 font-medium">المزيد</span>
             </button>
           </div>
         </LayoutGroup>

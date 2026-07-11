@@ -49,19 +49,28 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
   reciter, surahs, surahNums, reciterImage,
   currentTrackId, isPlaying, hasActiveTrack,
   onPlay, onPlayAll, onClose,
-}) => (
-  <>
-    <div className="sheet-overlay" onClick={onClose} />
-    <div
-      className="sheet-content"
-      dir="rtl"
-      // Reserve room for the MiniPlayer at all times so the layout never
-      // reflows when playback starts/stops while the sheet is open.
-      style={{ paddingBottom: hasActiveTrack ? '9rem' : '6rem' }}
-    >
-      <div className="sheet-handle" />
-      <div className="px-5 pb-6 pt-2 max-h-[70vh] overflow-y-auto overscroll-contain">
-        <div className="flex items-center justify-between mb-4 sticky top-0 bg-card/95 backdrop-blur-md -mx-5 px-5 py-2 z-10 border-b border-border/40">
+}) => {
+  const bottomOffset = hasActiveTrack
+    ? 'calc(var(--nav-height) + 4.5rem + env(safe-area-inset-bottom, 0px))'
+    : 'calc(var(--nav-height) + env(safe-area-inset-bottom, 0px))';
+  return (
+    <>
+      <div className="sheet-overlay" onClick={onClose} />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={`سور القارئ ${reciter.name}`}
+        dir="rtl"
+        className="fixed left-0 right-0 z-[72] bg-card rounded-t-3xl border-t border-border shadow-2xl flex flex-col overflow-hidden animate-[sheet-up_0.32s_cubic-bezier(0.32,0.72,0,1)]"
+        style={{
+          bottom: bottomOffset,
+          top: 'max(15vh, 4rem)',
+          maxWidth: '640px',
+          margin: '0 auto',
+        }}
+      >
+        <div className="sheet-handle flex-shrink-0" />
+        <div className="flex items-center justify-between px-5 py-3 border-b border-border/50 flex-shrink-0 bg-card">
           <div className="flex items-center gap-3 min-w-0">
             <img src={reciterImage} alt={reciter.name} loading="lazy" className="app-logo-img w-12 h-12 rounded-2xl flex-shrink-0" />
             <div className="min-w-0">
@@ -82,34 +91,40 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-2">
-          {surahNums.map((num) => {
-            const s = surahs.find((su) => su.number === num);
-            const trackId = `${reciter.id}-${num}`;
-            const isThisPlaying = currentTrackId === trackId && isPlaying;
-            return (
-              <button
-                key={num}
-                onClick={() => onPlay(num)}
-                className={`flex items-center gap-2 p-3 rounded-xl transition-colors text-right ${isThisPlaying ? 'bg-primary/10 border border-primary/30 shadow-sm' : 'bg-secondary/50 hover:bg-secondary border border-transparent'}`}
-              >
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isThisPlaying ? 'bg-primary' : 'bg-primary/10'}`}>
-                  {isThisPlaying
-                    ? <Pause className="w-3.5 h-3.5 text-primary-foreground" />
-                    : <Play className="w-3.5 h-3.5 text-primary ml-0.5" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className={`text-xs truncate font-semibold ${isThisPlaying ? 'text-primary' : 'text-foreground'} font-kufi`}>{s?.name || `سورة ${num}`}</div>
-                  <div className="text-[10px] text-muted-foreground">رقم {num}</div>
-                </div>
-              </button>
-            );
-          })}
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-3" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 24px)' }}>
+          {surahNums.length === 0 ? (
+            <div className="text-center py-10 text-sm text-muted-foreground">لا توجد سور متاحة لهذا القارئ</div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2">
+              {surahNums.map((num) => {
+                const s = surahs.find((su) => su.number === num);
+                const trackId = `${reciter.id}-${num}`;
+                const isThisPlaying = currentTrackId === trackId && isPlaying;
+                return (
+                  <button
+                    key={num}
+                    onClick={() => onPlay(num)}
+                    className={`flex items-center gap-2 p-3 rounded-xl transition-colors text-right ${isThisPlaying ? 'bg-primary/10 border border-primary/30 shadow-sm' : 'bg-secondary/50 hover:bg-secondary border border-transparent'}`}
+                  >
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isThisPlaying ? 'bg-primary' : 'bg-primary/10'}`}>
+                      {isThisPlaying
+                        ? <Pause className="w-3.5 h-3.5 text-primary-foreground" />
+                        : <Play className="w-3.5 h-3.5 text-primary ml-0.5" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className={`text-xs truncate font-semibold ${isThisPlaying ? 'text-primary' : 'text-foreground'} font-kufi`}>{s?.name || `سورة ${num}`}</div>
+                      <div className="text-[10px] text-muted-foreground">رقم {num}</div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
-    </div>
-  </>
-);
+    </>
+  );
+};
 
 const RecitersPage: React.FC = () => {
 
@@ -347,50 +362,167 @@ const RecitersPage: React.FC = () => {
             })}
           </div>
         ) : (
-          <div className="space-y-2 stagger-children">
-            {filtered.map((reciter) => {
+          <div className="space-y-2.5 stagger-children">
+            {filtered.map((reciter, idx) => {
               const isExpanded = expandedReciter === reciter.id;
               const surahNums = getSurahNums(reciter);
               const isReciterPlaying = currentTrack?.reciter === reciter.name && isPlaying;
+              const isFav = isReciterFav(reciter.id);
               return (
-                <div key={reciter.id} className={`card-elevated transition-all duration-200 ${isReciterPlaying ? '!border-primary/40' : ''}`}>
+                <div
+                  key={reciter.id}
+                  className={`relative overflow-hidden rounded-2xl border transition-all duration-300 group ${
+                    isReciterPlaying
+                      ? 'border-primary/50 shadow-[0_10px_30px_-12px_hsl(var(--primary)/0.45)]'
+                      : 'border-border/60 hover:border-primary/30 hover:shadow-lg'
+                  }`}
+                  style={{
+                    background:
+                      'linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--card)) 60%, hsl(var(--primary) / 0.04) 100%)',
+                  }}
+                >
+                  {/* Elegant gradient accent bar */}
+                  <div
+                    className="absolute top-0 bottom-0 right-0 w-[3px] pointer-events-none"
+                    style={{
+                      background: isReciterPlaying
+                        ? 'linear-gradient(180deg, hsl(var(--primary)), hsl(var(--accent)))'
+                        : 'linear-gradient(180deg, hsl(var(--primary) / 0.35), hsl(var(--accent) / 0.25))',
+                    }}
+                  />
+                  {/* Playing shimmer */}
+                  {isReciterPlaying && (
+                    <div
+                      className="absolute inset-0 opacity-40 pointer-events-none"
+                      style={{
+                        background:
+                          'radial-gradient(circle at 100% 50%, hsl(var(--primary) / 0.18), transparent 60%)',
+                      }}
+                    />
+                  )}
 
-                  <div className="flex items-center gap-3">
-                    <img src={getReciterImage(reciter)} alt={reciter.name} loading="lazy"
-                      className={`app-logo-img w-12 h-12 rounded-2xl border-2 flex-shrink-0 ${isReciterPlaying ? 'border-primary' : 'border-border'}`} />
-                    <button onClick={() => setExpandedReciter(isExpanded ? null : reciter.id)} className="flex-1 text-right min-w-0">
-                      <div className="font-bold text-foreground text-sm font-kufi truncate">{reciter.name}</div>
-                      <div className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
-                        <span className="stat-badge text-[10px] py-0 px-1.5">{surahNums.length} سورة</span>
-                        {isReciterPlaying && <span className="text-primary font-semibold">يعمل الآن</span>}
+                  <div className="relative flex items-center gap-3 p-3">
+                    {/* Rank badge */}
+                    <div className="hidden sm:flex flex-shrink-0 w-7 h-7 rounded-lg items-center justify-center text-[11px] font-bold text-muted-foreground bg-muted/40">
+                      {idx + 1}
+                    </div>
+
+                    {/* Avatar */}
+                    <button
+                      onClick={() => setExpandedReciter(isExpanded ? null : reciter.id)}
+                      className="relative flex-shrink-0"
+                      aria-label={`فتح سور ${reciter.name}`}
+                    >
+                      <div
+                        className={`absolute -inset-0.5 rounded-2xl blur-md transition-opacity ${
+                          isReciterPlaying ? 'opacity-70' : 'opacity-0 group-hover:opacity-40'
+                        }`}
+                        style={{ background: 'hsl(var(--primary) / 0.45)' }}
+                      />
+                      <img
+                        src={getReciterImage(reciter)}
+                        alt={reciter.name}
+                        loading="lazy"
+                        className={`app-logo-img relative w-14 h-14 rounded-2xl border-2 transition-transform group-hover:scale-105 ${
+                          isReciterPlaying ? 'border-primary' : 'border-border'
+                        }`}
+                      />
+                      {isReciterPlaying && (
+                        <span className="absolute -bottom-1 -left-1 w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-md">
+                          <Volume2 className="w-3 h-3 text-primary-foreground live-pulse" />
+                        </span>
+                      )}
+                    </button>
+
+                    {/* Info */}
+                    <button
+                      onClick={() => setExpandedReciter(isExpanded ? null : reciter.id)}
+                      className="flex-1 text-right min-w-0"
+                    >
+                      <div className="font-bold text-foreground text-[15px] font-kufi truncate leading-tight">
+                        {reciter.name}
+                      </div>
+                      <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-primary bg-primary/10 border border-primary/20 rounded-full px-2 py-0.5">
+                          <Hash className="w-2.5 h-2.5" />
+                          {surahNums.length} سورة
+                        </span>
+                        {isFav && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-rose-500 bg-rose-500/10 border border-rose-500/20 rounded-full px-2 py-0.5">
+                            <Heart className="w-2.5 h-2.5" fill="currentColor" />
+                            مفضل
+                          </span>
+                        )}
+                        {isReciterPlaying && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-primary">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary live-pulse" />
+                            يعمل الآن
+                          </span>
+                        )}
                       </div>
                     </button>
-                    <button onClick={() => handlePlayAll(reciter)}
-                      className="w-9 h-9 rounded-xl flex items-center justify-center shadow-emerald flex-shrink-0"
-                      style={{ background: 'var(--grad-primary)' }} title="تشغيل الكل">
-                      <Play className="w-3.5 h-3.5 text-primary-foreground ml-0.5" />
-                    </button>
-                    <button onClick={() => toggleReciter(reciter.id)}
-                      className={`fav-btn flex-shrink-0 ${isReciterFav(reciter.id) ? 'active' : ''}`}>
-                      <Heart className="w-4 h-4" fill={isReciterFav(reciter.id) ? 'currentColor' : 'none'} />
-                    </button>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <button
+                        onClick={() => toggleReciter(reciter.id)}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
+                          isFav
+                            ? 'bg-rose-500/15 text-rose-500 hover:bg-rose-500/25'
+                            : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                        }`}
+                        aria-label={isFav ? 'إزالة من المفضلة' : 'إضافة إلى المفضلة'}
+                      >
+                        <Heart className="w-4 h-4" fill={isFav ? 'currentColor' : 'none'} />
+                      </button>
+                      <button
+                        onClick={() => setExpandedReciter(isExpanded ? null : reciter.id)}
+                        className="w-9 h-9 rounded-xl flex items-center justify-center bg-muted/50 text-muted-foreground hover:bg-muted transition-all"
+                        aria-label={isExpanded ? 'إغلاق' : 'عرض السور'}
+                        aria-expanded={isExpanded}
+                      >
+                        <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} />
+                      </button>
+                      <button
+                        onClick={() => handlePlayAll(reciter)}
+                        className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-emerald hover:scale-105 active:scale-95 transition-transform"
+                        style={{ background: 'var(--grad-primary)' }}
+                        title="تشغيل الكل"
+                        aria-label="تشغيل الكل"
+                      >
+                        <Play className="w-4 h-4 text-primary-foreground ml-0.5" fill="currentColor" />
+                      </button>
+                    </div>
                   </div>
+
                   {isExpanded && (
-                    <div className="mt-3 pt-3 border-t border-border grid grid-cols-2 gap-2 animate-fade-in max-h-72 overflow-y-auto">
-                      {surahNums.map((num) => {
-                        const s = surahs.find((su) => su.number === num);
-                        const trackId = `${reciter.id}-${num}`;
-                        const isThisPlaying = currentTrack?.id === trackId && isPlaying;
-                        return (
-                          <button key={num} onClick={() => handlePlay(reciter, num)}
-                            className={`flex items-center gap-2 p-2.5 rounded-xl transition-all text-right ${isThisPlaying ? 'bg-primary/10 border border-primary/25' : 'bg-secondary/50 hover:bg-secondary border border-transparent'}`}>
-                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${isThisPlaying ? 'bg-primary' : 'bg-primary/10'}`}>
-                              {isThisPlaying ? <Pause className="w-3 h-3 text-primary-foreground" /> : <Play className="w-3 h-3 text-primary ml-0.5" />}
-                            </div>
-                            <span className={`text-xs truncate ${isThisPlaying ? 'text-primary font-semibold' : 'text-foreground'} font-kufi`}>{s?.name || `سورة ${num}`}</span>
-                          </button>
-                        );
-                      })}
+                    <div className="relative border-t border-border/60 bg-muted/20 px-3 py-3 animate-fade-in">
+                      <div className="grid grid-cols-2 gap-2 max-h-72 overflow-y-auto overscroll-contain pr-1">
+                        {surahNums.map((num) => {
+                          const s = surahs.find((su) => su.number === num);
+                          const trackId = `${reciter.id}-${num}`;
+                          const isThisPlaying = currentTrack?.id === trackId && isPlaying;
+                          return (
+                            <button
+                              key={num}
+                              onClick={() => handlePlay(reciter, num)}
+                              className={`flex items-center gap-2 p-2.5 rounded-xl transition-all text-right ${
+                                isThisPlaying
+                                  ? 'bg-primary/10 border border-primary/30 shadow-sm'
+                                  : 'bg-card hover:bg-secondary border border-border/40'
+                              }`}
+                            >
+                              <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 ${isThisPlaying ? 'bg-primary' : 'bg-primary/10'}`}>
+                                {isThisPlaying ? <Pause className="w-3 h-3 text-primary-foreground" /> : <Play className="w-3 h-3 text-primary ml-0.5" />}
+                              </div>
+                              <div className="flex-1 min-w-0 text-right">
+                                <div className={`text-xs truncate ${isThisPlaying ? 'text-primary font-semibold' : 'text-foreground'} font-kufi`}>{s?.name || `سورة ${num}`}</div>
+                                <div className="text-[9px] text-muted-foreground">رقم {num}</div>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>
