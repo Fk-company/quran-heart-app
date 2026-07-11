@@ -65,7 +65,7 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
         className="fixed left-0 right-0 z-[72] bg-card rounded-t-3xl border-t border-border shadow-2xl flex flex-col overflow-hidden animate-[sheet-up_0.32s_cubic-bezier(0.32,0.72,0,1)]"
         style={{
           bottom: bottomOffset,
-          top: 'max(15vh, 4rem)',
+          maxHeight: 'calc(100dvh - var(--nav-height) - var(--player-height) - env(safe-area-inset-bottom, 0px) - 1.25rem)',
           maxWidth: '640px',
           margin: '0 auto',
         }}
@@ -130,7 +130,7 @@ const SurahPicker: React.FC<SurahPickerProps> = ({
                     </span>
                     {/* Play indicator */}
                     <div
-                      className={`w-5.5 h-5.5 rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
+                      className={`w-[22px] h-[22px] rounded-full flex items-center justify-center transition-all flex-shrink-0 ${
                         isThisPlaying
                           ? 'bg-primary text-primary-foreground shadow-md'
                           : 'bg-primary/10 text-primary group-hover:bg-primary/20 group-hover:scale-110'
