@@ -265,13 +265,4 @@ const AyahTafsirModal: React.FC<AyahTafsirModalProps> = ({ ayah, nightMode, onCl
 
 export default AyahTafsirModal;
 
-              <p className={`text-[15px] leading-[2] whitespace-pre-line ${textColor}`} aria-live="polite">{tafsir}</p>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 export default AyahTafsirModal;
