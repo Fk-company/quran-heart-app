@@ -361,7 +361,7 @@ const RecitersPage: React.FC = () => {
               hasActiveTrack={!!currentTrack}
               onPlay={(num) => handlePlay(reciter, num)}
               onPlayAll={() => handlePlayAll(reciter)}
-              onClose={() => setExpandedReciter(null)}
+              onClose={closeExpanded}
             />
           );
         })()}
