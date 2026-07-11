@@ -53,34 +53,35 @@ interface VideoLesson {
   id: string;
   title: string;
   desc: string;
-  youtubeId: string;
+  query: string;
   channel: string;
   category: 'مقدمة' | 'أحكام النون' | 'أحكام الميم' | 'المدود' | 'مخارج وصفات' | 'تطبيق';
 }
 
 const VIDEO_LESSONS: VideoLesson[] = [
-  { id: 'v1', title: 'مقدمة في علم التجويد', desc: 'تعريف التجويد وأهميته وأحكامه', youtubeId: 'M8mF6iX1nS0', channel: 'أيمن سويد', category: 'مقدمة' },
-  { id: 'v2', title: 'الاستعاذة والبسملة', desc: 'أحكام البدء بالتلاوة وآدابها', youtubeId: 'nvJTflG7ZjI', channel: 'أيمن سويد', category: 'مقدمة' },
-  { id: 'v3', title: 'أحكام النون الساكنة والتنوين', desc: 'الإظهار، الإدغام، الإقلاب، الإخفاء', youtubeId: 'sLcWBTZ8yFo', channel: 'أيمن سويد', category: 'أحكام النون' },
-  { id: 'v4', title: 'الإخفاء الحقيقي بالتفصيل', desc: 'شرح 15 حرفاً وكيفية النطق بها', youtubeId: 'y3WMhJp6dUM', channel: 'أيمن سويد', category: 'أحكام النون' },
-  { id: 'v5', title: 'أحكام الميم الساكنة', desc: 'الإدغام والإخفاء والإظهار الشفوي', youtubeId: 'PdM10jDCJWQ', channel: 'أيمن سويد', category: 'أحكام الميم' },
-  { id: 'v6', title: 'المد الطبيعي وأنواع المدود', desc: 'مقادير المدود ومواضعها', youtubeId: 'nOvE_5F5Ews', channel: 'أيمن سويد', category: 'المدود' },
-  { id: 'v7', title: 'المد المتصل والمنفصل', desc: 'الفرق بينهما ومقدار كل منهما', youtubeId: 'zpVQ_LKPLW8', channel: 'أيمن سويد', category: 'المدود' },
-  { id: 'v8', title: 'المد اللازم بأقسامه', desc: 'كلمي وحرفي، مثقل ومخفف', youtubeId: 'yE8fWs8lkI0', channel: 'أيمن سويد', category: 'المدود' },
-  { id: 'v9', title: 'مخارج الحروف العامة', desc: 'الجوف، الحلق، اللسان، الشفتان، الخيشوم', youtubeId: 'lQAJ86KyHTU', channel: 'أيمن سويد', category: 'مخارج وصفات' },
-  { id: 'v10', title: 'صفات الحروف', desc: 'الصفات التي لها ضد وما لا ضد لها', youtubeId: 'nfDA8_1BhBg', channel: 'أيمن سويد', category: 'مخارج وصفات' },
-  { id: 'v11', title: 'القلقلة صغرى وكبرى', desc: 'حروف قطب جد وطريقة نطقها', youtubeId: '1qUD4Iiv-cM', channel: 'أيمن سويد', category: 'أحكام النون' },
-  { id: 'v12', title: 'اللام الشمسية والقمرية', desc: 'قواعد النطق بلام "أل" التعريف', youtubeId: 'Rgf8t-x66Cg', channel: 'أيمن سويد', category: 'أحكام النون' },
-  { id: 'v13', title: 'أحكام الراء', desc: 'تفخيم وترقيق الراء بجميع حالاتها', youtubeId: 'g-3v-Sp7fCs', channel: 'أيمن سويد', category: 'مخارج وصفات' },
-  { id: 'v14', title: 'أحكام الوقف والابتداء', desc: 'أنواع الوقف وعلامات المصحف', youtubeId: 'g7O-b5aLzZ8', channel: 'أيمن سويد', category: 'تطبيق' },
-  { id: 'v15', title: 'تطبيق عملي على سورة الفاتحة', desc: 'قراءة مجودة مع شرح الأحكام', youtubeId: 'gWZKUlLTUvE', channel: 'أيمن سويد', category: 'تطبيق' },
+  { id: 'v1', title: 'مقدمة في علم التجويد', desc: 'تعريف التجويد وأهميته وأحكامه', query: 'أيمن سويد مقدمة في علم التجويد', channel: 'أيمن سويد', category: 'مقدمة' },
+  { id: 'v2', title: 'الاستعاذة والبسملة', desc: 'أحكام البدء بالتلاوة وآدابها', query: 'أيمن سويد الاستعاذة والبسملة', channel: 'أيمن سويد', category: 'مقدمة' },
+  { id: 'v3', title: 'أحكام النون الساكنة والتنوين', desc: 'الإظهار، الإدغام، الإقلاب، الإخفاء', query: 'أيمن سويد أحكام النون الساكنة والتنوين', channel: 'أيمن سويد', category: 'أحكام النون' },
+  { id: 'v4', title: 'الإخفاء الحقيقي', desc: 'شرح 15 حرفاً وكيفية النطق بها', query: 'أيمن سويد الإخفاء الحقيقي', channel: 'أيمن سويد', category: 'أحكام النون' },
+  { id: 'v5', title: 'أحكام الميم الساكنة', desc: 'الإدغام والإخفاء والإظهار الشفوي', query: 'أيمن سويد أحكام الميم الساكنة', channel: 'أيمن سويد', category: 'أحكام الميم' },
+  { id: 'v6', title: 'المد الطبيعي وأنواع المدود', desc: 'مقادير المدود ومواضعها', query: 'أيمن سويد المد الطبيعي أنواع المدود', channel: 'أيمن سويد', category: 'المدود' },
+  { id: 'v7', title: 'المد المتصل والمنفصل', desc: 'الفرق بينهما ومقدار كل منهما', query: 'أيمن سويد المد المتصل والمنفصل', channel: 'أيمن سويد', category: 'المدود' },
+  { id: 'v8', title: 'المد اللازم بأقسامه', desc: 'كلمي وحرفي، مثقل ومخفف', query: 'أيمن سويد المد اللازم', channel: 'أيمن سويد', category: 'المدود' },
+  { id: 'v9', title: 'مخارج الحروف', desc: 'الجوف، الحلق، اللسان، الشفتان، الخيشوم', query: 'أيمن سويد مخارج الحروف', channel: 'أيمن سويد', category: 'مخارج وصفات' },
+  { id: 'v10', title: 'صفات الحروف', desc: 'الصفات التي لها ضد وما لا ضد لها', query: 'أيمن سويد صفات الحروف', channel: 'أيمن سويد', category: 'مخارج وصفات' },
+  { id: 'v11', title: 'القلقلة صغرى وكبرى', desc: 'حروف قطب جد وطريقة نطقها', query: 'أيمن سويد القلقلة', channel: 'أيمن سويد', category: 'أحكام النون' },
+  { id: 'v12', title: 'اللام الشمسية والقمرية', desc: 'قواعد النطق بلام "أل" التعريف', query: 'أيمن سويد اللام الشمسية والقمرية', channel: 'أيمن سويد', category: 'أحكام النون' },
+  { id: 'v13', title: 'أحكام الراء', desc: 'تفخيم وترقيق الراء بجميع حالاتها', query: 'أيمن سويد أحكام الراء', channel: 'أيمن سويد', category: 'مخارج وصفات' },
+  { id: 'v14', title: 'أحكام الوقف والابتداء', desc: 'أنواع الوقف وعلامات المصحف', query: 'أيمن سويد الوقف والابتداء', channel: 'أيمن سويد', category: 'تطبيق' },
+  { id: 'v15', title: 'تطبيق عملي على سورة الفاتحة', desc: 'قراءة مجودة مع شرح الأحكام', query: 'أيمن سويد تطبيق سورة الفاتحة تجويد', channel: 'أيمن سويد', category: 'تطبيق' },
 ];
 
 const VIDEO_CATEGORIES = ['الكل', 'مقدمة', 'أحكام النون', 'أحكام الميم', 'المدود', 'مخارج وصفات', 'تطبيق'] as const;
 
+const ytSearchUrl = (q: string) => `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
+
 const VideosSection: React.FC = () => {
   const [vCat, setVCat] = useState<(typeof VIDEO_CATEGORIES)[number]>('الكل');
-  const [active, setActive] = useState<VideoLesson>(VIDEO_LESSONS[0]);
   const list = useMemo(
     () => (vCat === 'الكل' ? VIDEO_LESSONS : VIDEO_LESSONS.filter((v) => v.category === vCat)),
     [vCat],
@@ -90,38 +91,8 @@ const VideosSection: React.FC = () => {
     <div className="space-y-3">
       <div className="rounded-2xl bg-primary/5 border border-primary/20 p-3">
         <p className="text-[11px] leading-6 text-foreground/80">
-          مقاطع تعليمية من قنوات موثوقة على يوتيوب. الفيديوهات تُشغّل من يوتيوب مباشرة وقد تتطلب اتصال إنترنت.
+          دروس تعليمية مختارة من قنوات موثوقة. اضغط على أي درس ليفتح لك نتائج البحث المطابقة على يوتيوب لاختيار الفيديو المناسب.
         </p>
-      </div>
-
-      <div className="rounded-2xl overflow-hidden bg-black border border-border/50 relative" style={{ aspectRatio: '16/9' }}>
-        <iframe
-          key={active.id}
-          src={`https://www.youtube.com/embed/${active.youtubeId}?rel=0&modestbranding=1`}
-          title={active.title}
-          className="absolute inset-0 w-full h-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          referrerPolicy="strict-origin-when-cross-origin"
-          loading="lazy"
-        />
-      </div>
-
-      <div className="rounded-2xl bg-card border border-border/50 p-3">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <h3 className="text-sm font-extrabold">{active.title}</h3>
-            <div className="text-[11px] text-muted-foreground mt-0.5">{active.desc}</div>
-            <div className="text-[10px] text-muted-foreground mt-1">القناة: {active.channel}</div>
-          </div>
-          <a
-            href={`https://www.youtube.com/watch?v=${active.youtubeId}`}
-            target="_blank" rel="noreferrer"
-            className="text-[10px] font-bold inline-flex items-center gap-1 bg-red-500/10 text-red-500 px-2 py-1 rounded-full flex-shrink-0"
-          >
-            <ExternalLink className="w-3 h-3" /> يوتيوب
-          </a>
-        </div>
       </div>
 
       <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
@@ -138,41 +109,32 @@ const VideosSection: React.FC = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        {list.map((v) => {
-          const isActive = v.id === active.id;
-          return (
-            <button
-              key={v.id}
-              onClick={() => setActive(v)}
-              className={`text-right rounded-xl border overflow-hidden transition ${
-                isActive ? 'border-primary ring-2 ring-primary/40 bg-primary/5' : 'border-border/50 bg-card'
-              }`}
-            >
-              <div className="relative bg-black" style={{ aspectRatio: '16/9' }}>
-                <img
-                  src={`https://i.ytimg.com/vi/${v.youtubeId}/mqdefault.jpg`}
-                  alt={v.title}
-                  className="w-full h-full object-cover opacity-90"
-                  loading="lazy"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.opacity = '0'; }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center bg-black/25">
-                  <div className="w-9 h-9 rounded-full bg-red-500 flex items-center justify-center">
-                    <Play className="w-4 h-4 text-white fill-white" />
-                  </div>
-                </div>
-                <div className="absolute top-1 right-1 bg-black/70 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                  {v.category}
-                </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        {list.map((v) => (
+          <a
+            key={v.id}
+            href={ytSearchUrl(v.query)}
+            target="_blank"
+            rel="noreferrer"
+            className="text-right rounded-xl border border-border/50 bg-card overflow-hidden transition hover:border-primary/60 active:scale-[0.99] flex items-stretch"
+          >
+            <div className="relative w-24 shrink-0 bg-gradient-to-br from-red-500/90 to-red-700 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-white/95 flex items-center justify-center shadow">
+                <Play className="w-5 h-5 text-red-600 fill-red-600" />
               </div>
-              <div className="p-2">
-                <div className="text-[11px] font-extrabold line-clamp-2 leading-4">{v.title}</div>
-                <div className="text-[9px] text-muted-foreground mt-0.5 truncate">{v.channel}</div>
+              <div className="absolute top-1 right-1 bg-black/60 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                {v.category}
               </div>
-            </button>
-          );
-        })}
+            </div>
+            <div className="p-2.5 flex-1 min-w-0">
+              <div className="text-[12px] font-extrabold line-clamp-2 leading-5">{v.title}</div>
+              <div className="text-[10px] text-muted-foreground mt-1 line-clamp-2 leading-4">{v.desc}</div>
+              <div className="text-[10px] text-red-500 font-bold mt-1 inline-flex items-center gap-1">
+                <ExternalLink className="w-3 h-3" /> فتح على يوتيوب
+              </div>
+            </div>
+          </a>
+        ))}
       </div>
     </div>
   );
