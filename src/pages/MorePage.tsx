@@ -6,7 +6,7 @@ import {
   X, Feather, Book, Grid3X3, List, ChevronLeft, TrendingUp, Baby, Sparkles, Mic,
   Brain, Smile, Lightbulb, Bot, Settings, CalendarDays, Target, Send, Globe,
   Trophy, Mic2, Map as MapIcon, Layers, Waves, Sunrise, FileText, Compass, Coins, Moon, BookHeart, MapPin, Bell, Car, SearchX,
-  Clock, Pin, PinOff, Zap, History
+  Clock, Pin, PinOff, Zap, History, Scroll, BookOpenCheck, GraduationCap, Library, Atom
 } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import EmptyState from '@/components/EmptyState';
