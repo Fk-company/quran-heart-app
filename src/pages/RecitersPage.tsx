@@ -412,7 +412,12 @@ const RecitersPage: React.FC = () => {
                     aria-label="مفضلة">
                     <Heart className="w-3.5 h-3.5" fill={isReciterFav(reciter.id) ? 'currentColor' : 'none'} />
                   </button>
-                  <button onClick={() => setExpandedReciter(reciter.id)} className="w-full flex flex-col items-center gap-1.5">
+                  <button
+                    onClick={() => setExpandedReciter(reciter.id)}
+                    className="w-full flex flex-col items-center gap-1.5"
+                    aria-label={`عرض سور ${reciter.name}`}
+                    aria-expanded={expandedReciter === reciter.id}
+                  >
                     <div className="relative">
                       <div
                         className="absolute -inset-1 rounded-2xl blur-md opacity-60"
