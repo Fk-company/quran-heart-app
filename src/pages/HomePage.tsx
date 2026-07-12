@@ -71,7 +71,7 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { theme, themeMode, toggleTheme, setAutoMode } = useTheme();
   const { lastRead } = useLastRead();
-  const { requestPermission, schedulePrayerNotification, sendAdhkarReminder, isSupported } = useNotifications();
+  const { requestPermission, schedulePrayerNotification, sendAdhkarReminder, syncPrayerSchedule, isSupported } = useNotifications();
   const { tracker } = useReadingTracker();
   const { favorites } = useFavorites();
   const [prayerTimes, setPrayerTimes] = useState<PrayerTimes | null>(null);
@@ -105,6 +105,11 @@ const HomePage: React.FC = () => {
     if (notificationsEnabled) {
       setNotificationsEnabled(false);
       localStorage.setItem('notifications_enabled', 'false');
+      // Clear background schedule in the SW
+      try {
+        const reg = await navigator.serviceWorker?.ready;
+        (reg?.active || reg?.waiting || reg?.installing)?.postMessage({ type: 'CLEAR_SCHEDULE' });
+      } catch {}
       return;
     }
     const granted = await requestPermission();
@@ -118,9 +123,11 @@ const HomePage: React.FC = () => {
           const time = prayerTimes[key]?.split(' ')[0];
           if (time) schedulePrayerNotification(prayerNames[key], time, timezone || undefined);
         });
+        // Persist full schedule to the SW so it keeps firing after the page closes.
+        syncPrayerSchedule(prayerTimes as any, timezone || undefined);
       }
     }
-  }, [notificationsEnabled, requestPermission, prayerTimes, timezone, schedulePrayerNotification, sendAdhkarReminder]);
+  }, [notificationsEnabled, requestPermission, prayerTimes, timezone, schedulePrayerNotification, sendAdhkarReminder, syncPrayerSchedule]);
 
   useEffect(() => {
     if (prayerTimes && notificationsEnabled) {
@@ -129,8 +136,9 @@ const HomePage: React.FC = () => {
         const time = prayerTimes[key]?.split(' ')[0];
         if (time) schedulePrayerNotification(prayerNames[key], time, timezone || undefined);
       });
+      syncPrayerSchedule(prayerTimes as any, timezone || undefined);
     }
-  }, [prayerTimes, timezone, notificationsEnabled]);
+  }, [prayerTimes, timezone, notificationsEnabled, schedulePrayerNotification, syncPrayerSchedule]);
 
   useEffect(() => {
     const todayKey = (() => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; })();
