@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { getNotificationSettings, playAdhan } from './useNotificationSettings';
+import { getNotificationSettings, playAdhan, MUEZZINS } from './useNotificationSettings';
 
 const ICON = '/app-logo.png';
 
