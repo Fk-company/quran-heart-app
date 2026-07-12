@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { getNotificationSettings, playAdhan } from './useNotificationSettings';
+import { getNotificationSettings, playAdhan, MUEZZINS } from './useNotificationSettings';
 
 const ICON = '/app-logo.png';
 
@@ -224,6 +224,48 @@ export const useNotifications = () => {
     }
   }, [sendNotification]);
 
+  // Push the full prayer schedule + adhan URL to the SW so it can re-schedule
+  // reminders across days even while the page is closed.
+  const syncPrayerSchedule = useCallback(async (
+    times: Record<string, string> | null | undefined,
+    tz?: string,
+  ) => {
+    if (!('serviceWorker' in navigator)) return;
+    const reg = await ensureServiceWorker();
+    const sw = reg && (reg.active || reg.waiting || reg.installing);
+    if (!sw) return;
+    const ns = getNotificationSettings();
+    const adhanUrl = (MUEZZINS.find(m => m.id === ns.adhanMuezzin) || MUEZZINS[0]).url;
+    const cleanTimes: Record<string, string> = {};
+    if (times) for (const k of Object.keys(times)) cleanTimes[k] = (times[k] || '').split(' ')[0];
+    sw.postMessage({
+      type: 'SET_SCHEDULE',
+      schedule: {
+        prayer: {
+          enabled: !!(ns.enabled && ns.prayerEnabled && times),
+          times: cleanTimes,
+          tz,
+          adhanUrl: ns.adhanAudio ? adhanUrl : '',
+          earlyMinutes: ns.prayerEarlyMinutes || 0,
+          perPrayer: { Fajr: true, Dhuhr: true, Asr: true, Maghrib: true, Isha: true },
+        },
+        daily: [
+          ns.wirdReminder && ns.wirdTime ? { tag: 'wird', hhmm: ns.wirdTime, title: 'وردك اليومي', body: 'حان وقت وردك القرآني', tz } : null,
+        ].filter(Boolean),
+      },
+    });
+    // Also register periodic sync so the SW wakes up daily to re-schedule.
+    try {
+      const anyReg: any = reg;
+      if (anyReg && 'periodicSync' in anyReg) {
+        const status = await (navigator as any).permissions?.query({ name: 'periodic-background-sync' as any });
+        if (!status || status.state === 'granted') {
+          await anyReg.periodicSync.register('reschedule', { minInterval: 12 * 60 * 60 * 1000 });
+        }
+      }
+    } catch {}
+  }, []);
+
   const scheduleDailyReminder = useCallback(async (
     hhmm: string, title: string, body: string, tag: string, tz?: string,
   ) => {
@@ -273,6 +315,7 @@ export const useNotifications = () => {
     schedulePrayerNotification,
     scheduleDailyReminder,
     sendAdhkarReminder,
+    syncPrayerSchedule,
     isSupported: 'Notification' in window,
     permission: permissionRef.current,
   };
