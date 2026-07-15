@@ -126,6 +126,9 @@ const SettingsPage: React.FC = () => {
   const [storageBytes, setStorageBytes] = useState(0);
   const [offlineDownloading, setOfflineDownloading] = useState(false);
   const [offlineProgress, setOfflineProgress] = useState({ done: 0, total: 0 });
+  const [tafsirDownloading, setTafsirDownloading] = useState(false);
+  const [tafsirProgress, setTafsirProgress] = useState({ done: 0, total: 0 });
+  const [tafsirEdition, setTafsirEdition] = useState<string>('ar.muyassar');
   const importRef = useRef<HTMLInputElement>(null);
 
   const currentReciter = useMemo(
@@ -266,6 +269,41 @@ const SettingsPage: React.FC = () => {
     navigator.serviceWorker.addEventListener('message', onMsg);
     target.postMessage({ type: 'PRECACHE_URLS', urls });
     toast('جاري التحميل…', { description: 'يمكنك متابعة استخدام التطبيق' });
+  };
+
+  const handleDownloadTafsir = async () => {
+    if (!('serviceWorker' in navigator)) {
+      toast.error('المتصفح لا يدعم العمل بدون إنترنت');
+      return;
+    }
+    const reg = await navigator.serviceWorker.ready.catch(() => null);
+    const target = reg?.active || navigator.serviceWorker.controller;
+    if (!target) {
+      toast.error('لم يتم تفعيل العمل دون اتصال بعد — أعد فتح التطبيق ثم حاول');
+      return;
+    }
+    const urls: string[] = [];
+    for (let i = 1; i <= 114; i++) {
+      urls.push(`https://api.alquran.cloud/v1/surah/${i}/${tafsirEdition}`);
+    }
+    const total = urls.length;
+    setTafsirDownloading(true);
+    setTafsirProgress({ done: 0, total });
+
+    const onMsg = (event: MessageEvent) => {
+      const msg = event.data || {};
+      if (msg.type === 'PRECACHE_PROGRESS') {
+        setTafsirProgress({ done: msg.done, total: msg.total });
+      } else if (msg.type === 'PRECACHE_DONE') {
+        setTafsirProgress({ done: msg.done, total: msg.total });
+        setTafsirDownloading(false);
+        toast.success(`تم تحميل التفسير كاملاً (${msg.done} سورة)`);
+        navigator.serviceWorker.removeEventListener('message', onMsg);
+      }
+    };
+    navigator.serviceWorker.addEventListener('message', onMsg);
+    target.postMessage({ type: 'PRECACHE_URLS', urls });
+    toast('جاري تحميل التفسير…', { description: 'قد يستغرق دقيقة حسب سرعة الإنترنت' });
   };
 
   // -- render ----------------------------------------------------------------
@@ -571,6 +609,56 @@ const SettingsPage: React.FC = () => {
                   الحجم التقريبي 5–8 ميجابايت • يُخزَّن على جهازك فقط
                 </p>
               </SectionCard>
+
+              <SectionCard icon={BookOpen} title="تنزيل التفسير كاملاً" hint="لقراءة التفسير دون إنترنت">
+                <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+                  اختر إصدار التفسير الذي تريد تخزينه على جهازك، وسيتم تحميل تفسير جميع سور القرآن الكريم للاستخدام لاحقاً بدون اتصال.
+                </p>
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  {[
+                    { id: 'ar.muyassar', name: 'التفسير الميسر' },
+                    { id: 'ar.jalalayn', name: 'تفسير الجلالين' },
+                  ].map((ed) => (
+                    <button
+                      key={ed.id}
+                      onClick={() => setTafsirEdition(ed.id)}
+                      disabled={tafsirDownloading}
+                      className={`p-2.5 rounded-xl border text-xs font-medium transition-all ${
+                        tafsirEdition === ed.id
+                          ? 'border-primary bg-primary/10 text-primary ring-2 ring-primary/20'
+                          : 'border-border bg-secondary/30 text-foreground hover:bg-secondary'
+                      } disabled:opacity-60`}
+                    >
+                      {ed.name}
+                    </button>
+                  ))}
+                </div>
+                {tafsirDownloading && tafsirProgress.total > 0 && (
+                  <div className="mb-3">
+                    <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                      <div
+                        className="h-full bg-primary transition-all duration-300"
+                        style={{ width: `${(tafsirProgress.done / tafsirProgress.total) * 100}%` }}
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground text-center mt-1">
+                      {tafsirProgress.done} / {tafsirProgress.total} سورة
+                    </p>
+                  </div>
+                )}
+                <button
+                  onClick={handleDownloadTafsir}
+                  disabled={tafsirDownloading}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-accent/10 text-accent text-xs font-semibold hover:bg-accent/20 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  <CloudDownload className="w-4 h-4" />
+                  {tafsirDownloading ? 'جاري تحميل التفسير…' : 'تحميل التفسير كاملاً'}
+                </button>
+                <p className="text-[10px] text-muted-foreground text-center mt-2">
+                  الحجم التقريبي 8–15 ميجابايت • يُخزَّن محلياً على جهازك
+                </p>
+              </SectionCard>
+
 
               <SectionCard icon={HardDrive} title="التخزين والبيانات" hint="النسخ الاحتياطي وذاكرة التطبيق">
                 <div className="flex items-center gap-3 mb-3 p-3 rounded-xl bg-secondary/40">
