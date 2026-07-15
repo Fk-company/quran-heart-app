@@ -197,14 +197,16 @@ const MiniPlayer: React.FC = () => {
 
           {/* Volume + Speed */}
           <div className="flex items-center gap-3 px-1">
-            <button onClick={() => setVolume(volume > 0 ? 0 : 1)} className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0">
+            <button onClick={() => setVolume(volume > 0 ? 0 : 1)} aria-label={volume > 0 ? 'كتم الصوت' : 'إعادة الصوت'} className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0">
               <VolIcon className="w-4 h-4" />
             </button>
-            <Slider value={[volume * 100]} max={100} step={1} onValueChange={([val]) => setVolume(val / 100)} className="flex-1" />
+            <Slider value={[volume * 100]} max={100} step={1} onValueChange={([val]) => setVolume(val / 100)} className="flex-1" aria-label="مستوى الصوت" />
             <span className="text-[10px] text-muted-foreground w-8 text-center tabular-nums">{Math.round(volume * 100)}%</span>
             {!isLive && (
               <div className="relative">
                 <button onClick={() => setShowRate(!showRate)}
+                  aria-label="سرعة التشغيل"
+                  aria-expanded={showRate}
                   className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-colors ${playbackRate !== 1 ? 'bg-accent/15 text-accent' : 'bg-secondary text-foreground'}`}
                   title="سرعة التشغيل">
                   <Gauge className="w-3 h-3" />{playbackRate}×
@@ -224,6 +226,8 @@ const MiniPlayer: React.FC = () => {
             )}
             <div className="relative">
               <button onClick={() => setShowSleep(!showSleep)}
+                aria-label="مؤقّت الإيقاف"
+                aria-expanded={showSleep}
                 className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-colors ${sleepTimerEnd ? 'bg-primary/15 text-primary' : 'bg-secondary text-foreground'}`}
                 title="مؤقّت إيقاف">
                 {sleepTimerEnd ? <Timer className="w-3 h-3" /> : <Moon className="w-3 h-3" />}
