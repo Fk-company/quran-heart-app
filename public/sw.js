@@ -1,6 +1,6 @@
 // Service worker: offline shell + API caching + background notifications (survives page close).
-const CACHE_VERSION = 'quran-app-v3';
-const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/app-logo.png'];
+const CACHE_VERSION = 'quran-app-v4';
+const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/app-logo.png', '/404.html'];
 const DEFAULT_ICON = '/app-logo.png';
 
 self.addEventListener('install', (event) => {
@@ -243,6 +243,25 @@ self.addEventListener('message', (event) => {
     event.waitUntil(idbSet('schedule', null));
   } else if (msg.type === 'RESCHEDULE') {
     event.waitUntil(rescheduleAll());
+  } else if (msg.type === 'PRECACHE_URLS' && Array.isArray(msg.urls)) {
+    event.waitUntil((async () => {
+      const cache = await caches.open(CACHE_VERSION);
+      let done = 0;
+      const total = msg.urls.length;
+      for (const url of msg.urls) {
+        try {
+          const res = await fetch(url, { cache: 'no-store' });
+          if (res && res.ok) await cache.put(url, res.clone());
+        } catch {}
+        done++;
+        if (event.source && done % 5 === 0) {
+          try { event.source.postMessage({ type: 'PRECACHE_PROGRESS', done, total }); } catch {}
+        }
+      }
+      if (event.source) {
+        try { event.source.postMessage({ type: 'PRECACHE_DONE', done, total }); } catch {}
+      }
+    })());
   }
 });
 

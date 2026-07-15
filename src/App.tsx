@@ -12,6 +12,7 @@ import MiniPlayer from "@/components/MiniPlayer";
 import PageTransition from "@/components/PageTransition";
 import SplashScreen from "@/components/SplashScreen";
 import OnboardingModal from "@/components/OnboardingModal";
+import OfflineIndicator from "@/components/OfflineIndicator";
 import AboutPage from "./pages/AboutPage";
 import HomePage from "./pages/HomePage";
 import QuranPage from "./pages/QuranPage";
@@ -167,6 +168,7 @@ const App = () => {
               {!showSplash && <OnboardingModal />}
               <div className="min-h-screen bg-background islamic-bg">
                 <a href="#main-content" className="skip-to-content">تخطّي إلى المحتوى الرئيسي</a>
+                <OfflineIndicator />
                 <TopBar />
                 <AnimatedRoutes />
                 <MiniPlayer />
