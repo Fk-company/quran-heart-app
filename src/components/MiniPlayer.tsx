@@ -87,7 +87,7 @@ const MiniPlayer: React.FC = () => {
         <div className="max-w-lg mx-auto px-5 py-5">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
-            <button onClick={() => setExpanded(false)} className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center hover:bg-muted transition-colors">
+            <button onClick={() => setExpanded(false)} aria-label="طي المشغل" className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center hover:bg-muted transition-colors">
               <ChevronDown className="w-4 h-4 text-foreground" />
             </button>
             <div className="text-center flex-1 mx-3 min-w-0">
@@ -96,7 +96,7 @@ const MiniPlayer: React.FC = () => {
                 {!isLive && queue.length > 1 ? `${queueIndex + 1} / ${queue.length}` : 'Quran Heart'}
               </p>
             </div>
-            <button onClick={stop} className="w-9 h-9 rounded-xl bg-destructive/10 hover:bg-destructive/20 flex items-center justify-center transition-colors">
+            <button onClick={stop} aria-label="إيقاف التشغيل وإغلاق" className="w-9 h-9 rounded-xl bg-destructive/10 hover:bg-destructive/20 flex items-center justify-center transition-colors">
               <X className="w-4 h-4 text-destructive" />
             </button>
           </div>
