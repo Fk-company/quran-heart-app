@@ -126,6 +126,9 @@ const SettingsPage: React.FC = () => {
   const [storageBytes, setStorageBytes] = useState(0);
   const [offlineDownloading, setOfflineDownloading] = useState(false);
   const [offlineProgress, setOfflineProgress] = useState({ done: 0, total: 0 });
+  const [tafsirDownloading, setTafsirDownloading] = useState(false);
+  const [tafsirProgress, setTafsirProgress] = useState({ done: 0, total: 0 });
+  const [tafsirEdition, setTafsirEdition] = useState<string>('ar.muyassar');
   const importRef = useRef<HTMLInputElement>(null);
 
   const currentReciter = useMemo(
