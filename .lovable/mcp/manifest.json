@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "sdk_version": "0.22.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "quran-heart-mcp",
+      "version": "0.1.0",
+      "title": "قلب القرآن — Quran Heart"
+    },
+    "tools": [
+      {
+        "name": "search_quran",
+        "title": "بحث في القرآن الكريم",
+        "description": "Search the Holy Quran for verses matching an Arabic keyword or phrase. Returns matching ayahs with their surah name, ayah number, and Arabic text.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Arabic keyword or phrase to search for (e.g. الرحمن، الصبر، الجنة)."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50,
+              "description": "Maximum number of matches to return (default 20, max 50)."
+            }
+          },
+          "required": [
+            "query"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_ayah",
+        "title": "جلب آية مع التفسير",
+        "description": "Fetch a specific ayah from the Quran with its Arabic text, English translation, and Arabic tafsir (Al-Muyassar).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "surah": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 114,
+              "description": "Surah number (1–114)."
+            },
+            "ayah": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 286,
+              "description": "Ayah number within the surah."
+            }
+          },
+          "required": [
+            "surah",
+            "ayah"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_surah_info",
+        "title": "معلومات السورة",
+        "description": "Get metadata for a Quran surah: Arabic name, English name, revelation type (Meccan/Medinan), ayah count, and starting juz.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "surah": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 114,
+              "description": "Surah number (1–114)."
+            }
+          },
+          "required": [
+            "surah"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_prayer_times",
+        "title": "مواقيت الصلاة",
+        "description": "Get today's Islamic prayer times (Fajr, Dhuhr, Asr, Maghrib, Isha) for a given city and country using the Aladhan API.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": false,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "city": {
+              "type": "string",
+              "minLength": 1,
+              "description": "City name in English or Arabic (e.g. Riyadh, Cairo, Istanbul)."
+            },
+            "country": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Country name in English (e.g. Saudi Arabia, Egypt, Turkey)."
+            },
+            "method": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 15,
+              "description": "Calculation method id (Aladhan). Default 4 (Umm Al-Qura)."
+            }
+          },
+          "required": [
+            "city",
+            "country"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
