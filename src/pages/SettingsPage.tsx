@@ -1,14 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import SEO from '@/components/SEO';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import {
   Settings, Type, Palette, Mic, RotateCcw, Repeat, Volume2,
-  Moon, Sun, Check, Info, Save, BookOpen, Sparkles, ChevronsDown, ChevronsUp, Search, X, LayoutGrid
+  Moon, Sun, Check, Save, BookOpen, Sparkles, LayoutGrid,
+  Bell, Download, Upload, Trash2, Share2, HardDrive,
+  ChevronLeft, User2, Star,
 } from 'lucide-react';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import SEO from '@/components/SEO';
+import PageHeader from '@/components/PageHeader';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
 import { useSettings } from '@/hooks/useSettings';
 import { useTheme } from '@/contexts/ThemeContext';
-import PageHeader from '@/components/PageHeader';
 import { NAV_CATALOG, DEFAULT_NAV_IDS, getNavIds, setNavIds } from '@/components/BottomNav';
 
 const RECITERS = [
@@ -26,476 +32,626 @@ const COLOR_SCHEMES = [
   { id: 'highContrast' as const, name: 'تباين عالي', colors: ['hsl(0,0%,10%)', 'hsl(0,0%,90%)'] },
 ];
 
-const ALL_SECTIONS = ['appearance', 'fonts', 'reciter', 'memorization', 'colors', 'navigation', 'about'];
+// -- helpers -----------------------------------------------------------------
 
-const Hint: React.FC<{ text: string }> = ({ text }) => (
-  <span className="inline-flex items-center" title={text} aria-label={text}>
-    <Info className="w-3.5 h-3.5 text-muted-foreground/70 hover:text-primary transition-colors cursor-help" />
-  </span>
+const SETTINGS_KEY = 'app_settings';
+
+function formatBytes(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+}
+
+function estimateLocalStorage() {
+  let total = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k) continue;
+    total += (k.length + (localStorage.getItem(k)?.length ?? 0)) * 2; // UTF-16
+  }
+  return total;
+}
+
+// -- reusable UI -------------------------------------------------------------
+
+const SectionCard: React.FC<{
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  hint?: string;
+  tone?: 'primary' | 'accent' | 'destructive';
+  children: React.ReactNode;
+}> = ({ icon: Icon, title, hint, tone = 'primary', children }) => (
+  <motion.section
+    initial={{ opacity: 0, y: 8 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.25 }}
+    className="rounded-2xl border border-border/60 bg-card/60 backdrop-blur-sm overflow-hidden"
+  >
+    <header className="flex items-center gap-2.5 px-4 py-3 border-b border-border/50 bg-gradient-to-l from-transparent via-transparent to-secondary/40">
+      <span
+        className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+          tone === 'accent'
+            ? 'bg-accent/15 text-accent'
+            : tone === 'destructive'
+            ? 'bg-destructive/15 text-destructive'
+            : 'bg-primary/15 text-primary'
+        }`}
+      >
+        <Icon className="w-4 h-4" />
+      </span>
+      <div className="flex-1 min-w-0">
+        <h3 className="text-sm font-bold text-foreground leading-tight">{title}</h3>
+        {hint && <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{hint}</p>}
+      </div>
+    </header>
+    <div className="p-4">{children}</div>
+  </motion.section>
 );
+
+const QuickAction: React.FC<{
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  onClick: () => void;
+  tone?: 'primary' | 'accent' | 'destructive';
+}> = ({ icon: Icon, label, onClick, tone = 'primary' }) => (
+  <button
+    onClick={onClick}
+    className="group flex flex-col items-center gap-1.5 py-3 px-2 rounded-2xl bg-secondary/50 hover:bg-secondary border border-border/50 transition-all active:scale-95"
+  >
+    <span
+      className={`w-9 h-9 rounded-full flex items-center justify-center transition-transform group-hover:scale-110 ${
+        tone === 'accent'
+          ? 'bg-accent/15 text-accent'
+          : tone === 'destructive'
+          ? 'bg-destructive/15 text-destructive'
+          : 'bg-primary/15 text-primary'
+      }`}
+    >
+      <Icon className="w-4 h-4" />
+    </span>
+    <span className="text-[11px] font-medium text-foreground">{label}</span>
+  </button>
+);
+
+// -- page --------------------------------------------------------------------
 
 const SettingsPage: React.FC = () => {
   const { settings, updateSetting, resetSettings } = useSettings();
   const { theme, toggleTheme } = useTheme();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [tab, setTab] = useState<string>(() => localStorage.getItem('settings_tab') || 'general');
   const [navIds, setNavIdsState] = useState<string[]>(getNavIds);
-  const [openSections, setOpenSections] = useState<string[]>(() => {
-    try {
-      const raw = localStorage.getItem('settings_open_sections');
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) return parsed.filter((v) => ALL_SECTIONS.includes(v));
-      }
-    } catch {}
-    return ['appearance'];
-  });
+  const [storageBytes, setStorageBytes] = useState(0);
+  const importRef = useRef<HTMLInputElement>(null);
+
+  const currentReciter = useMemo(
+    () => RECITERS.find((r) => r.id === settings.defaultReciter)?.name ?? '—',
+    [settings.defaultReciter]
+  );
 
   useEffect(() => {
-    try { localStorage.setItem('settings_open_sections', JSON.stringify(openSections)); } catch {}
-  }, [openSections]);
+    localStorage.setItem('settings_tab', tab);
+  }, [tab]);
 
-  // Visual confirmation that settings auto-save
   useEffect(() => {
     setSavedFlash(true);
-    const t = setTimeout(() => setSavedFlash(false), 1200);
+    const t = setTimeout(() => setSavedFlash(false), 1000);
     return () => clearTimeout(t);
   }, [settings]);
 
-  // Search keywords map per section
-  const sectionKeywords: Record<string, string> = {
-    appearance: 'المظهر الوضع الليلي ضوء داكن فاتح ثيم',
-    fonts: 'الخطوط حجم الخط القراءة المصحف نص آيات',
-    reciter: 'القارئ التلاوة صوت العفاسي الحصري المنشاوي',
-    memorization: 'الحفظ التكرار اختبار حفظ',
-    colors: 'الألوان نمط ألوان لوحة',
-    navigation: 'التنقل الشريط السفلي تخصيص أيقونات روابط سريعة',
-    about: 'عن التطبيق إصدار حول معلومات',
+  useEffect(() => {
+    setStorageBytes(estimateLocalStorage());
+  }, [settings, tab]);
+
+  // -- quick actions ---------------------------------------------------------
+
+  const handleExport = () => {
+    try {
+      const payload = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        settings,
+        navIds: getNavIds(),
+        theme,
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `quran-heart-settings-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('تم تصدير الإعدادات');
+    } catch {
+      toast.error('تعذّر التصدير');
+    }
   };
 
-  const matchedSections = React.useMemo(() => {
-    const q = searchQuery.trim();
-    if (!q) return ALL_SECTIONS;
-    return ALL_SECTIONS.filter((id) => sectionKeywords[id]?.includes(q) || id.includes(q.toLowerCase()));
-  }, [searchQuery]);
+  const handleImportFile = async (file: File) => {
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      if (parsed.settings && typeof parsed.settings === 'object') {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(parsed.settings));
+      }
+      if (Array.isArray(parsed.navIds)) {
+        setNavIds(parsed.navIds);
+        setNavIdsState(parsed.navIds);
+      }
+      toast.success('تم استيراد الإعدادات — يُعاد تحميل الصفحة');
+      setTimeout(() => window.location.reload(), 700);
+    } catch {
+      toast.error('ملف غير صالح');
+    }
+  };
 
-  // When searching, auto-open matched sections
-  useEffect(() => {
-    if (searchQuery.trim() && matchedSections.length) setOpenSections(matchedSections);
-  }, [searchQuery, matchedSections]);
+  const handleClearCache = () => {
+    // Preserve user preferences; drop cached content
+    const preserveKeys = new Set([
+      SETTINGS_KEY,
+      'bottom_nav_ids',
+      'theme',
+      'settings_open_sections',
+      'settings_tab',
+      'favorites',
+      'bookmarks',
+      'reading_progress',
+      'khatm_progress',
+      'tasbih_history',
+    ]);
+    const keysToRemove: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && !preserveKeys.has(k)) keysToRemove.push(k);
+    }
+    keysToRemove.forEach((k) => localStorage.removeItem(k));
+    setStorageBytes(estimateLocalStorage());
+    setShowClearConfirm(false);
+    toast.success(`تم مسح ${keysToRemove.length} عنصر من الذاكرة المؤقتة`);
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: 'قلب القرآن',
+      text: 'تطبيق قلب القرآن — القرآن الكريم، التفسير، الأذكار، ومواقيت الصلاة',
+      url: window.location.origin,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        toast.success('تم نسخ الرابط');
+      }
+    } catch {
+      /* user cancelled */
+    }
+  };
+
+  // -- render ----------------------------------------------------------------
 
   return (
     <>
-      <SEO title="الإعدادات — قلب القرآن" description="تخصيص إعدادات التطبيق: الثيم، الخط، الإشعارات، والصوت." />
+      <SEO title="الإعدادات — قلب القرآن" description="تخصيص إعدادات التطبيق: الثيم، الخط، الإشعارات، الصوت، والنسخ الاحتياطي." />
       <div className="page-container page-with-topbar" dir="rtl">
-      <div className="page-inner">
-        <PageHeader
-          icon={Settings}
-          title="الإعدادات"
-          subtitle="تخصيص التطبيق"
-          showBack
-        />
+        <div className="page-inner">
+          <PageHeader icon={Settings} title="الإعدادات" subtitle="تخصيص كامل للتطبيق" showBack />
 
-        {/* Auto-save indicator */}
-        <div className="mb-4 flex items-center justify-between text-[11px] text-muted-foreground bg-secondary/40 border border-border/60 rounded-xl px-3 py-2">
-          <span className="flex items-center gap-1.5">
-            <Save className={`w-3.5 h-3.5 transition-colors ${savedFlash ? 'text-primary' : 'text-muted-foreground/70'}`} />
-            <span>الحفظ التلقائي مفعّل — تُستعاد إعداداتك تلقائياً عند فتح التطبيق.</span>
-          </span>
-          {savedFlash && <span className="text-primary font-medium">تم الحفظ</span>}
-        </div>
-
-        {/* Search settings */}
-        <div className="relative mb-3">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="ابحث في الإعدادات (مثال: خط، مظهر، قارئ)..."
-            className="w-full bg-secondary/60 border border-border/60 rounded-xl pr-10 pl-9 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:ring-2 focus:ring-primary/30"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-muted flex items-center justify-center"
-              aria-label="مسح البحث"
-            >
-              <X className="w-3.5 h-3.5 text-muted-foreground" />
-            </button>
-          )}
-        </div>
-
-        {/* Expand / Collapse all */}
-        <div className="mb-3 flex items-center gap-2">
-          <button
-            onClick={() => setOpenSections(ALL_SECTIONS)}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-secondary/60 hover:bg-secondary text-foreground text-xs font-medium transition-colors border border-border/60"
+          {/* Hero summary card */}
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-bl from-primary/15 via-accent/5 to-transparent p-4 mb-4"
           >
-            <ChevronsDown className="w-3.5 h-3.5 text-primary" />
-            فتح جميع الأقسام
-          </button>
-          <button
-            onClick={() => setOpenSections([])}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-secondary/60 hover:bg-secondary text-foreground text-xs font-medium transition-colors border border-border/60"
-          >
-            <ChevronsUp className="w-3.5 h-3.5 text-accent" />
-            طي جميع الأقسام
-          </button>
-        </div>
+            <div className="absolute -top-8 -left-8 w-32 h-32 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+            <div className="relative flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20">
+                <User2 className="w-6 h-6 text-primary-foreground" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] text-muted-foreground">تخصيصك الحالي</p>
+                <p className="text-sm font-bold text-foreground truncate">{currentReciter}</p>
+              </div>
+              <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground bg-background/60 border border-border/60 rounded-full px-2.5 py-1">
+                <Save className={`w-3 h-3 ${savedFlash ? 'text-primary' : 'text-muted-foreground/70'}`} />
+                <span>{savedFlash ? 'تم الحفظ' : 'حفظ تلقائي'}</span>
+              </div>
+            </div>
+            <div className="relative grid grid-cols-3 gap-2 mt-3">
+              <div className="rounded-xl bg-background/60 border border-border/50 px-2.5 py-2 text-center">
+                <p className="text-[10px] text-muted-foreground">المظهر</p>
+                <p className="text-xs font-bold text-foreground">{theme === 'dark' ? 'ليلي' : 'نهاري'}</p>
+              </div>
+              <div className="rounded-xl bg-background/60 border border-border/50 px-2.5 py-2 text-center">
+                <p className="text-[10px] text-muted-foreground">حجم الخط</p>
+                <p className="text-xs font-bold text-foreground">{settings.fontSize}px</p>
+              </div>
+              <div className="rounded-xl bg-background/60 border border-border/50 px-2.5 py-2 text-center">
+                <p className="text-[10px] text-muted-foreground">التكرار</p>
+                <p className="text-xs font-bold text-foreground">{settings.repeatCount}×</p>
+              </div>
+            </div>
+          </motion.div>
 
-        {searchQuery && matchedSections.length === 0 && (
-          <div className="card-surface text-center text-sm text-muted-foreground py-6 mb-3">
-            لا توجد نتائج تطابق "{searchQuery}"
+          {/* Quick actions */}
+          <div className="grid grid-cols-4 gap-2 mb-5">
+            <QuickAction icon={Download} label="تصدير" onClick={handleExport} />
+            <QuickAction icon={Upload} label="استيراد" onClick={() => importRef.current?.click()} tone="accent" />
+            <QuickAction icon={Share2} label="مشاركة" onClick={handleShare} />
+            <QuickAction icon={Trash2} label="مسح الذاكرة" onClick={() => setShowClearConfirm(true)} tone="destructive" />
           </div>
-        )}
+          <input
+            ref={importRef}
+            type="file"
+            accept="application/json"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleImportFile(f);
+              e.target.value = '';
+            }}
+          />
 
-        <Accordion type="multiple" value={openSections} onValueChange={setOpenSections} className="space-y-3">
-          {/* Appearance */}
-          <AccordionItem value="appearance" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("appearance") ? "" : "hidden"}`}>
-            <AccordionTrigger className="px-4 py-3 hover:no-underline">
-              <div className="flex items-center gap-2">
-                <Sun className="w-4 h-4 text-accent" />
-                <span className="text-sm font-semibold text-foreground">المظهر</span>
-                <Hint text="تبديل بين الوضع الفاتح والداكن لراحة العين" />
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-4">
-              <div className="flex items-center gap-3">
-                {theme === 'dark' ? <Moon className="w-5 h-5 text-accent" /> : <Sun className="w-5 h-5 text-accent" />}
-                <div className="flex-1">
-                  <p className="text-sm font-semibold text-foreground">الوضع الليلي</p>
-                  <p className="text-[11px] text-muted-foreground">يُريح العين أثناء القراءة الليلية</p>
-                </div>
-                <button
-                  onClick={toggleTheme}
-                  className={`w-12 h-7 rounded-full transition-colors relative ${theme === 'dark' ? 'bg-primary' : 'bg-muted'}`}
-                  aria-label="تبديل الوضع الليلي"
-                >
-                  <div className={`w-5 h-5 rounded-full bg-white shadow-sm absolute top-1 transition-all ${theme === 'dark' ? 'left-1' : 'left-6'}`} />
-                </button>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+          {/* Tabs */}
+          <Tabs value={tab} onValueChange={setTab} className="w-full">
+            <TabsList className="w-full grid grid-cols-4 bg-secondary/60 h-auto p-1 mb-4 rounded-2xl">
+              <TabsTrigger value="general" className="rounded-xl text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">عام</TabsTrigger>
+              <TabsTrigger value="reading" className="rounded-xl text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">القراءة</TabsTrigger>
+              <TabsTrigger value="audio" className="rounded-xl text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">الصوت</TabsTrigger>
+              <TabsTrigger value="more" className="rounded-xl text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm py-2">المزيد</TabsTrigger>
+            </TabsList>
 
-          {/* Font Size */}
-          <AccordionItem value="fonts" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("fonts") ? "" : "hidden"}`}>
-            <AccordionTrigger className="px-4 py-3 hover:no-underline">
-              <div className="flex items-center gap-2">
-                <Type className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-foreground">حجم الخطوط</span>
-                <Hint text="تكبير أو تصغير الخط في الواجهة وفي صفحات المصحف" />
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-4 space-y-4">
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <Type className="w-4 h-4 text-primary" />
-                    <span className="text-sm font-medium text-foreground">خط القراءة العام</span>
-                    <Hint text="يطبَّق على نصوص الأدعية والأحاديث والتفسير" />
+            {/* GENERAL --------------------------------------------------- */}
+            <TabsContent value="general" className="space-y-3 mt-0">
+              <SectionCard icon={Sun} title="المظهر" hint="الوضع الليلي وراحة العين" tone="accent">
+                <div className="flex items-center gap-3">
+                  {theme === 'dark' ? <Moon className="w-5 h-5 text-accent" /> : <Sun className="w-5 h-5 text-accent" />}
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-foreground">الوضع الليلي</p>
+                    <p className="text-[11px] text-muted-foreground">يُريح العين أثناء القراءة الليلية</p>
                   </div>
-                  <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">{settings.fontSize}px</span>
+                  <Switch checked={theme === 'dark'} onCheckedChange={toggleTheme} aria-label="تبديل الوضع الليلي" />
+                </div>
+              </SectionCard>
+
+              <SectionCard icon={Palette} title="نمط الألوان" hint="لوحة ألوان التطبيق">
+                <div className="grid grid-cols-2 gap-2">
+                  {COLOR_SCHEMES.map((scheme) => (
+                    <button
+                      key={scheme.id}
+                      onClick={() => updateSetting('colorScheme', scheme.id)}
+                      className={`p-3 rounded-xl border transition-all text-center ${
+                        settings.colorScheme === scheme.id
+                          ? 'border-primary bg-primary/5 shadow-sm ring-2 ring-primary/20'
+                          : 'border-border bg-secondary/30 hover:bg-secondary'
+                      }`}
+                    >
+                      <div className="flex items-center justify-center gap-1.5 mb-2">
+                        {scheme.colors.map((c, i) => (
+                          <div key={i} className="w-6 h-6 rounded-full border border-border" style={{ background: c }} />
+                        ))}
+                      </div>
+                      <span className={`text-xs font-medium ${settings.colorScheme === scheme.id ? 'text-primary' : 'text-foreground'}`}>
+                        {scheme.name}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </SectionCard>
+
+              <SectionCard icon={Bell} title="الإشعارات والأذان" hint="مواقيت الصلاة والتنبيهات" tone="accent">
+                <Link
+                  to="/notification-settings"
+                  className="flex items-center gap-3 p-3 rounded-xl bg-secondary/40 hover:bg-secondary transition-colors"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-accent/15 flex items-center justify-center">
+                    <Bell className="w-5 h-5 text-accent" />
+                  </div>
+                  <div className="flex-1 text-right">
+                    <p className="text-sm font-semibold text-foreground">إعدادات الإشعارات</p>
+                    <p className="text-[11px] text-muted-foreground">تفعيل الأذان، تشخيص iOS، والتنبيهات</p>
+                  </div>
+                  <ChevronLeft className="w-4 h-4 text-muted-foreground" />
+                </Link>
+              </SectionCard>
+
+              <SectionCard icon={LayoutGrid} title="تخصيص الشريط السفلي" hint="اختر 4 اختصارات">
+                <p className="text-xs text-muted-foreground mb-3">اختر 4 اختصارات لتظهر بجانب زر "المزيد".</p>
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  {NAV_CATALOG.map((item) => {
+                    const selected = navIds.includes(item.id);
+                    const Icon = item.icon;
+                    const disabled = !selected && navIds.length >= 4;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          let next: string[];
+                          if (selected) next = navIds.filter((id) => id !== item.id);
+                          else if (navIds.length < 4) next = [...navIds, item.id];
+                          else return;
+                          setNavIdsState(next);
+                          setNavIds(next);
+                        }}
+                        disabled={disabled}
+                        className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-2xl border transition-all ${
+                          selected
+                            ? 'bg-primary/10 border-primary/40 text-primary'
+                            : disabled
+                            ? 'bg-secondary/30 border-transparent text-muted-foreground/50 opacity-60'
+                            : 'bg-secondary border-transparent text-muted-foreground'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span className="text-[11px] font-medium">{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">المختار: {navIds.length}/4</span>
+                  <button
+                    onClick={() => { setNavIdsState(DEFAULT_NAV_IDS); setNavIds(DEFAULT_NAV_IDS); }}
+                    className="text-primary font-medium hover:underline"
+                  >
+                    استعادة الافتراضي
+                  </button>
+                </div>
+              </SectionCard>
+            </TabsContent>
+
+            {/* READING --------------------------------------------------- */}
+            <TabsContent value="reading" className="space-y-3 mt-0">
+              <SectionCard icon={Type} title="خط القراءة العام" hint="نصوص الأدعية والأحاديث والتفسير">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-muted-foreground">حجم الخط</span>
+                  <span className="text-xs text-primary font-bold bg-primary/10 px-2.5 py-0.5 rounded-full">{settings.fontSize}px</span>
                 </div>
                 <input
                   type="range"
                   min={14}
                   max={28}
                   value={settings.fontSize}
-                  onChange={e => updateSetting('fontSize', Number(e.target.value))}
+                  onChange={(e) => updateSetting('fontSize', Number(e.target.value))}
                   className="w-full accent-primary"
                 />
-                <p className="font-amiri text-foreground mt-2 leading-relaxed" style={{ fontSize: settings.fontSize }}>
+                <p className="font-amiri text-foreground mt-3 leading-relaxed text-center" style={{ fontSize: settings.fontSize }}>
                   بِسْمِ اللَّهِ الرَّحْمَـٰنِ الرَّحِيمِ
                 </p>
-              </div>
+              </SectionCard>
 
-              <div className="border-t border-border pt-4">
+              <SectionCard icon={BookOpen} title="خط المصحف" hint="حجم الآيات داخل صفحات المصحف" tone="accent">
                 <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-accent" />
-                    <span className="text-sm font-medium text-foreground">خط المصحف</span>
-                    <Hint text="حجم خط الآيات داخل صفحات المصحف فقط" />
-                  </div>
-                  <span className="text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">{settings.mushafFontSize}px</span>
+                  <span className="text-xs text-muted-foreground">حجم الخط</span>
+                  <span className="text-xs text-accent font-bold bg-accent/10 px-2.5 py-0.5 rounded-full">{settings.mushafFontSize}px</span>
                 </div>
                 <input
                   type="range"
                   min={18}
                   max={36}
                   value={settings.mushafFontSize}
-                  onChange={e => updateSetting('mushafFontSize', Number(e.target.value))}
+                  onChange={(e) => updateSetting('mushafFontSize', Number(e.target.value))}
                   className="w-full accent-accent"
                 />
-                <p className="font-amiri text-foreground mt-2 leading-[2.4] text-center" style={{ fontSize: settings.mushafFontSize }}>
+                <p className="font-amiri text-foreground mt-3 leading-[2.4] text-center" style={{ fontSize: settings.mushafFontSize }}>
                   الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ
                 </p>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+              </SectionCard>
 
-          {/* Default Reciter */}
-          <AccordionItem value="reciter" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("reciter") ? "" : "hidden"}`}>
-            <AccordionTrigger className="px-4 py-3 hover:no-underline">
-              <div className="flex items-center gap-2">
-                <Mic className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-foreground">القارئ الافتراضي</span>
-                <Hint text="الصوت الذي يُستخدم تلقائياً عند تشغيل أي تلاوة" />
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-4">
-              <div className="space-y-1.5">
-                {RECITERS.map(reciter => (
-                  <button
-                    key={reciter.id}
-                    onClick={() => updateSetting('defaultReciter', reciter.id)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-xl transition-colors text-right ${
-                      settings.defaultReciter === reciter.id
-                        ? 'bg-primary/10 border border-primary/20'
-                        : 'bg-secondary/50 hover:bg-secondary border border-transparent'
-                    }`}
-                  >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      settings.defaultReciter === reciter.id ? 'bg-primary' : 'bg-muted'
-                    }`}>
-                      {settings.defaultReciter === reciter.id
-                        ? <Check className="w-4 h-4 text-primary-foreground" />
-                        : <Mic className="w-3.5 h-3.5 text-muted-foreground" />}
-                    </div>
-                    <span className={`text-sm ${settings.defaultReciter === reciter.id ? 'text-primary font-semibold' : 'text-foreground'}`}>
-                      {reciter.name}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* Memorization */}
-          <AccordionItem value="memorization" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("memorization") ? "" : "hidden"}`}>
-            <AccordionTrigger className="px-4 py-3 hover:no-underline">
-              <div className="flex items-center gap-2">
-                <Repeat className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-foreground">إعدادات الحفظ</span>
-                <Hint text="ضبط عدد التكرار التلقائي للآية لتسهيل الحفظ" />
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Repeat className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium text-foreground">عدد التكرارات الافتراضي</span>
-                  <Hint text="كم مرة تتكرر الآية الواحدة قبل الانتقال" />
+              <SectionCard icon={Repeat} title="إعدادات الحفظ" hint="التكرار التلقائي للآية">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-medium text-foreground">عدد التكرارات</span>
+                  <span className="text-xs text-primary font-bold bg-primary/10 px-2.5 py-0.5 rounded-full">{settings.repeatCount}×</span>
                 </div>
-                <span className="text-xs text-primary font-bold bg-primary/10 px-2.5 py-0.5 rounded-full">{settings.repeatCount}×</span>
-              </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                {[1, 2, 3, 5, 7, 10, 15, 20].map(n => (
-                  <button
-                    key={n}
-                    onClick={() => updateSetting('repeatCount', n)}
-                    className={`flex-1 min-w-[36px] py-2 rounded-xl text-xs font-medium transition-colors ${
-                      settings.repeatCount === n
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-secondary text-secondary-foreground hover:bg-muted'
-                    }`}
-                  >
-                    {n}
-                  </button>
-                ))}
-              </div>
-              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">
-                <Volume2 className="w-4 h-4 text-accent" />
-                <span className="text-sm font-medium text-foreground flex-1">تشغيل تلقائي للآية التالية</span>
-                <Hint text="ينتقل تلقائياً إلى الآية التالية بعد انتهاء التكرار" />
-                <button
-                  onClick={() => updateSetting('autoPlayNext', !settings.autoPlayNext)}
-                  className={`w-12 h-7 rounded-full transition-colors relative ${settings.autoPlayNext ? 'bg-primary' : 'bg-muted'}`}
-                  aria-label="تشغيل تلقائي"
-                >
-                  <div className={`w-5 h-5 rounded-full bg-white shadow-sm absolute top-1 transition-all ${settings.autoPlayNext ? 'left-1' : 'left-6'}`} />
-                </button>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* Color Scheme */}
-          <AccordionItem value="colors" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("colors") ? "" : "hidden"}`}>
-            <AccordionTrigger className="px-4 py-3 hover:no-underline">
-              <div className="flex items-center gap-2">
-                <Palette className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-foreground">نمط الألوان</span>
-                <Hint text="اختر لوحة الألوان المفضلة لكامل التطبيق" />
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-4">
-              <div className="grid grid-cols-2 gap-2">
-                {COLOR_SCHEMES.map(scheme => (
-                  <button
-                    key={scheme.id}
-                    onClick={() => updateSetting('colorScheme', scheme.id)}
-                    className={`p-3 rounded-xl border transition-all text-center ${
-                      settings.colorScheme === scheme.id
-                        ? 'border-primary bg-primary/5 shadow-sm'
-                        : 'border-border bg-secondary/30 hover:bg-secondary'
-                    }`}
-                  >
-                    <div className="flex items-center justify-center gap-1.5 mb-2">
-                      {scheme.colors.map((c, i) => (
-                        <div key={i} className="w-6 h-6 rounded-full border border-border" style={{ background: c }} />
-                      ))}
-                    </div>
-                    <span className={`text-xs font-medium ${settings.colorScheme === scheme.id ? 'text-primary' : 'text-foreground'}`}>
-                      {scheme.name}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* Bottom Navigation Customization */}
-          <AccordionItem value="navigation" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("navigation") ? "" : "hidden"}`}>
-            <AccordionTrigger className="px-4 py-3 hover:no-underline">
-              <div className="flex items-center gap-2">
-                <LayoutGrid className="w-4 h-4 text-primary" />
-                <span className="text-sm font-semibold text-foreground">تخصيص الشريط السفلي</span>
-                <Hint text="اختر 4 أيقونات لتظهر في شريط التنقل السفلي" />
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-4 pb-4">
-              <p className="text-xs text-muted-foreground mb-3">اختر 4 اختصارات لتظهر بجانب زر "المزيد".</p>
-              <div className="grid grid-cols-3 gap-2 mb-3">
-                {NAV_CATALOG.map((item) => {
-                  const selected = navIds.includes(item.id);
-                  const Icon = item.icon;
-                  const disabled = !selected && navIds.length >= 4;
-                  return (
+                <div className="grid grid-cols-4 gap-2">
+                  {[1, 2, 3, 5, 7, 10, 15, 20].map((n) => (
                     <button
-                      key={item.id}
-                      onClick={() => {
-                        let next: string[];
-                        if (selected) next = navIds.filter((id) => id !== item.id);
-                        else if (navIds.length < 4) next = [...navIds, item.id];
-                        else return;
-                        setNavIdsState(next);
-                        setNavIds(next);
-                      }}
-                      disabled={disabled}
-                      className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-2xl border transition-all ${
-                        selected
-                          ? 'bg-primary/10 border-primary/40 text-primary'
-                          : disabled
-                          ? 'bg-secondary/30 border-transparent text-muted-foreground/50 opacity-60'
-                          : 'bg-secondary border-transparent text-muted-foreground'
+                      key={n}
+                      onClick={() => updateSetting('repeatCount', n)}
+                      className={`py-2 rounded-xl text-xs font-medium transition-colors ${
+                        settings.repeatCount === n
+                          ? 'bg-primary text-primary-foreground shadow-sm'
+                          : 'bg-secondary text-secondary-foreground hover:bg-muted'
                       }`}
                     >
-                      <Icon className="w-4 h-4" />
-                      <span className="text-[11px] font-medium">{item.label}</span>
-                      {selected && <Check className="w-3 h-3 absolute" style={{ position: 'static' }} />}
+                      {n}
                     </button>
-                  );
-                })}
-              </div>
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">المختار: {navIds.length}/4</span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
+                  <Volume2 className="w-4 h-4 text-accent" />
+                  <span className="text-sm font-medium text-foreground flex-1">تشغيل تلقائي للآية التالية</span>
+                  <Switch
+                    checked={settings.autoPlayNext}
+                    onCheckedChange={(v) => updateSetting('autoPlayNext', v)}
+                    aria-label="تشغيل تلقائي"
+                  />
+                </div>
+              </SectionCard>
+            </TabsContent>
+
+            {/* AUDIO ----------------------------------------------------- */}
+            <TabsContent value="audio" className="space-y-3 mt-0">
+              <SectionCard icon={Mic} title="القارئ الافتراضي" hint="الصوت المُستخدم تلقائياً">
+                <div className="space-y-1.5">
+                  {RECITERS.map((reciter) => (
+                    <button
+                      key={reciter.id}
+                      onClick={() => updateSetting('defaultReciter', reciter.id)}
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl transition-colors text-right ${
+                        settings.defaultReciter === reciter.id
+                          ? 'bg-primary/10 border border-primary/30'
+                          : 'bg-secondary/50 hover:bg-secondary border border-transparent'
+                      }`}
+                    >
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        settings.defaultReciter === reciter.id ? 'bg-primary' : 'bg-muted'
+                      }`}>
+                        {settings.defaultReciter === reciter.id
+                          ? <Check className="w-4 h-4 text-primary-foreground" />
+                          : <Mic className="w-3.5 h-3.5 text-muted-foreground" />}
+                      </div>
+                      <span className={`text-sm ${settings.defaultReciter === reciter.id ? 'text-primary font-semibold' : 'text-foreground'}`}>
+                        {reciter.name}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </SectionCard>
+            </TabsContent>
+
+            {/* MORE ------------------------------------------------------ */}
+            <TabsContent value="more" className="space-y-3 mt-0">
+              <SectionCard icon={HardDrive} title="التخزين والبيانات" hint="النسخ الاحتياطي وذاكرة التطبيق">
+                <div className="flex items-center gap-3 mb-3 p-3 rounded-xl bg-secondary/40">
+                  <HardDrive className="w-5 h-5 text-primary" />
+                  <div className="flex-1">
+                    <p className="text-xs text-muted-foreground">حجم البيانات المحفوظة محلياً</p>
+                    <p className="text-sm font-bold text-foreground">{formatBytes(storageBytes)}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={handleExport}
+                    className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    تصدير JSON
+                  </button>
+                  <button
+                    onClick={() => importRef.current?.click()}
+                    className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-accent/10 text-accent text-xs font-medium hover:bg-accent/20 transition-colors"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    استيراد JSON
+                  </button>
+                </div>
                 <button
-                  onClick={() => { setNavIdsState(DEFAULT_NAV_IDS); setNavIds(DEFAULT_NAV_IDS); }}
-                  className="text-primary font-medium hover:underline"
+                  onClick={() => setShowClearConfirm(true)}
+                  className="mt-2 w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-destructive/10 text-destructive text-xs font-medium hover:bg-destructive/20 transition-colors"
                 >
-                  استعادة الافتراضي
+                  <Trash2 className="w-3.5 h-3.5" />
+                  مسح الذاكرة المؤقتة
                 </button>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
+                <p className="text-[10px] text-muted-foreground text-center mt-2">
+                  المسح يحافظ على تفضيلاتك والمفضلة والتقدم
+                </p>
+              </SectionCard>
 
-          {/* About */}
-          <AccordionItem value="about" className={`card-surface !border-0 !p-0 overflow-hidden ${matchedSections.includes("about") ? "" : "hidden"}`}>
-            <AccordionTrigger className="px-4 py-3 hover:no-underline">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-accent" />
-                <span className="text-sm font-semibold text-foreground">حول التطبيق</span>
-                <Hint text="معلومات عن الإصدار وآلية الحفظ" />
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-4">
-              <ul className="text-xs text-muted-foreground space-y-2 leading-relaxed">
-                <li className="flex gap-2"><Check className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" /> تُحفظ جميع إعداداتك محلياً على جهازك بشكل آمن.</li>
-                <li className="flex gap-2"><Check className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" /> تُستعاد آخر حالة تلقائياً عند تحديث الصفحة أو إعادة فتح التطبيق.</li>
-                <li className="flex gap-2"><Check className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" /> يمكنك في أي وقت إعادة كل شيء إلى القيم الافتراضية من الأسفل.</li>
-              </ul>
-              <div className="mt-4 pt-4 border-t border-border">
-                <p className="text-xs text-muted-foreground mb-3">صنع هذا التطبيق صدقة جارية — فخري عادل</p>
-                <div className="flex items-center gap-2">
-                  <a
-                    href="https://t.me/fakhri_adel"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-white"
-                    style={{ background: 'linear-gradient(135deg, #229ED9 0%, #1A8BC7 100%)' }}
-                  >
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.477-1.635z"/></svg>
-                    تلغرام
-                  </a>
-                  <a
-                    href="https://www.instagram.com/fakhri_adel/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-white"
-                    style={{ background: 'linear-gradient(135deg, #833AB4 0%, #FD1D1D 50%, #F77737 100%)' }}
-                  >
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.85-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
-                    انستغرام
-                  </a>
+              <SectionCard icon={Sparkles} title="حول التطبيق" hint="معلومات وتواصل" tone="accent">
+                <ul className="text-xs text-muted-foreground space-y-2 leading-relaxed">
+                  <li className="flex gap-2"><Check className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" /> تُحفظ جميع إعداداتك محلياً على جهازك بشكل آمن.</li>
+                  <li className="flex gap-2"><Check className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" /> تُستعاد آخر حالة تلقائياً عند إعادة فتح التطبيق.</li>
+                  <li className="flex gap-2"><Check className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" /> يمكنك استعادة القيم الافتراضية في أي وقت.</li>
+                </ul>
+                <div className="mt-4 pt-4 border-t border-border">
+                  <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1.5">
+                    <Star className="w-3.5 h-3.5 text-accent" />
+                    صنع هذا التطبيق صدقة جارية — فخري عادل
+                  </p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <a
+                      href="https://t.me/fakhri_adel"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-white"
+                      style={{ background: 'linear-gradient(135deg, #229ED9 0%, #1A8BC7 100%)' }}
+                    >
+                      تلغرام
+                    </a>
+                    <a
+                      href="https://www.instagram.com/fakhri_adel/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium text-white"
+                      style={{ background: 'linear-gradient(135deg, #833AB4 0%, #FD1D1D 50%, #F77737 100%)' }}
+                    >
+                      انستغرام
+                    </a>
+                    <button
+                      onClick={handleShare}
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium bg-primary text-primary-foreground"
+                    >
+                      <Share2 className="w-3.5 h-3.5" />
+                      مشاركة التطبيق
+                    </button>
+                  </div>
+                </div>
+              </SectionCard>
+
+              <button
+                onClick={() => setShowResetConfirm(true)}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-destructive/10 border border-destructive/20 text-destructive font-medium text-sm hover:bg-destructive/15 transition-colors"
+              >
+                <RotateCcw className="w-4 h-4" />
+                إعادة كل الإعدادات إلى الافتراضي
+              </button>
+            </TabsContent>
+          </Tabs>
+
+          {/* Reset confirmation */}
+          {showResetConfirm && createPortal(
+            <>
+              <div className="sheet-overlay" style={{ zIndex: 80 }} onClick={() => setShowResetConfirm(false)} />
+              <div className="sheet-content" style={{ zIndex: 81 }} dir="rtl">
+                <div className="sheet-handle" />
+                <div className="px-5 pb-8 pt-2 text-center">
+                  <RotateCcw className="w-10 h-10 text-destructive mx-auto mb-3" />
+                  <h3 className="text-lg font-bold text-foreground mb-2">إعادة الإعدادات؟</h3>
+                  <p className="text-sm text-muted-foreground mb-5">سيتم إعادة جميع الإعدادات إلى القيم الافتراضية</p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setShowResetConfirm(false)}
+                      className="flex-1 py-3 rounded-xl bg-secondary text-secondary-foreground font-medium"
+                    >
+                      إلغاء
+                    </button>
+                    <button
+                      onClick={() => { resetSettings(); setShowResetConfirm(false); toast.success('تمت إعادة الإعدادات'); }}
+                      className="flex-1 py-3 rounded-xl bg-destructive text-destructive-foreground font-medium"
+                    >
+                      إعادة
+                    </button>
+                  </div>
                 </div>
               </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+            </>,
+            document.body
+          )}
 
-        {/* Reset */}
-        <div className="my-6">
-          <button
-            onClick={() => setShowResetConfirm(true)}
-            className="w-full card-surface flex items-center gap-3 text-destructive"
-          >
-            <RotateCcw className="w-4 h-4" />
-            <span className="text-sm font-medium">إعادة الإعدادات الافتراضية</span>
-          </button>
+          {/* Clear cache confirmation */}
+          {showClearConfirm && createPortal(
+            <>
+              <div className="sheet-overlay" style={{ zIndex: 80 }} onClick={() => setShowClearConfirm(false)} />
+              <div className="sheet-content" style={{ zIndex: 81 }} dir="rtl">
+                <div className="sheet-handle" />
+                <div className="px-5 pb-8 pt-2 text-center">
+                  <Trash2 className="w-10 h-10 text-destructive mx-auto mb-3" />
+                  <h3 className="text-lg font-bold text-foreground mb-2">مسح الذاكرة المؤقتة؟</h3>
+                  <p className="text-sm text-muted-foreground mb-5">سيتم حذف البيانات المؤقتة (المخبأة) مع الحفاظ على إعداداتك ومفضلتك وتقدمك.</p>
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setShowClearConfirm(false)}
+                      className="flex-1 py-3 rounded-xl bg-secondary text-secondary-foreground font-medium"
+                    >
+                      إلغاء
+                    </button>
+                    <button
+                      onClick={handleClearCache}
+                      className="flex-1 py-3 rounded-xl bg-destructive text-destructive-foreground font-medium"
+                    >
+                      مسح
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>,
+            document.body
+          )}
         </div>
-
-        {/* Reset confirmation */}
-        {showResetConfirm && createPortal(
-          <>
-            <div className="sheet-overlay" style={{ zIndex: 80 }} onClick={() => setShowResetConfirm(false)} />
-            <div className="sheet-content" style={{ zIndex: 81 }} dir="rtl">
-              <div className="sheet-handle" />
-              <div className="px-5 pb-8 pt-2 text-center">
-                <RotateCcw className="w-10 h-10 text-destructive mx-auto mb-3" />
-                <h3 className="text-lg font-bold text-foreground mb-2">إعادة الإعدادات؟</h3>
-                <p className="text-sm text-muted-foreground mb-5">سيتم إعادة جميع الإعدادات إلى القيم الافتراضية</p>
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setShowResetConfirm(false)}
-                    className="flex-1 py-3 rounded-xl bg-secondary text-secondary-foreground font-medium"
-                  >
-                    إلغاء
-                  </button>
-                  <button
-                    onClick={() => { resetSettings(); setShowResetConfirm(false); }}
-                    className="flex-1 py-3 rounded-xl bg-destructive text-destructive-foreground font-medium"
-                  >
-                    إعادة
-                  </button>
-                </div>
-              </div>
-            </div>
-          </>,
-          document.body
-        )}
       </div>
-    </div>
     </>
   );
 };
