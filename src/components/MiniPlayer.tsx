@@ -264,6 +264,7 @@ const MiniPlayer: React.FC = () => {
       </div>
       <div className="flex items-center gap-2.5 px-3 py-2 max-w-lg mx-auto">
         <button onClick={isPlaying ? pause : resume}
+          aria-label={isPlaying ? 'إيقاف مؤقت' : 'تشغيل'}
           className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm hover:scale-105 active:scale-95 transition-transform"
           style={{ background: 'var(--grad-primary)' }}>
           {isLoading ? <Loader2 className="w-4 h-4 text-primary-foreground animate-spin" />
@@ -271,7 +272,7 @@ const MiniPlayer: React.FC = () => {
             : isPlaying ? <Pause className="w-4 h-4 text-primary-foreground" />
             : <Play className="w-4 h-4 text-primary-foreground ml-0.5" />}
         </button>
-        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setExpanded(true)}>
+        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setExpanded(true)} role="button" tabIndex={0} aria-label="فتح المشغل الكامل">
           <div className="flex items-center gap-1.5">
             {isLive && <span className="w-1.5 h-1.5 rounded-full bg-destructive live-pulse flex-shrink-0" />}
             <p className="text-xs font-bold text-foreground truncate font-kufi">{currentTrack.title}</p>
@@ -285,14 +286,15 @@ const MiniPlayer: React.FC = () => {
         </div>
         {!isLive && queue.length > 1 && (
           <button onClick={next} disabled={!hasNext}
+            aria-label="المقطع التالي"
             className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center disabled:opacity-30 hover:bg-muted transition-colors">
             <SkipForward className="w-3.5 h-3.5 text-foreground" />
           </button>
         )}
-        <button onClick={() => setExpanded(true)} className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center hover:bg-muted transition-colors">
+        <button onClick={() => setExpanded(true)} aria-label="فتح المشغل الكامل" className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center hover:bg-muted transition-colors">
           <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
         </button>
-        <button onClick={stop} className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center hover:bg-destructive/15 transition-colors">
+        <button onClick={stop} aria-label="إيقاف التشغيل" className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center hover:bg-destructive/15 transition-colors">
           <X className="w-3.5 h-3.5 text-muted-foreground" />
         </button>
       </div>
