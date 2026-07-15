@@ -1,6 +1,6 @@
 // Service worker: offline shell + API caching + background notifications (survives page close).
-const CACHE_VERSION = 'quran-app-v3';
-const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/app-logo.png'];
+const CACHE_VERSION = 'quran-app-v4';
+const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/app-logo.png', '/404.html'];
 const DEFAULT_ICON = '/app-logo.png';
 
 self.addEventListener('install', (event) => {
