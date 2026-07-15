@@ -168,6 +168,7 @@ const App = () => {
               {!showSplash && <OnboardingModal />}
               <div className="min-h-screen bg-background islamic-bg">
                 <a href="#main-content" className="skip-to-content">تخطّي إلى المحتوى الرئيسي</a>
+                <OfflineIndicator />
                 <TopBar />
                 <AnimatedRoutes />
                 <MiniPlayer />
