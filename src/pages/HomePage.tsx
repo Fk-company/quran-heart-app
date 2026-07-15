@@ -358,7 +358,10 @@ const HomePage: React.FC = () => {
               <AppLogo size={44} rounded="rounded-2xl" />
             </div>
             <div>
-              <h1 className="text-xl font-bold font-kufi text-gradient-primary leading-tight">قلب القرآن</h1>
+              <h1 className="text-xl font-bold font-kufi text-gradient-primary leading-tight">
+                قلب القرآن
+                <span className="sr-only"> — مواقيت الصلاة والقرآن الكريم والأذكار والتفسير</span>
+              </h1>
               {hijriDate && <p className="text-[11px] text-muted-foreground mt-0.5 font-medium">{hijriDate}</p>}
             </div>
           </div>

@@ -53,6 +53,23 @@ const entries: Entry[] = [
   { path: "/settings", changefreq: "monthly", priority: "0.3" },
   { path: "/notification-settings", changefreq: "monthly", priority: "0.3" },
   { path: "/developer-social", changefreq: "monthly", priority: "0.3" },
+  { path: "/about", changefreq: "monthly", priority: "0.5" },
+  { path: "/privacy", changefreq: "yearly", priority: "0.3" },
+  { path: "/terms", changefreq: "yearly", priority: "0.3" },
+  { path: "/learn", changefreq: "monthly", priority: "0.7" },
+  { path: "/dashboard", changefreq: "weekly", priority: "0.6" },
+  { path: "/focus-mode", changefreq: "monthly", priority: "0.5" },
+  { path: "/tajweed", changefreq: "monthly", priority: "0.8" },
+  { path: "/islamic-terms", changefreq: "monthly", priority: "0.7" },
+  { path: "/asbab-al-nuzul", changefreq: "monthly", priority: "0.7" },
+  { path: "/daily-khatirah", changefreq: "daily", priority: "0.7" },
+  { path: "/daily-challenges", changefreq: "daily", priority: "0.6" },
+  { path: "/quran-quotes", changefreq: "weekly", priority: "0.7" },
+  { path: "/quran-stories", changefreq: "monthly", priority: "0.7" },
+  { path: "/quran-miracles", changefreq: "monthly", priority: "0.7" },
+  { path: "/surah-summary", changefreq: "monthly", priority: "0.7" },
+  { path: "/revelation-map", changefreq: "monthly", priority: "0.6" },
+  { path: "/reciter-compare", changefreq: "monthly", priority: "0.6" },
 ];
 
 // Per-surah pages (1..114)

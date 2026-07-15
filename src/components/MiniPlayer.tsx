@@ -87,7 +87,7 @@ const MiniPlayer: React.FC = () => {
         <div className="max-w-lg mx-auto px-5 py-5">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
-            <button onClick={() => setExpanded(false)} className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center hover:bg-muted transition-colors">
+            <button onClick={() => setExpanded(false)} aria-label="طي المشغل" className="w-9 h-9 rounded-xl bg-secondary flex items-center justify-center hover:bg-muted transition-colors">
               <ChevronDown className="w-4 h-4 text-foreground" />
             </button>
             <div className="text-center flex-1 mx-3 min-w-0">
@@ -96,7 +96,7 @@ const MiniPlayer: React.FC = () => {
                 {!isLive && queue.length > 1 ? `${queueIndex + 1} / ${queue.length}` : 'Quran Heart'}
               </p>
             </div>
-            <button onClick={stop} className="w-9 h-9 rounded-xl bg-destructive/10 hover:bg-destructive/20 flex items-center justify-center transition-colors">
+            <button onClick={stop} aria-label="إيقاف التشغيل وإغلاق" className="w-9 h-9 rounded-xl bg-destructive/10 hover:bg-destructive/20 flex items-center justify-center transition-colors">
               <X className="w-4 h-4 text-destructive" />
             </button>
           </div>
@@ -153,19 +153,24 @@ const MiniPlayer: React.FC = () => {
           {/* Main controls */}
           <div className="flex items-center justify-center gap-3 mb-4">
             <button onClick={toggleShuffle}
+              aria-label="تشغيل عشوائي"
+              aria-pressed={shuffle}
               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${shuffle ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:bg-secondary'}`}
               title="عشوائي" disabled={isLive}>
               <Shuffle className="w-4 h-4" />
             </button>
             <button onClick={prev} disabled={!hasPrev || isLive}
+              aria-label="المقطع السابق"
               className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center disabled:opacity-30 hover:bg-muted transition-colors">
               <SkipBack className="w-4 h-4 text-foreground" />
             </button>
             <button onClick={() => seekTo(Math.max(0, progress - 10))} disabled={isLive}
+              aria-label="إرجاع عشر ثوانٍ"
               className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center disabled:opacity-30 text-[10px] text-foreground hover:bg-muted transition-colors">
               -10
             </button>
             <button onClick={isPlaying ? pause : resume}
+              aria-label={isPlaying ? 'إيقاف مؤقت' : 'تشغيل'}
               className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-emerald hover:scale-105 active:scale-95 transition-transform"
               style={{ background: 'var(--grad-primary)' }}>
               {isLoading ? <Loader2 className="w-6 h-6 text-primary-foreground animate-spin" />
@@ -173,14 +178,17 @@ const MiniPlayer: React.FC = () => {
                 : <Play className="w-6 h-6 text-primary-foreground ml-0.5" />}
             </button>
             <button onClick={() => seekTo(Math.min(duration, progress + 10))} disabled={isLive}
+              aria-label="تقديم عشر ثوانٍ"
               className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center disabled:opacity-30 text-[10px] text-foreground hover:bg-muted transition-colors">
               +10
             </button>
             <button onClick={next} disabled={!hasNext || isLive}
+              aria-label="المقطع التالي"
               className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center disabled:opacity-30 hover:bg-muted transition-colors">
               <SkipForward className="w-4 h-4 text-foreground" />
             </button>
             <button onClick={cycleRepeat}
+              aria-label={`تكرار: ${repeatMode === 'off' ? 'متوقف' : repeatMode === 'all' ? 'الكل' : 'مقطع واحد'}`}
               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${repeatMode !== 'off' ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:bg-secondary'}`}
               title="تكرار" disabled={isLive}>
               {repeatMode === 'one' ? <Repeat1 className="w-4 h-4" /> : <Repeat className="w-4 h-4" />}
@@ -189,14 +197,16 @@ const MiniPlayer: React.FC = () => {
 
           {/* Volume + Speed */}
           <div className="flex items-center gap-3 px-1">
-            <button onClick={() => setVolume(volume > 0 ? 0 : 1)} className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0">
+            <button onClick={() => setVolume(volume > 0 ? 0 : 1)} aria-label={volume > 0 ? 'كتم الصوت' : 'إعادة الصوت'} className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0">
               <VolIcon className="w-4 h-4" />
             </button>
-            <Slider value={[volume * 100]} max={100} step={1} onValueChange={([val]) => setVolume(val / 100)} className="flex-1" />
+            <Slider value={[volume * 100]} max={100} step={1} onValueChange={([val]) => setVolume(val / 100)} className="flex-1" aria-label="مستوى الصوت" />
             <span className="text-[10px] text-muted-foreground w-8 text-center tabular-nums">{Math.round(volume * 100)}%</span>
             {!isLive && (
               <div className="relative">
                 <button onClick={() => setShowRate(!showRate)}
+                  aria-label="سرعة التشغيل"
+                  aria-expanded={showRate}
                   className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-colors ${playbackRate !== 1 ? 'bg-accent/15 text-accent' : 'bg-secondary text-foreground'}`}
                   title="سرعة التشغيل">
                   <Gauge className="w-3 h-3" />{playbackRate}×
@@ -216,6 +226,8 @@ const MiniPlayer: React.FC = () => {
             )}
             <div className="relative">
               <button onClick={() => setShowSleep(!showSleep)}
+                aria-label="مؤقّت الإيقاف"
+                aria-expanded={showSleep}
                 className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-colors ${sleepTimerEnd ? 'bg-primary/15 text-primary' : 'bg-secondary text-foreground'}`}
                 title="مؤقّت إيقاف">
                 {sleepTimerEnd ? <Timer className="w-3 h-3" /> : <Moon className="w-3 h-3" />}
@@ -252,6 +264,7 @@ const MiniPlayer: React.FC = () => {
       </div>
       <div className="flex items-center gap-2.5 px-3 py-2 max-w-lg mx-auto">
         <button onClick={isPlaying ? pause : resume}
+          aria-label={isPlaying ? 'إيقاف مؤقت' : 'تشغيل'}
           className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm hover:scale-105 active:scale-95 transition-transform"
           style={{ background: 'var(--grad-primary)' }}>
           {isLoading ? <Loader2 className="w-4 h-4 text-primary-foreground animate-spin" />
@@ -259,7 +272,7 @@ const MiniPlayer: React.FC = () => {
             : isPlaying ? <Pause className="w-4 h-4 text-primary-foreground" />
             : <Play className="w-4 h-4 text-primary-foreground ml-0.5" />}
         </button>
-        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setExpanded(true)}>
+        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setExpanded(true)} role="button" tabIndex={0} aria-label="فتح المشغل الكامل">
           <div className="flex items-center gap-1.5">
             {isLive && <span className="w-1.5 h-1.5 rounded-full bg-destructive live-pulse flex-shrink-0" />}
             <p className="text-xs font-bold text-foreground truncate font-kufi">{currentTrack.title}</p>
@@ -273,14 +286,15 @@ const MiniPlayer: React.FC = () => {
         </div>
         {!isLive && queue.length > 1 && (
           <button onClick={next} disabled={!hasNext}
+            aria-label="المقطع التالي"
             className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center disabled:opacity-30 hover:bg-muted transition-colors">
             <SkipForward className="w-3.5 h-3.5 text-foreground" />
           </button>
         )}
-        <button onClick={() => setExpanded(true)} className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center hover:bg-muted transition-colors">
+        <button onClick={() => setExpanded(true)} aria-label="فتح المشغل الكامل" className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center hover:bg-muted transition-colors">
           <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" />
         </button>
-        <button onClick={stop} className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center hover:bg-destructive/15 transition-colors">
+        <button onClick={stop} aria-label="إيقاف التشغيل" className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center hover:bg-destructive/15 transition-colors">
           <X className="w-3.5 h-3.5 text-muted-foreground" />
         </button>
       </div>
