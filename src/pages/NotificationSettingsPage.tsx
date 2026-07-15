@@ -75,6 +75,12 @@ const NotificationSettingsPage: React.FC = () => {
   const { requestPermission, sendNotification, permission, isSupported } = useNotifications();
   const [previewing, setPreviewing] = useState(false);
   const [granted, setGranted] = useState(permission === 'granted');
+  const [showIosGuide, setShowIosGuide] = useState(false);
+  const [diag, setDiag] = useState<Diagnostics>(() => detectDiagnostics());
+
+  useEffect(() => {
+    setDiag(detectDiagnostics());
+  }, [granted]);
 
   const askPerm = async () => {
     const ok = await requestPermission();
