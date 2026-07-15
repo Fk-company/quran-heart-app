@@ -7,7 +7,7 @@ import {
   Settings, Type, Palette, Mic, RotateCcw, Repeat, Volume2,
   Moon, Sun, Check, Save, BookOpen, Sparkles, LayoutGrid,
   Bell, Download, Upload, Trash2, Share2, HardDrive,
-  ChevronLeft, User2, Star,
+  ChevronLeft, User2, Star, WifiOff, CloudDownload,
 } from 'lucide-react';
 import SEO from '@/components/SEO';
 import PageHeader from '@/components/PageHeader';
