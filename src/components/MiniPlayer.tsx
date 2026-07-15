@@ -153,19 +153,24 @@ const MiniPlayer: React.FC = () => {
           {/* Main controls */}
           <div className="flex items-center justify-center gap-3 mb-4">
             <button onClick={toggleShuffle}
+              aria-label="تشغيل عشوائي"
+              aria-pressed={shuffle}
               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${shuffle ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:bg-secondary'}`}
               title="عشوائي" disabled={isLive}>
               <Shuffle className="w-4 h-4" />
             </button>
             <button onClick={prev} disabled={!hasPrev || isLive}
+              aria-label="المقطع السابق"
               className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center disabled:opacity-30 hover:bg-muted transition-colors">
               <SkipBack className="w-4 h-4 text-foreground" />
             </button>
             <button onClick={() => seekTo(Math.max(0, progress - 10))} disabled={isLive}
+              aria-label="إرجاع عشر ثوانٍ"
               className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center disabled:opacity-30 text-[10px] text-foreground hover:bg-muted transition-colors">
               -10
             </button>
             <button onClick={isPlaying ? pause : resume}
+              aria-label={isPlaying ? 'إيقاف مؤقت' : 'تشغيل'}
               className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-emerald hover:scale-105 active:scale-95 transition-transform"
               style={{ background: 'var(--grad-primary)' }}>
               {isLoading ? <Loader2 className="w-6 h-6 text-primary-foreground animate-spin" />
@@ -173,14 +178,17 @@ const MiniPlayer: React.FC = () => {
                 : <Play className="w-6 h-6 text-primary-foreground ml-0.5" />}
             </button>
             <button onClick={() => seekTo(Math.min(duration, progress + 10))} disabled={isLive}
+              aria-label="تقديم عشر ثوانٍ"
               className="w-10 h-10 rounded-xl bg-secondary flex items-center justify-center disabled:opacity-30 text-[10px] text-foreground hover:bg-muted transition-colors">
               +10
             </button>
             <button onClick={next} disabled={!hasNext || isLive}
+              aria-label="المقطع التالي"
               className="w-11 h-11 rounded-xl bg-secondary flex items-center justify-center disabled:opacity-30 hover:bg-muted transition-colors">
               <SkipForward className="w-4 h-4 text-foreground" />
             </button>
             <button onClick={cycleRepeat}
+              aria-label={`تكرار: ${repeatMode === 'off' ? 'متوقف' : repeatMode === 'all' ? 'الكل' : 'مقطع واحد'}`}
               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${repeatMode !== 'off' ? 'bg-primary/15 text-primary' : 'text-muted-foreground hover:bg-secondary'}`}
               title="تكرار" disabled={isLive}>
               {repeatMode === 'one' ? <Repeat1 className="w-4 h-4" /> : <Repeat className="w-4 h-4" />}
