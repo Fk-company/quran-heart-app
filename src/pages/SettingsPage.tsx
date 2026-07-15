@@ -232,6 +232,42 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  const handleDownloadOffline = async () => {
+    if (!('serviceWorker' in navigator)) {
+      toast.error('المتصفح لا يدعم العمل بدون إنترنت');
+      return;
+    }
+    const reg = await navigator.serviceWorker.ready.catch(() => null);
+    const target = reg?.active || navigator.serviceWorker.controller;
+    if (!target) {
+      toast.error('لم يتم تفعيل العمل دون اتصال بعد — أعد فتح التطبيق ثم حاول');
+      return;
+    }
+    // Full Quran text (114 surahs) via AlQuran Cloud + a light tafsir edition.
+    const urls: string[] = [];
+    for (let i = 1; i <= 114; i++) {
+      urls.push(`https://api.alquran.cloud/v1/surah/${i}/quran-uthmani`);
+    }
+    const total = urls.length;
+    setOfflineDownloading(true);
+    setOfflineProgress({ done: 0, total });
+
+    const onMsg = (event: MessageEvent) => {
+      const msg = event.data || {};
+      if (msg.type === 'PRECACHE_PROGRESS') {
+        setOfflineProgress({ done: msg.done, total: msg.total });
+      } else if (msg.type === 'PRECACHE_DONE') {
+        setOfflineProgress({ done: msg.done, total: msg.total });
+        setOfflineDownloading(false);
+        toast.success(`تم تحميل ${msg.done} سورة للاستخدام دون إنترنت`);
+        navigator.serviceWorker.removeEventListener('message', onMsg);
+      }
+    };
+    navigator.serviceWorker.addEventListener('message', onMsg);
+    target.postMessage({ type: 'PRECACHE_URLS', urls });
+    toast('جاري التحميل…', { description: 'يمكنك متابعة استخدام التطبيق' });
+  };
+
   // -- render ----------------------------------------------------------------
 
   return (
