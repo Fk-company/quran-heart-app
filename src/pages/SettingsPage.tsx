@@ -124,6 +124,8 @@ const SettingsPage: React.FC = () => {
   const [tab, setTab] = useState<string>(() => localStorage.getItem('settings_tab') || 'general');
   const [navIds, setNavIdsState] = useState<string[]>(getNavIds);
   const [storageBytes, setStorageBytes] = useState(0);
+  const [offlineDownloading, setOfflineDownloading] = useState(false);
+  const [offlineProgress, setOfflineProgress] = useState({ done: 0, total: 0 });
   const importRef = useRef<HTMLInputElement>(null);
 
   const currentReciter = useMemo(
