@@ -542,6 +542,36 @@ const SettingsPage: React.FC = () => {
 
             {/* MORE ------------------------------------------------------ */}
             <TabsContent value="more" className="space-y-3 mt-0">
+              <SectionCard icon={WifiOff} title="العمل دون اتصال" hint="حمّل المحتوى للاستخدام بدون إنترنت" tone="accent">
+                <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+                  التطبيق يعمل دون اتصال تلقائياً بعد أول زيارة. لتخزين نصوص المصحف الكامل مسبقاً واستخدامه في أي وقت، اضغط زر التحميل أدناه.
+                </p>
+                {offlineDownloading && offlineProgress.total > 0 && (
+                  <div className="mb-3">
+                    <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                      <div
+                        className="h-full bg-primary transition-all duration-300"
+                        style={{ width: `${(offlineProgress.done / offlineProgress.total) * 100}%` }}
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground text-center mt-1">
+                      {offlineProgress.done} / {offlineProgress.total} سورة
+                    </p>
+                  </div>
+                )}
+                <button
+                  onClick={handleDownloadOffline}
+                  disabled={offlineDownloading}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  <CloudDownload className="w-4 h-4" />
+                  {offlineDownloading ? 'جاري التحميل…' : 'تحميل المصحف كامل للاستخدام دون إنترنت'}
+                </button>
+                <p className="text-[10px] text-muted-foreground text-center mt-2">
+                  الحجم التقريبي 5–8 ميجابايت • يُخزَّن على جهازك فقط
+                </p>
+              </SectionCard>
+
               <SectionCard icon={HardDrive} title="التخزين والبيانات" hint="النسخ الاحتياطي وذاكرة التطبيق">
                 <div className="flex items-center gap-3 mb-3 p-3 rounded-xl bg-secondary/40">
                   <HardDrive className="w-5 h-5 text-primary" />
