@@ -1,9 +1,65 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import SEO from '@/components/SEO';
-import { Bell, BellOff, Volume2, VolumeX, Clock, Moon, Mic, Repeat, Play, Square, CheckCircle2 } from 'lucide-react';
+import { Bell, BellOff, Volume2, VolumeX, Clock, Moon, Mic, Repeat, Play, Square, CheckCircle2, AlertTriangle, Smartphone, Share2, PlusSquare, Info, ShieldCheck, XCircle, Apple } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import { useNotificationSettings, MUEZZINS, playAdhan, stopAdhan } from '@/hooks/useNotificationSettings';
 import { useNotifications } from '@/hooks/useNotifications';
+
+type DiagStatus = 'ok' | 'warn' | 'error' | 'info';
+
+interface Diagnostics {
+  isIOS: boolean;
+  isSafari: boolean;
+  isStandalone: boolean;
+  iosVersion: number | null;
+  swSupported: boolean;
+  notifSupported: boolean;
+  timestampTrigger: boolean;
+  periodicSync: boolean;
+  permission: NotificationPermission | 'unsupported';
+}
+
+function detectDiagnostics(): Diagnostics {
+  if (typeof window === 'undefined') {
+    return {
+      isIOS: false, isSafari: false, isStandalone: false, iosVersion: null,
+      swSupported: false, notifSupported: false, timestampTrigger: false,
+      periodicSync: false, permission: 'unsupported',
+    };
+  }
+  const ua = navigator.userAgent || '';
+  const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && (navigator as any).maxTouchPoints > 1);
+  const isSafari = /^((?!chrome|android|crios|fxios|edgios).)*safari/i.test(ua);
+  const isStandalone = window.matchMedia?.('(display-mode: standalone)').matches || (navigator as any).standalone === true;
+  const iosMatch = ua.match(/OS (\d+)_/);
+  const iosVersion = iosMatch ? parseInt(iosMatch[1], 10) : null;
+  const swSupported = 'serviceWorker' in navigator;
+  const notifSupported = 'Notification' in window;
+  const timestampTrigger = typeof window !== 'undefined' && 'TimestampTrigger' in window;
+  const periodicSync = swSupported && 'periodicSync' in (ServiceWorkerRegistration.prototype || {});
+  const permission = notifSupported ? Notification.permission : 'unsupported';
+  return { isIOS, isSafari, isStandalone, iosVersion, swSupported, notifSupported, timestampTrigger, periodicSync, permission };
+}
+
+const StatusRow: React.FC<{ icon: React.ElementType; label: string; value: string; status: DiagStatus }> = ({ icon: Icon, label, value, status }) => {
+  const colors: Record<DiagStatus, string> = {
+    ok: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/30',
+    warn: 'text-amber-500 bg-amber-500/10 border-amber-500/30',
+    error: 'text-rose-500 bg-rose-500/10 border-rose-500/30',
+    info: 'text-sky-500 bg-sky-500/10 border-sky-500/30',
+  };
+  return (
+    <div className="flex items-center gap-3 py-2">
+      <div className={`w-9 h-9 rounded-xl border flex items-center justify-center ${colors[status]}`}>
+        <Icon className="w-4 h-4" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-bold text-foreground truncate">{label}</p>
+        <p className="text-[11px] text-muted-foreground truncate">{value}</p>
+      </div>
+    </div>
+  );
+};
 
 const Toggle: React.FC<{ checked: boolean; onChange: (v: boolean) => void }> = ({ checked, onChange }) => (
   <button
