@@ -610,6 +610,56 @@ const SettingsPage: React.FC = () => {
                 </p>
               </SectionCard>
 
+              <SectionCard icon={BookOpen} title="تنزيل التفسير كاملاً" hint="لقراءة التفسير دون إنترنت">
+                <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+                  اختر إصدار التفسير الذي تريد تخزينه على جهازك، وسيتم تحميل تفسير جميع سور القرآن الكريم للاستخدام لاحقاً بدون اتصال.
+                </p>
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  {[
+                    { id: 'ar.muyassar', name: 'التفسير الميسر' },
+                    { id: 'ar.jalalayn', name: 'تفسير الجلالين' },
+                  ].map((ed) => (
+                    <button
+                      key={ed.id}
+                      onClick={() => setTafsirEdition(ed.id)}
+                      disabled={tafsirDownloading}
+                      className={`p-2.5 rounded-xl border text-xs font-medium transition-all ${
+                        tafsirEdition === ed.id
+                          ? 'border-primary bg-primary/10 text-primary ring-2 ring-primary/20'
+                          : 'border-border bg-secondary/30 text-foreground hover:bg-secondary'
+                      } disabled:opacity-60`}
+                    >
+                      {ed.name}
+                    </button>
+                  ))}
+                </div>
+                {tafsirDownloading && tafsirProgress.total > 0 && (
+                  <div className="mb-3">
+                    <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                      <div
+                        className="h-full bg-primary transition-all duration-300"
+                        style={{ width: `${(tafsirProgress.done / tafsirProgress.total) * 100}%` }}
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground text-center mt-1">
+                      {tafsirProgress.done} / {tafsirProgress.total} سورة
+                    </p>
+                  </div>
+                )}
+                <button
+                  onClick={handleDownloadTafsir}
+                  disabled={tafsirDownloading}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-accent/10 text-accent text-xs font-semibold hover:bg-accent/20 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  <CloudDownload className="w-4 h-4" />
+                  {tafsirDownloading ? 'جاري تحميل التفسير…' : 'تحميل التفسير كاملاً'}
+                </button>
+                <p className="text-[10px] text-muted-foreground text-center mt-2">
+                  الحجم التقريبي 8–15 ميجابايت • يُخزَّن محلياً على جهازك
+                </p>
+              </SectionCard>
+
+
               <SectionCard icon={HardDrive} title="التخزين والبيانات" hint="النسخ الاحتياطي وذاكرة التطبيق">
                 <div className="flex items-center gap-3 mb-3 p-3 rounded-xl bg-secondary/40">
                   <HardDrive className="w-5 h-5 text-primary" />
