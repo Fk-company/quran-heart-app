@@ -271,6 +271,41 @@ const SettingsPage: React.FC = () => {
     toast('جاري التحميل…', { description: 'يمكنك متابعة استخدام التطبيق' });
   };
 
+  const handleDownloadTafsir = async () => {
+    if (!('serviceWorker' in navigator)) {
+      toast.error('المتصفح لا يدعم العمل بدون إنترنت');
+      return;
+    }
+    const reg = await navigator.serviceWorker.ready.catch(() => null);
+    const target = reg?.active || navigator.serviceWorker.controller;
+    if (!target) {
+      toast.error('لم يتم تفعيل العمل دون اتصال بعد — أعد فتح التطبيق ثم حاول');
+      return;
+    }
+    const urls: string[] = [];
+    for (let i = 1; i <= 114; i++) {
+      urls.push(`https://api.alquran.cloud/v1/surah/${i}/${tafsirEdition}`);
+    }
+    const total = urls.length;
+    setTafsirDownloading(true);
+    setTafsirProgress({ done: 0, total });
+
+    const onMsg = (event: MessageEvent) => {
+      const msg = event.data || {};
+      if (msg.type === 'PRECACHE_PROGRESS') {
+        setTafsirProgress({ done: msg.done, total: msg.total });
+      } else if (msg.type === 'PRECACHE_DONE') {
+        setTafsirProgress({ done: msg.done, total: msg.total });
+        setTafsirDownloading(false);
+        toast.success(`تم تحميل التفسير كاملاً (${msg.done} سورة)`);
+        navigator.serviceWorker.removeEventListener('message', onMsg);
+      }
+    };
+    navigator.serviceWorker.addEventListener('message', onMsg);
+    target.postMessage({ type: 'PRECACHE_URLS', urls });
+    toast('جاري تحميل التفسير…', { description: 'قد يستغرق دقيقة حسب سرعة الإنترنت' });
+  };
+
   // -- render ----------------------------------------------------------------
 
   return (
